@@ -132,8 +132,9 @@ uses the login's own chart at the clinic. Any other chart gets `404`.
 | `DELETE /patient/care` | `204`. A caregiver stops looking after the person chosen with `?patient=` |
 | `GET /patient/clinics` | `{ clinics: [{ id, name, patientId, self, personName }] }`: one row per chart this login may act on; a clinic shows twice when the login has its own chart there and looks after somebody else's |
 | `POST /patient/clinics` | `{ code, confirmedPatientId }` → `201 { clinic: { id, name }, patientId }`. **Add a clinic:** redeems an activation code (after `POST /activation/preview`) and links that chart to this login: as its own, or, for a caregiver code, as somebody it looks after. Open to any signed-in account. `422` for an invalid code, a clinic already linked (own codes only) or a code that now opens a different chart |
-| `GET /patient/appointments` | `{ upcoming[], past[], cancelHours }`. `upcoming`: visits still ahead, plus today's that aren't over yet (pending, confirmed, checked in or in consultation), even past their start time; `past`: the rest. Each `{ id, scheduledAt, durationMinutes, service, serviceLabel, reason, status, statusLabel, visitType, doctor, doctorId }`; upcoming ones also `{ canCancel, cancelBy, canMove, movePending }`; completed past ones also `{ feedback: { score, tags[], note } \| null, canRate, doctorFaved }` (this login's rating; `canRate` for 14 days after the visit) |
+| `GET /patient/appointments` | `{ upcoming[], past[], cancelHours }`. `upcoming`: visits still ahead, plus today's that aren't over yet (pending, confirmed, checked in or in consultation), even past their start time; `past`: the rest. Each `{ id, scheduledAt, durationMinutes, service, serviceLabel, reason, status, statusLabel, visitType, doctor, doctorId }`; upcoming ones also `{ canCancel, cancelBy, canMove, movePending, confirmedAt, canConfirm }` (`confirmedAt`: when the patient said "I'll be there", or null; `canConfirm`: not yet said, pending or confirmed, from the start of the day before the visit until its time); completed past ones also `{ feedback: { score, tags[], note } \| null, canRate, doctorFaved }` (this login's rating; `canRate` for 14 days after the visit) |
 | `POST /patient/appointments/:id/cancel` | Cancels the patient's own visit, up to the clinic's cut-off (`cancelHours` before it) → `{ id, status: "CANCELLED" }`; `409` with what to do instead when it's too late |
+| `POST /patient/appointments/:id/confirm` | "I'll be there" → `{ id, confirmedAt }`. Not the `CONFIRMED` status, which is the clinic accepting the booking. Only while `canConfirm`; sending it again returns the first `confirmedAt`; `409` otherwise. The clinic sees it on the desk and the doctor's day; a new time from the clinic clears it |
 | `GET /patient/after-visit` | `{ visit: { id, scheduledAt, serviceLabel, doctor: { id, fullName }, faved } \| null }`: the latest completed visit of this person in the last 14 days that this login hasn't given feedback on or closed, for the "How was your visit?" card |
 | `POST /patient/appointments/:id/feedback` | `{ score?: 1–5, tags?: string[], note? }` → `{ id, saved: true }`. Only the clinic sees it. `tags`: `LISTENED`, `EXPLAINED`, `ON_TIME`, `FRIENDLY`, `CLEAN`, `LONG_WAIT`, `RUSHED`, `UNCLEAR`, `UNFRIENDLY`, `COST`. Without `score`, records the sheet as closed. Completed visits only (`409` otherwise); sending again replaces it |
 | `GET /patient/requests` | `{ requests[] }`, each `{ id, preferredDate, preferredTime, service, serviceLabel, reason, status, decisionNote, createdAt, rescheduleOf, rescheduleFrom, doctor: { id, fullName } }`; `rescheduleOf` / `rescheduleFrom`: for a move, the visit and its current time |
@@ -160,11 +161,12 @@ An appointment is always this shape:
 
 ```
 { id, scheduledAt, durationMinutes, service, serviceLabel, reason, status, statusLabel,
-  source, arrivedAt, consultationStartedAt, patient: { id, fullName },
+  source, arrivedAt, consultationStartedAt, patientConfirmedAt, patient: { id, fullName },
   nextStatuses: [{ status, label }] }
 ```
 
-`nextStatuses` lists the only moves the status endpoint will accept from where
+`patientConfirmedAt` is when the patient said "I'll be there" from the app,
+or null. `nextStatuses` lists the only moves the status endpoint will accept from where
 the visit is now.
 
 | | |

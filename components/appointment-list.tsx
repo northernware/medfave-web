@@ -26,6 +26,8 @@ export type AppointmentListItem = {
   status: AppointmentStatus;
   priority: VisitPriority;
   visitType: AppointmentType;
+  /** When the patient said "I'll be there" from the app. */
+  patientConfirmedAt?: Date | null;
   patient: {
     id: string;
     firstName: string;

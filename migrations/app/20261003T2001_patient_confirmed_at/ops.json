@@ -1,0 +1,44 @@
+[
+  {
+    "id": "column.public.Appointment.patientConfirmedAt",
+    "label": "Add column \"patientConfirmedAt\" to \"Appointment\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "patientConfirmedAt",
+        "table": "Appointment"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"patientConfirmedAt\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Appointment",
+          "patientConfirmedAt"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"patientConfirmedAt\"",
+        "sql": "ALTER TABLE \"public\".\"Appointment\" ADD COLUMN \"patientConfirmedAt\" timestamp(3)"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"patientConfirmedAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Appointment",
+          "patientConfirmedAt"
+        ]
+      }
+    ]
+  }
+]

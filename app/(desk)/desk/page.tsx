@@ -63,7 +63,7 @@ export default async function DeskPage({ searchParams }: PageProps<"/desk">) {
 
   const visitsBetween = (from: Date, to: Date) =>
     orm.Appointment
-      .select("id", "scheduledAt", "durationMinutes", "service", "reason", "status")
+      .select("id", "scheduledAt", "durationMinutes", "service", "reason", "status", "patientConfirmedAt")
       .include("patient", (p) => p.select("id", "firstName", "middleName", "lastName", "contactNumber"))
       .include("doctor", (d) => d.select("id", "fullName"))
       .where((a) => a.clinicId.eq(staff.clinicId))
@@ -103,8 +103,13 @@ export default async function DeskPage({ searchParams }: PageProps<"/desk">) {
       .aggregate((agg) => ({ n: agg.count() })),
   ]);
 
-  const todays = todaysRows.map((a) => ({ ...a, scheduledAt: instantFromDb(a.scheduledAt) }));
-  const railItems = railRows ? railRows.map((a) => ({ ...a, scheduledAt: instantFromDb(a.scheduledAt) })) : todays;
+  const toItem = (a: (typeof todaysRows)[number]) => ({
+    ...a,
+    scheduledAt: instantFromDb(a.scheduledAt),
+    patientConfirmedAt: a.patientConfirmedAt ? instantFromDb(a.patientConfirmedAt) : null,
+  });
+  const todays = todaysRows.map(toItem);
+  const railItems = railRows ? railRows.map(toItem) : todays;
   const busyDays = [...new Set(weekRows.map((a) => dayKey(instantFromDb(a.scheduledAt))))];
   const queue = queueRows
     .map((a) => ({
@@ -242,7 +247,13 @@ export default async function DeskPage({ searchParams }: PageProps<"/desk">) {
               <li key={a.id} className="flex flex-wrap items-center gap-3 py-2.5">
                 <span className="tabular w-16 shrink-0 text-sm font-medium">{formatTime(a.scheduledAt)}</span>
                 <Link href={`/desk/appointments/${a.id}`} className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-semibold">{fullName(a.patient)}</span>
+                  <span className="block truncate text-sm font-semibold">
+                    {fullName(a.patient)}
+                    {/* Said "I'll be there" in the app: one less number to ring. */}
+                    {a.patientConfirmedAt && (a.status === "PENDING" || a.status === "CONFIRMED") ? (
+                      <span className="ml-1.5 text-xs font-normal text-ok-ink">Coming</span>
+                    ) : null}
+                  </span>
                   <span className="block truncate text-xs text-ink-muted">
                     {a.doctor.fullName} · {a.reason}
                     {a.patient.contactNumber ? ` · ${a.patient.contactNumber}` : ""}

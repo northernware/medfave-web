@@ -72,11 +72,13 @@ export async function updateAppointment(
     if (clash) return { clash };
 
     const now = instantToDb(new Date());
+    const moved = resolved.scheduledAt.getTime() !== instantFromDb(owned.scheduledAt).getTime();
     await tx.orm.public.Appointment
       .where((a) => a.id.eq(appointmentId))
-      .update({ ...resolved.data, updatedAt: now });
+      // The patient's "I'll be there" was for the old time.
+      .update({ ...resolved.data, ...(moved ? { patientConfirmedAt: null } : {}), updatedAt: now });
     // A new time goes in the visit's history, with the one it had before.
-    if (resolved.scheduledAt.getTime() !== instantFromDb(owned.scheduledAt).getTime()) {
+    if (moved) {
       await tx.orm.public.AppointmentEvent.create({
         id: newId(),
         appointmentId,

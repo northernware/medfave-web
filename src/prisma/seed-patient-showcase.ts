@@ -9,6 +9,7 @@ import { calendarDateToDb, dayKey, fromDateTimeLocalValue, instantToDb } from ".
  * demo patient (patient@medfave.com, Ramon Dela Cruz, Northern Family Clinic):
  *
  *  - two documents shared with him (Documents, and "From your clinic" on Home)
+ *  - a visit tomorrow, not yet said "I'll be there" to (the confirm buttons)
  *  - a visit booked but not yet confirmed ("Pending" badge)
  *  - a visit with a move he asked for ("Move requested")
  *  - a request the clinic declined, with a note ("From the clinic: …")
@@ -45,12 +46,12 @@ async function main() {
   const doctor = await orm.Doctor.select("id", "accountId").where((d) => d.clinicId.eq(chart.clinicId)).where((d) => d.fullName.eq("Dr. Ana Reyes")).first();
   if (!doctor?.accountId) throw new Error("No Dr. Ana Reyes at the demo clinic.");
 
-  // Out with the last run's rows.
-  await orm.AppointmentRequest.where((r) => r.id.like("showcase-%")).delete();
-  await orm.Appointment.where((a) => a.id.like("showcase-%")).delete();
-  await orm.DocumentRequest.where((d) => d.id.like("showcase-%")).delete();
-  await orm.CareLink.where((c) => c.id.like("showcase-%")).delete();
-  await orm.Fave.where((f) => f.id.like("showcase-%")).delete();
+  // Out with the last run's rows. `deleteAndCount`, not `delete`: that removes one row.
+  await orm.AppointmentRequest.where((r) => r.id.like("showcase-%")).deleteAndCount();
+  await orm.Appointment.where((a) => a.id.like("showcase-%")).deleteAndCount();
+  await orm.DocumentRequest.where((d) => d.id.like("showcase-%")).deleteAndCount();
+  await orm.CareLink.where((c) => c.id.like("showcase-%")).deleteAndCount();
+  await orm.Fave.where((f) => f.id.like("showcase-%")).deleteAndCount();
 
   const now = instantToDb(new Date());
   const base = { clinicId: chart.clinicId, patientId: chart.id, doctorId: doctor.id, createdAt: now, updatedAt: now };
@@ -99,6 +100,17 @@ async function main() {
     releasedById: doctor.id,
     releasedTo: "Ramon Dela Cruz",
   });
+
+  // Tomorrow: inside the window to say "I'll be there" or ask to move it.
+  await orm.Appointment.create({
+    ...base,
+    id: id("tomorrow-visit"),
+    scheduledAt: at(1, 9, 30).at,
+    durationMinutes: 30,
+    service: "GENERAL_CONSULTATION",
+    reason: "Cough for a week",
+    status: "CONFIRMED",
+  } as Parameters<typeof orm.Appointment.create>[0]);
 
   // Booked, not yet confirmed.
   await orm.Appointment.create({

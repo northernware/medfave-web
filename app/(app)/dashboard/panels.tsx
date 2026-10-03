@@ -258,6 +258,8 @@ export function LastVisitDetails({ visit, doctorName }: { visit: LastVisit | nul
 type RailItem = Pick<AppointmentListItem, "id" | "scheduledAt" | "durationMinutes" | "service" | "status"> & {
   patient: { firstName: string; middleName: string | null; lastName: string };
   reason?: string | null;
+  /** The patient said "I'll be there" from the app. */
+  patientConfirmedAt?: Date | null;
   /** Shown on the desk, where the day has every doctor's visits. */
   doctor?: { fullName: string };
 };
@@ -476,6 +478,9 @@ export function ScheduleRail({
                   <span className="flex items-center gap-1.5 text-[11px] leading-4 font-medium text-ink-muted">
                     <span aria-hidden className={`size-1.5 rounded-full ${STATUS_DOT[a.status]}`} />
                     {APPOINTMENT_STATUS_LABELS[a.status]}
+                    {a.patientConfirmedAt && (a.status === "PENDING" || a.status === "CONFIRMED") ? (
+                      <span className="text-ok-ink" title="The patient said they'll be there">· Coming</span>
+                    ) : null}
                   </span>
                   {action}
                 </div>

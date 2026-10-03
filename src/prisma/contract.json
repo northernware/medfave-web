@@ -823,6 +823,16 @@
                   "kind": "scalar"
                 }
               },
+              "patientConfirmedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamp-string@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
               "patientId": {
                 "nullable": false,
                 "type": {
@@ -1146,6 +1156,9 @@
                 },
                 "notes": {
                   "column": "notes"
+                },
+                "patientConfirmedAt": {
+                  "column": "patientConfirmedAt"
                 },
                 "patientId": {
                   "column": "patientId"
@@ -7338,6 +7351,14 @@
                   "nativeType": "text",
                   "nullable": true
                 },
+                "patientConfirmedAt": {
+                  "codecId": "pg/timestamp-string@1",
+                  "nativeType": "timestamp",
+                  "nullable": true,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
                 "patientId": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
@@ -12503,7 +12524,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "db5065a364bcc03314531fde6adda919a531c985214eea7b0752035425cdd9be"
+    "storageHash": "bb5b4857a5bcfff9b00d9217c175411a5b1b2a711c33b007fcf1eabac01cc9d1"
   },
   "capabilities": {
     "postgres": {

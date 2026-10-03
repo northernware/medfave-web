@@ -227,6 +227,11 @@ namespace public {
     /// IN_CONSULTATION. Waiting time is arrival to this, so it stops climbing
     /// once the patient is in the room instead of running until check-out.
     consultationStartedAt      TimestampString(3)?
+    /// When the patient said "I'll be there", from the app, in the day before
+    /// the visit. Not the CONFIRMED status, which is the clinic accepting the
+    /// booking. Cleared when the clinic gives the visit a new time, since the
+    /// patient agreed to the old one.
+    patientConfirmedAt         TimestampString(3)?
     doctor                     Doctor                      @relation(fields: [doctorId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "Appointment_doctorId_fkey", index: false)
     clinic                     Clinic                      @relation(fields: [clinicId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "Appointment_clinicId_fkey")
     bookedBy                   Account?                    @relation(name: "Appointment_bookedById_fkey", fields: [bookedById], references: [id], onDelete: SetNull, onUpdate: Cascade, map: "Appointment_bookedById_fkey")

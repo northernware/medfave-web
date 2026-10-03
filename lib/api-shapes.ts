@@ -21,6 +21,7 @@ export type AppointmentRow = {
   source: BookingSource;
   arrivedAt: string | null;
   consultationStartedAt: string | null;
+  patientConfirmedAt: string | null;
   patient: Name & { id: string };
 };
 
@@ -35,6 +36,7 @@ export const APPOINTMENT_COLUMNS = [
   "source",
   "arrivedAt",
   "consultationStartedAt",
+  "patientConfirmedAt",
 ] as const;
 
 export function shapeAppointment(a: AppointmentRow) {
@@ -50,6 +52,8 @@ export function shapeAppointment(a: AppointmentRow) {
     source: a.source,
     arrivedAt: a.arrivedAt ? instantFromDb(a.arrivedAt).toISOString() : null,
     consultationStartedAt: a.consultationStartedAt ? instantFromDb(a.consultationStartedAt).toISOString() : null,
+    /** When the patient said "I'll be there" from the app, or null. */
+    patientConfirmedAt: a.patientConfirmedAt ? instantFromDb(a.patientConfirmedAt).toISOString() : null,
     patient: { id: a.patient.id, fullName: fullName(a.patient) },
     /** Where this visit may move next — the only statuses the status endpoint will accept. */
     nextStatuses: movesFrom(a.status, isClinicToday(a.scheduledAt)).map((s) => ({ status: s, label: APPOINTMENT_STATUS_LABELS[s] })),

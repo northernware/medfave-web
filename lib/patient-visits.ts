@@ -2,7 +2,7 @@ import "server-only";
 import { newId } from "@/lib/ids";
 import { revalidatePath } from "next/cache";
 import { orm } from "@/src/prisma/db";
-import { formatDateTime, instantFromDb, instantToDb } from "@/lib/datetime";
+import { clinicDayRange, formatDateTime, instantFromDb, instantToDb } from "@/lib/datetime";
 
 /*
  * A patient's own changes to a visit they already have, shared by the app's
@@ -79,6 +79,49 @@ export async function cancelByPatient(
   revalidatePath("/dashboard");
   revalidatePath("/portal");
   return { ok: true };
+}
+
+/**
+ * When the patient may say "I'll be there": from the start of the clinic day
+ * before the visit until its time. Earlier, the answer means little; later,
+ * they are either here or late. The clinic's zone has no daylight saving, so
+ * a day is 24 hours.
+ */
+export function confirmWindow(scheduledAt: Date) {
+  return { from: new Date(clinicDayRange(scheduledAt).start.getTime() - 86_400_000), until: scheduledAt };
+}
+
+export function canConfirm(visit: { status: string; scheduledAt: Date; patientConfirmedAt: Date | null }, now = new Date()) {
+  if (visit.patientConfirmedAt || !(CHANGEABLE as readonly string[]).includes(visit.status)) return false;
+  const { from, until } = confirmWindow(visit.scheduledAt);
+  return now >= from && now < until;
+}
+
+/**
+ * The patient saying they will come to a visit. Theirs only, booked and not
+ * started, inside the confirm window. Saying it twice is fine: the first time
+ * stands.
+ */
+export async function confirmByPatient(
+  patient: { patientId: string },
+  appointmentId: string,
+): Promise<{ ok: true; confirmedAt: Date } | { ok: false; status: number; message: string }> {
+  const visit = await orm.Appointment
+    .select("id", "status", "scheduledAt", "patientConfirmedAt")
+    .where((a) => a.id.eq(appointmentId))
+    .where((a) => a.patientId.eq(patient.patientId))
+    .first();
+  if (!visit) return { ok: false, status: 404, message: "Visit not found." };
+  if (visit.patientConfirmedAt) return { ok: true, confirmedAt: instantFromDb(visit.patientConfirmedAt) };
+  const shaped = { status: visit.status, scheduledAt: instantFromDb(visit.scheduledAt), patientConfirmedAt: null };
+  if (!canConfirm(shaped)) {
+    return { ok: false, status: 409, message: "This visit can't be confirmed now." };
+  }
+  const now = new Date();
+  await orm.Appointment.where((a) => a.id.eq(appointmentId)).update({ patientConfirmedAt: instantToDb(now) });
+  revalidatePath("/desk");
+  revalidatePath("/dashboard");
+  return { ok: true, confirmedAt: now };
 }
 
 /** For move requests: when each visit being moved is now, by its id. */

@@ -38,6 +38,7 @@ export function appointmentListQuery() {
       // so a list that hides them makes the reader open each one to find out.
       "priority",
       "visitType",
+      "patientConfirmedAt",
     )
     .include("patient", (p) =>
       p
@@ -51,7 +52,11 @@ export function appointmentListQuery() {
 export function toAppointmentListItem(
   row: Awaited<ReturnType<ReturnType<typeof appointmentListQuery>["all"]>>[number],
 ): AppointmentListItem {
-  return { ...row, scheduledAt: instantFromDb(row.scheduledAt) };
+  return {
+    ...row,
+    scheduledAt: instantFromDb(row.scheduledAt),
+    patientConfirmedAt: row.patientConfirmedAt ? instantFromDb(row.patientConfirmedAt) : null,
+  };
 }
 
 /** Every patient this doctor can book, ready for a grouped <select>. */

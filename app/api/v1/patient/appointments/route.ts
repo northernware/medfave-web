@@ -1,7 +1,7 @@
 import { apiPatient } from "@/lib/api";
 import { clinicDayRange, instantFromDb, instantToDb } from "@/lib/datetime";
 import { APPOINTMENT_STATUS_LABELS, SERVICE_LABELS } from "@/lib/domain";
-import { cancelBy, cancelCutoffHours, CHANGEABLE } from "@/lib/patient-visits";
+import { cancelBy, cancelCutoffHours, canConfirm, CHANGEABLE } from "@/lib/patient-visits";
 import { orm } from "@/src/prisma/db";
 
 /** How long after a visit it can still be rated or the rating changed. As lib/faves.ts. */
@@ -23,7 +23,7 @@ export async function GET(request: Request) {
 
   const [ahead, before] = await Promise.all([
     orm.Appointment
-      .select("id", "scheduledAt", "durationMinutes", "service", "reason", "status", "visitType")
+      .select("id", "scheduledAt", "durationMinutes", "service", "reason", "status", "visitType", "patientConfirmedAt")
       .include("doctor", (d) => d.select("id", "fullName"))
       .where((a) => a.patientId.eq(me.patientId))
       .where((a) => a.scheduledAt.gte(now))
@@ -31,7 +31,7 @@ export async function GET(request: Request) {
       .limit(50)
       .all(),
     orm.Appointment
-      .select("id", "scheduledAt", "durationMinutes", "service", "reason", "status", "visitType")
+      .select("id", "scheduledAt", "durationMinutes", "service", "reason", "status", "visitType", "patientConfirmedAt")
       .include("doctor", (d) => d.select("id", "fullName"))
       .where((a) => a.patientId.eq(me.patientId))
       .where((a) => a.scheduledAt.lt(now))
@@ -81,6 +81,13 @@ export async function GET(request: Request) {
       // Not once its time has come: today's late-running visit can't be moved from here.
       canMove: changeable(a) && !moving.has(a.id) && instantFromDb(a.scheduledAt).getTime() > Date.now(),
       movePending: moving.has(a.id),
+      // "I'll be there", from the day before (lib/patient-visits.ts).
+      confirmedAt: a.patientConfirmedAt ? instantFromDb(a.patientConfirmedAt).toISOString() : null,
+      canConfirm: canConfirm({
+        status: a.status,
+        scheduledAt: instantFromDb(a.scheduledAt),
+        patientConfirmedAt: a.patientConfirmedAt ? instantFromDb(a.patientConfirmedAt) : null,
+      }),
     };
   };
 

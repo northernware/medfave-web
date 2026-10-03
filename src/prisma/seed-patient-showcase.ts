@@ -46,12 +46,12 @@ async function main() {
   const doctor = await orm.Doctor.select("id", "accountId").where((d) => d.clinicId.eq(chart.clinicId)).where((d) => d.fullName.eq("Dr. Ana Reyes")).first();
   if (!doctor?.accountId) throw new Error("No Dr. Ana Reyes at the demo clinic.");
 
-  // Out with the last run's rows.
-  await orm.AppointmentRequest.where((r) => r.id.like("showcase-%")).delete();
-  await orm.Appointment.where((a) => a.id.like("showcase-%")).delete();
-  await orm.DocumentRequest.where((d) => d.id.like("showcase-%")).delete();
-  await orm.CareLink.where((c) => c.id.like("showcase-%")).delete();
-  await orm.Fave.where((f) => f.id.like("showcase-%")).delete();
+  // Out with the last run's rows. `deleteAndCount`, not `delete`: that removes one row.
+  await orm.AppointmentRequest.where((r) => r.id.like("showcase-%")).deleteAndCount();
+  await orm.Appointment.where((a) => a.id.like("showcase-%")).deleteAndCount();
+  await orm.DocumentRequest.where((d) => d.id.like("showcase-%")).deleteAndCount();
+  await orm.CareLink.where((c) => c.id.like("showcase-%")).deleteAndCount();
+  await orm.Fave.where((f) => f.id.like("showcase-%")).deleteAndCount();
 
   const now = instantToDb(new Date());
   const base = { clinicId: chart.clinicId, patientId: chart.id, doctorId: doctor.id, createdAt: now, updatedAt: now };

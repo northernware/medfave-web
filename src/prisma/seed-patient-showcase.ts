@@ -9,6 +9,7 @@ import { calendarDateToDb, dayKey, fromDateTimeLocalValue, instantToDb } from ".
  * demo patient (patient@medfave.com, Ramon Dela Cruz, Northern Family Clinic):
  *
  *  - two documents shared with him (Documents, and "From your clinic" on Home)
+ *  - a visit tomorrow, not yet said "I'll be there" to (the confirm buttons)
  *  - a visit booked but not yet confirmed ("Pending" badge)
  *  - a visit with a move he asked for ("Move requested")
  *  - a request the clinic declined, with a note ("From the clinic: …")
@@ -99,6 +100,17 @@ async function main() {
     releasedById: doctor.id,
     releasedTo: "Ramon Dela Cruz",
   });
+
+  // Tomorrow: inside the window to say "I'll be there" or ask to move it.
+  await orm.Appointment.create({
+    ...base,
+    id: id("tomorrow-visit"),
+    scheduledAt: at(1, 9, 30).at,
+    durationMinutes: 30,
+    service: "GENERAL_CONSULTATION",
+    reason: "Cough for a week",
+    status: "CONFIRMED",
+  } as Parameters<typeof orm.Appointment.create>[0]);
 
   // Booked, not yet confirmed.
   await orm.Appointment.create({

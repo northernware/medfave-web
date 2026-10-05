@@ -53,6 +53,7 @@ export const DESK_LINKS: readonly NavLink[] = [
   { href: "/desk/appointments", label: "Appointments", icon: "appointments", group: "Front desk" },
   { href: "/desk/requests", label: "Requests", icon: "requests", group: "Front desk" },
   { href: "/desk/patients", label: "Patients", icon: "patients", group: "Front desk" },
+  { href: "/desk/feedback", label: "Patient feedback", icon: "feedback", group: "Front desk" },
 ];
 
 /** Running the clinic: for its doctor and its administrators. */

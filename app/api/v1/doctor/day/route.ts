@@ -1,8 +1,9 @@
 import { apiDoctor, apiError } from "@/lib/api";
 import { APPOINTMENT_COLUMNS, shapeAppointment } from "@/lib/api-shapes";
-import { dayKey, instantFromDb, instantToDb, startOfClinicDay } from "@/lib/datetime";
+import { dayKey, instantToDb, startOfClinicDay } from "@/lib/datetime";
 import { QUEUE_STATUSES } from "@/lib/domain";
 import { sweepNoShows } from "@/lib/no-show";
+import { queueOrder } from "@/lib/visit-day";
 import { sendDueReminders } from "@/lib/reminders";
 import { orm } from "@/src/prisma/db";
 
@@ -54,15 +55,8 @@ export async function GET(request: Request) {
       .aggregate((agg) => ({ n: agg.count() })),
   ]);
 
-  // Whoever is with the doctor first, then the waiting room by arrival, longest
-  // wait first: the queue is whoever got here first, not whose slot is earliest
-  // (a walk-in has no meaningful slot). The same order as the patient's "ahead
-  // of you" and the web's waiting list.
-  const arrived = (a: (typeof queueRows)[number]) => (a.arrivedAt ? instantFromDb(a.arrivedAt).getTime() : 0);
-  const queue = [...queueRows].sort(
-    (a, b) =>
-      Number(b.status === "IN_CONSULTATION") - Number(a.status === "IN_CONSULTATION") || arrived(a) - arrived(b),
-  );
+  // With the doctor first, then the waiting room by arrival (lib/visit-day.ts).
+  const queue = [...queueRows].sort(queueOrder);
 
   return Response.json({
     date,

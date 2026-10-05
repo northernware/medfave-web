@@ -1,14 +1,12 @@
 import { apiPatient } from "@/lib/api";
-import { clinicDayRange, instantFromDb, instantToDb } from "@/lib/datetime";
+import { instantFromDb, instantToDb } from "@/lib/datetime";
 import { APPOINTMENT_STATUS_LABELS, QUEUE_STATUSES, SERVICE_LABELS } from "@/lib/domain";
-import { cancelBy, cancelCutoffHours, canConfirm, CHANGEABLE } from "@/lib/patient-visits";
+import { cancelBy, cancelCutoffHours } from "@/lib/patient-visits";
+import { canConfirm, CHANGEABLE, splitVisits } from "@/lib/visit-day";
 import { orm } from "@/src/prisma/db";
 
 /** How long after a visit it can still be rated or the rating changed. As lib/faves.ts. */
 const RATE_FOR_DAYS = 14;
-
-/** A visit not yet over: booked, or at the clinic now. */
-const UNDERWAY = ["PENDING", "CONFIRMED", "CHECKED_IN", "IN_CONSULTATION"] as const;
 
 /**
  * The patient's own visits: what is coming and what has been.
@@ -39,13 +37,7 @@ export async function GET(request: Request) {
       .limit(50)
       .all(),
   ]);
-  // Today's visit stays "upcoming" past its start time until it's over: the
-  // patient may still be in the waiting room, or with the doctor.
-  const today = clinicDayRange(new Date()).start;
-  const underway = (a: (typeof before)[number]) =>
-    (UNDERWAY as readonly string[]).includes(a.status) && instantFromDb(a.scheduledAt) >= today;
-  const upcoming = [...before.filter(underway).reverse(), ...ahead];
-  const past = before.filter((a) => !underway(a));
+  const { upcoming, past } = splitVisits(ahead, before);
 
   const [hours, moves] = await Promise.all([
     cancelCutoffHours(me.clinicId),

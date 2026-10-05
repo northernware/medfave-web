@@ -33,7 +33,7 @@ export async function GET(request: Request) {
   const [rows, queueRows, pending] = await Promise.all([
     orm.Appointment
       .select(...APPOINTMENT_COLUMNS)
-      .include("patient", (p) => p.select("id", "firstName", "middleName", "lastName"))
+      .include("patient", (p) => p.select("id", "firstName", "middleName", "lastName", "householdId"))
       .where((a) => a.doctorId.eq(doctor.doctorId))
       .where((a) => a.scheduledAt.gte(instantToDb(start)))
       .where((a) => a.scheduledAt.lt(instantToDb(end)))
@@ -42,7 +42,7 @@ export async function GET(request: Request) {
     date === today
       ? orm.Appointment
           .select(...APPOINTMENT_COLUMNS)
-          .include("patient", (p) => p.select("id", "firstName", "middleName", "lastName"))
+          .include("patient", (p) => p.select("id", "firstName", "middleName", "lastName", "householdId"))
           .where((a) => a.doctorId.eq(doctor.doctorId))
           .where((a) => a.status.in(QUEUE_STATUSES))
           .all()

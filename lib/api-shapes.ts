@@ -22,7 +22,8 @@ export type AppointmentRow = {
   arrivedAt: string | null;
   consultationStartedAt: string | null;
   patientConfirmedAt: string | null;
-  patient: Name & { id: string };
+  /** `householdId` where the endpoint selects it (the doctor's day), to see family together. */
+  patient: Name & { id: string; householdId?: string };
 };
 
 /** The columns `shapeAppointment` needs, for `.select(...)`. */
@@ -54,7 +55,11 @@ export function shapeAppointment(a: AppointmentRow) {
     consultationStartedAt: a.consultationStartedAt ? instantFromDb(a.consultationStartedAt).toISOString() : null,
     /** When the patient said "I'll be there" from the app, or null. */
     patientConfirmedAt: a.patientConfirmedAt ? instantFromDb(a.patientConfirmedAt).toISOString() : null,
-    patient: { id: a.patient.id, fullName: fullName(a.patient) },
+    patient: {
+      id: a.patient.id,
+      fullName: fullName(a.patient),
+      ...(a.patient.householdId ? { householdId: a.patient.householdId } : {}),
+    },
     /** Where this visit may move next — the only statuses the status endpoint will accept. */
     nextStatuses: movesFor(a).map((s) => ({ status: s, label: APPOINTMENT_STATUS_LABELS[s] })),
   };

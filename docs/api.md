@@ -171,7 +171,7 @@ the visit is now.
 
 | | |
 | --- | --- |
-| `GET /doctor/day?date=YYYY-MM-DD` | `{ date, isToday, appointments[], queue[], pendingRequests }`. Today when `date` is left out. `queue` is who is here, only for today: those with the doctor first, then the checked-in in arrival order (longest wait first). Marks overdue no-shows and sends tomorrow's reminders first, as the dashboard does. |
+| `GET /doctor/day?date=YYYY-MM-DD` | `{ date, isToday, appointments[], queue[], pendingRequests }`. Today when `date` is left out. `queue` is who is here, only for today: those with the doctor first, then the checked-in in arrival order (longest wait first). Here each `patient` also carries `householdId`, so family waiting together can be seen together. Marks overdue no-shows and sends tomorrow's reminders first, as the dashboard does. |
 | `GET /doctor/feedback?view=all\|attention&page=` | `{ average, count, good, faves, mentions: [{ tag, label, n }], page, pages, total, items: [{ id, score, tags: [{ tag, label }], note, createdAt, appointment: { id, scheduledAt, serviceLabel }, patient: { id, fullName } }] }`: what patients said about this doctor's visits, as the web's `/feedback`. `good` counts scores of 4–5; `attention` lists 1–3 only; 25 per page, newest first |
 | `GET /doctor/week?from=&days=` | `{ days: [{ date, count }] }`: visits still expected per day (7 by default, 31 at most) |
 | `GET /doctor/clinic` | Same shape as `/patient/clinic`, for the signed-in doctor's own hours, plus `breaks`, `slotStepMinutes` and `today` |

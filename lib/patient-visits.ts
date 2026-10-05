@@ -2,7 +2,7 @@ import "server-only";
 import { newId } from "@/lib/ids";
 import { revalidatePath } from "next/cache";
 import { orm } from "@/src/prisma/db";
-import { clinicDayRange, formatDateTime, instantFromDb, instantToDb } from "@/lib/datetime";
+import { formatDateTime, instantFromDb, instantToDb } from "@/lib/datetime";
 
 /*
  * A patient's own changes to a visit they already have, shared by the app's
@@ -12,7 +12,8 @@ import { clinicDayRange, formatDateTime, instantFromDb, instantToDb } from "@/li
  */
 
 /** Statuses a patient may still cancel or move: not started, not over. */
-export const CHANGEABLE = ["PENDING", "CONFIRMED"] as const;
+export { canConfirm, CHANGEABLE, confirmWindow } from "@/lib/visit-day";
+import { canConfirm, CHANGEABLE } from "@/lib/visit-day";
 
 export async function cancelCutoffHours(clinicId: string): Promise<number> {
   const clinic = await orm.Clinic.select("patientCancelHours").where((c) => c.id.eq(clinicId)).first();
@@ -79,22 +80,6 @@ export async function cancelByPatient(
   revalidatePath("/dashboard");
   revalidatePath("/portal");
   return { ok: true };
-}
-
-/**
- * When the patient may say "I'll be there": from the start of the clinic day
- * before the visit until its time. Earlier, the answer means little; later,
- * they are either here or late. The clinic's zone has no daylight saving, so
- * a day is 24 hours.
- */
-export function confirmWindow(scheduledAt: Date) {
-  return { from: new Date(clinicDayRange(scheduledAt).start.getTime() - 86_400_000), until: scheduledAt };
-}
-
-export function canConfirm(visit: { status: string; scheduledAt: Date; patientConfirmedAt: Date | null }, now = new Date()) {
-  if (visit.patientConfirmedAt || !(CHANGEABLE as readonly string[]).includes(visit.status)) return false;
-  const { from, until } = confirmWindow(visit.scheduledAt);
-  return now >= from && now < until;
 }
 
 /**

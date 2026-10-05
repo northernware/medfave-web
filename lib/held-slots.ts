@@ -1,5 +1,5 @@
 import "server-only";
-import { instantFromDb } from "@/lib/datetime";
+import { heldFrom } from "@/lib/visit-day";
 import { orm } from "@/src/prisma/db";
 
 type Orm = typeof orm;
@@ -40,17 +40,5 @@ export async function heldSlots(
     .orderBy((e) => e.at.desc())
     .all();
 
-  const held: { id: string; scheduledAt: Date; durationMinutes: number; patient: (typeof visits)[number]["patient"] }[] = [];
-  const seen = new Set<string>();
-  for (const e of events) {
-    // Only the latest check-in counts: an earlier one may have been undone.
-    if (seen.has(e.appointmentId)) continue;
-    seen.add(e.appointmentId);
-    if (!e.previousScheduledAt) continue;
-    const at = instantFromDb(e.previousScheduledAt);
-    if (at < from || at >= to) continue;
-    const visit = visits.find((a) => a.id === e.appointmentId)!;
-    held.push({ id: visit.id, scheduledAt: at, durationMinutes: visit.durationMinutes, patient: visit.patient });
-  }
-  return held;
+  return heldFrom(visits, events, from, to);
 }

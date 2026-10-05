@@ -54,12 +54,14 @@ export async function GET(request: Request) {
       .aggregate((agg) => ({ n: agg.count() })),
   ]);
 
-  // The queue is whoever got here first, not whose slot is earliest — a
-  // walk-in has no meaningful slot.
+  // Whoever is with the doctor first, then the waiting room by arrival, longest
+  // wait first: the queue is whoever got here first, not whose slot is earliest
+  // (a walk-in has no meaningful slot). The same order as the patient's "ahead
+  // of you" and the web's waiting list.
+  const arrived = (a: (typeof queueRows)[number]) => (a.arrivedAt ? instantFromDb(a.arrivedAt).getTime() : 0);
   const queue = [...queueRows].sort(
     (a, b) =>
-      (a.arrivedAt ? instantFromDb(a.arrivedAt).getTime() : 0) -
-      (b.arrivedAt ? instantFromDb(b.arrivedAt).getTime() : 0),
+      Number(b.status === "IN_CONSULTATION") - Number(a.status === "IN_CONSULTATION") || arrived(a) - arrived(b),
   );
 
   return Response.json({

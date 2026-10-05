@@ -115,13 +115,19 @@ export const STATUS_TRANSITIONS: Record<AppointmentStatus, AppointmentStatus[]> 
 };
 
 /**
- * The moves to offer from here. A no-show can be checked in on its own day,
- * and then that leads: they turned up late, which is the likelier fix than
- * restoring a time that has passed.
+ * The moves to offer from here.
+ *
+ * A no-show can be checked in on its own day, and then that leads: they turned
+ * up late. Putting a cancelled or missed visit back (CONFIRMED) is offered only
+ * while its time is still to come (`stillDue`: before its time plus the
+ * no-show grace). After that it would only be marked missed again, so there
+ * is nothing to restore.
  */
-export function movesFrom(status: AppointmentStatus, onItsDay: boolean): AppointmentStatus[] {
-  if (status === "NO_SHOW") return onItsDay ? ["CHECKED_IN", "CONFIRMED"] : ["CONFIRMED"];
-  return STATUS_TRANSITIONS[status];
+export function movesFrom(status: AppointmentStatus, onItsDay: boolean, stillDue: boolean): AppointmentStatus[] {
+  const moves = status === "NO_SHOW" && onItsDay ? ["CHECKED_IN", "CONFIRMED"] as AppointmentStatus[] : STATUS_TRANSITIONS[status];
+  return moves.filter(
+    (to) => !(to === "CONFIRMED" && (status === "NO_SHOW" || status === "CANCELLED") && !stillDue) && !(to === "CHECKED_IN" && status === "NO_SHOW" && !onItsDay),
+  );
 }
 
 export function canMoveTo(from: AppointmentStatus, to: AppointmentStatus) {

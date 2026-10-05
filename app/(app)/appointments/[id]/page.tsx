@@ -12,7 +12,6 @@ import { formatDateTime, formatTime } from "@/lib/datetime";
 import { NO_SHOW_GRACE_MINUTES } from "@/lib/no-show";
 import {
   ageFrom,
-  movesFrom,
   statusActionLabel,
   APPOINTMENT_STATUS_LABELS,
   APPOINTMENT_STATUS_TONE,
@@ -25,7 +24,7 @@ import {
   VISIT_PRIORITY_LABELS,
   VISIT_PRIORITY_TONE,
 } from "@/lib/domain";
-import { isClinicToday } from "@/lib/booking";
+import { movesFor } from "@/lib/booking";
 import { AlertBanner, AllergyBanner } from "@/components/allergy-banner";
 import { DELETE_PHRASES } from "@/lib/confirm-phrase";
 import { DangerZone } from "@/components/danger-zone";
@@ -302,7 +301,7 @@ export default async function AppointmentPage({
             <div className="mt-5 flex flex-wrap gap-2 border-t border-border pt-4">
               {/* Only the moves that exist from here. The first is the one the
                   visit is expected to make next, so it leads. */}
-              {movesFrom(appointment.status, isClinicToday(appointment.scheduledAt)).map((next, i) => (
+              {movesFor(appointment).map((next, i) => (
                 <form key={next} action={setAppointmentStatus}>
                   <input type="hidden" name="appointmentId" value={appointment.id} />
                   <input type="hidden" name="status" value={next} />
@@ -311,9 +310,11 @@ export default async function AppointmentPage({
                   </button>
                 </form>
               ))}
-              {movesFrom(appointment.status, isClinicToday(appointment.scheduledAt)).length === 0 ? (
+              {movesFor(appointment).length === 0 ? (
                 <p className="text-sm text-ink-muted">
-                  This visit is finished. Its record is where anything further belongs.
+                  {appointment.status === "COMPLETED"
+                    ? "This visit is finished. Its record is where anything further belongs."
+                    : "Its time has passed. Book a new visit if they still need one."}
                 </p>
               ) : null}
               <Link href={`/appointments/${appointment.id}/edit`} className={buttonClass("ghost")}>

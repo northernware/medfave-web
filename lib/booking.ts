@@ -12,7 +12,8 @@ import {
   instantToDb,
 } from "@/lib/datetime";
 import { newId } from "@/lib/ids";
-import { canMoveTo, fullName, SERVICE_MINUTES } from "@/lib/domain";
+import { canMoveTo, fullName, movesFrom, SERVICE_MINUTES } from "@/lib/domain";
+import { NO_SHOW_GRACE_MINUTES } from "@/lib/no-show";
 import { formatSpan, minuteOfDay, occupiesSlot, overlaps } from "@/lib/scheduling";
 import { checkAvailability, durationFor } from "@/lib/availability";
 import { heldSlots } from "@/lib/held-slots";
@@ -500,7 +501,7 @@ export async function changeAppointmentStatus(
   if (!existing) return { ok: false, reason: "not-found" };
 
   // The page only offers moves that exist, but the page is not the authority.
-  if (!canMoveTo(existing.status, status)) {
+  if (!canMoveTo(existing.status, status) || !movesFor(existing).includes(status)) {
     return { ok: false, reason: "transition", current: existing.status };
   }
 
@@ -604,6 +605,12 @@ export async function changeAppointmentStatus(
 
   revalidateAppointmentPages(appointmentId);
   return { ok: true, status };
+}
+
+/** What may be done with a visit now: `movesFrom`, with its day and whether its time is still to come. */
+export function movesFor(a: { status: AppointmentStatus; scheduledAt: string }, now = new Date()) {
+  const stillDue = instantFromDb(a.scheduledAt).getTime() + NO_SHOW_GRACE_MINUTES * 60_000 > now.getTime();
+  return movesFrom(a.status, isClinicToday(a.scheduledAt, now), stillDue);
 }
 
 /** Whether a stored visit time falls on today, by the clinic's clock. */

@@ -21,6 +21,7 @@
     "db:seed-second-clinic": "tsx src/prisma/seed-second-clinic.ts",
     "db:seed-group-practice": "tsx src/prisma/seed-group-practice.ts",
     "db:seed-patient-showcase": "tsx src/prisma/seed-patient-showcase.ts",
+    "db:seed-doctor-showcase": "tsx src/prisma/seed-doctor-showcase.ts",
     "admin:grant": "tsx src/prisma/grant-admin.ts",
     "db:backfill-names": "tsx src/prisma/backfill-name-parts.ts"
   },

@@ -1,6 +1,6 @@
 import { apiPatient } from "@/lib/api";
 import { clinicDayRange, instantFromDb, instantToDb } from "@/lib/datetime";
-import { APPOINTMENT_STATUS_LABELS, SERVICE_LABELS } from "@/lib/domain";
+import { APPOINTMENT_STATUS_LABELS, QUEUE_STATUSES, SERVICE_LABELS } from "@/lib/domain";
 import { cancelBy, cancelCutoffHours, canConfirm, CHANGEABLE } from "@/lib/patient-visits";
 import { orm } from "@/src/prisma/db";
 
@@ -23,7 +23,7 @@ export async function GET(request: Request) {
 
   const [ahead, before] = await Promise.all([
     orm.Appointment
-      .select("id", "scheduledAt", "durationMinutes", "service", "reason", "status", "visitType", "patientConfirmedAt")
+      .select("id", "scheduledAt", "durationMinutes", "service", "reason", "status", "visitType", "patientConfirmedAt", "arrivedAt")
       .include("doctor", (d) => d.select("id", "fullName"))
       .where((a) => a.patientId.eq(me.patientId))
       .where((a) => a.scheduledAt.gte(now))
@@ -31,7 +31,7 @@ export async function GET(request: Request) {
       .limit(50)
       .all(),
     orm.Appointment
-      .select("id", "scheduledAt", "durationMinutes", "service", "reason", "status", "visitType", "patientConfirmedAt")
+      .select("id", "scheduledAt", "durationMinutes", "service", "reason", "status", "visitType", "patientConfirmedAt", "arrivedAt")
       .include("doctor", (d) => d.select("id", "fullName"))
       .where((a) => a.patientId.eq(me.patientId))
       .where((a) => a.scheduledAt.lt(now))
@@ -55,6 +55,30 @@ export async function GET(request: Request) {
       .where((r) => r.status.eq("PENDING"))
       .all(),
   ]);
+  // Where a checked-in patient is in their doctor's waiting room: how many got
+  // here before them and are still waiting, and whether the doctor is with
+  // someone now. The same order as the doctor's queue: arrival, not slot.
+  const waitingFor = upcoming.filter((a) => a.status === "CHECKED_IN");
+  const queues = new Map<string, { status: string; arrivedAt: string | null }[]>();
+  for (const doctorId of new Set(waitingFor.map((a) => a.doctor.id))) {
+    queues.set(
+      doctorId,
+      await orm.Appointment
+        .select("status", "arrivedAt")
+        .where((a) => a.doctorId.eq(doctorId))
+        .where((a) => a.status.in(QUEUE_STATUSES))
+        .all(),
+    );
+  }
+  const placeOf = (a: (typeof ahead)[number]) => {
+    const queue = queues.get(a.doctor.id);
+    if (a.status !== "CHECKED_IN" || !queue) return null;
+    const mine = a.arrivedAt ? instantFromDb(a.arrivedAt).getTime() : Date.now();
+    return {
+      ahead: queue.filter((q) => q.status === "CHECKED_IN" && q.arrivedAt && instantFromDb(q.arrivedAt).getTime() < mine).length,
+      doctorBusy: queue.some((q) => q.status === "IN_CONSULTATION"),
+    };
+  };
   const moving = new Set(moves.map((m) => m.rescheduleOfId).filter(Boolean));
   const changeable = (a: (typeof ahead)[number]) => (CHANGEABLE as readonly string[]).includes(a.status);
 
@@ -81,6 +105,8 @@ export async function GET(request: Request) {
       // Not once its time has come: today's late-running visit can't be moved from here.
       canMove: changeable(a) && !moving.has(a.id) && instantFromDb(a.scheduledAt).getTime() > Date.now(),
       movePending: moving.has(a.id),
+      // Checked in: people ahead in the waiting room, and whether the doctor is with someone.
+      queue: placeOf(a),
       // "I'll be there", from the day before (lib/patient-visits.ts).
       confirmedAt: a.patientConfirmedAt ? instantFromDb(a.patientConfirmedAt).toISOString() : null,
       canConfirm: canConfirm({

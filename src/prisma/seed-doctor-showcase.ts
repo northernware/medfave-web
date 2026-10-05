@@ -7,8 +7,8 @@ import { addDays } from "../../lib/scheduling";
  * Fills in what the doctor's app shows when there is data for it, for Dr. Ana
  * Reyes (doctor@medfave.com, Northern Family Clinic), timed from now:
  *
- *  - Today: one patient with the doctor, two in the waiting room (one for a
- *    while), two still to come (one said "I'll be there")
+ *  - Today: one patient with the doctor, three of one household waiting
+ *    (Joaquin for a while, Ramon, Marilou), two still to come (one said "I'll be there")
  *  - the rest of the week with visits on most days
  *  - three requests waiting (the inbox count), one from a new patient
  *  - charts: allergies (one severe), an alert, conditions, medicines, a
@@ -103,6 +103,16 @@ async function main() {
     reason: "Sugar log review",
     status: "CHECKED_IN",
     arrivedAt: fromNow(-6),
+  });
+  // Ramon waits too: three of the Dela Cruz household, to see a family together.
+  await visit({
+    id: id("today-waiting-ramon"),
+    patientId: who("Ramon"),
+    scheduledAt: fromNow(130),
+    service: "FOLLOW_UP_CHECKUP",
+    reason: "Blood pressure check",
+    status: "CHECKED_IN",
+    arrivedAt: fromNow(-12),
   });
   await visit({
     id: id("today-coming"),

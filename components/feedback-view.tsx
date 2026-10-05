@@ -1,26 +1,11 @@
 import Link from "next/link";
 import { formatDate, instantFromDb } from "@/lib/datetime";
 import { fullName, SERVICE_LABELS } from "@/lib/domain";
-import { FEEDBACK_TAG_LABELS, SCORE_WORDS, type FeedbackTag } from "@/lib/faves";
-import { orm } from "@/src/prisma/db";
+import { FEEDBACK_TAG_LABELS, SCORE_WORDS } from "@/lib/faves";
+import { FEEDBACK_PAGE_SIZE, FEEDBACK_VIEWS as VIEWS, readFeedback, tagsOf, type FeedbackScope, type FeedbackViewKey as ViewKey } from "@/lib/feedback";
 import { Pager } from "@/components/pager";
 import { RatingFace } from "@/components/rating-face";
 import { Badge, Card, EmptyState, PageHeader, Stat, StatStrip } from "@/components/ui";
-
-const VIEWS = [
-  { key: "all", label: "All" },
-  { key: "attention", label: "Needs attention" },
-] as const;
-type ViewKey = (typeof VIEWS)[number]["key"];
-
-const PAGE_SIZE = 25;
-/** Ratings of 1–3: the ones worth reading first. */
-const LOW = [1, 2, 3];
-
-const tagsOf = (tags: string | null) => (tags ? (tags.split(",") as FeedbackTag[]) : []);
-
-/** Whose feedback: one doctor's, or the whole clinic's (the desk and administrators). */
-export type FeedbackScope = { doctorId: string } | { clinicId: string };
 
 /**
  * What patients said after their visits: a face from 1 to 5, what stood out,
@@ -44,55 +29,11 @@ export async function FeedbackView({
   const { view, page: pageParam } = searchParams;
   const active: ViewKey = VIEWS.some((v) => v.key === view) ? (view as ViewKey) : "all";
   const clinicWide = "clinicId" in scope;
-
-  // The clinic's doctors, for its faves and to say whose visit each rating was.
-  const doctors = "clinicId" in scope
-    ? await orm.Doctor.select("id", "fullName").where((d) => d.clinicId.eq(scope.clinicId)).all()
-    : [];
-  const doctorIds = "clinicId" in scope ? doctors.map((d) => d.id) : [scope.doctorId];
-  const doctorName = new Map(doctors.map((d) => [d.id, d.fullName]));
-  const showDoctor = doctors.length > 1;
-
-  // Every answered rating, for the figures. A clinic's feedback is small enough to sum here.
-  const [rated, faves] = await Promise.all([
-    orm.VisitFeedback
-      .select("score", "tags")
-      .where((f) => ("clinicId" in scope ? f.clinicId.eq(scope.clinicId) : f.doctorId.eq(scope.doctorId)))
-      .where((f) => f.score.gte(1))
-      .all(),
-    doctorIds.length
-      ? orm.Fave.where((f) => f.doctorId.in(doctorIds)).aggregate((agg) => ({ n: agg.count() }))
-      : { n: 0 },
-  ]);
-  const scores = rated.map((r) => r.score!);
-  const average = scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
-  const good = scores.filter((s) => s >= 4).length;
-  const tagCounts = new Map<FeedbackTag, number>();
-  for (const r of rated) for (const t of tagsOf(r.tags)) tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1);
-  const mentions = [...tagCounts.entries()].sort((a, b) => b[1] - a[1]);
-
-  let list = orm.VisitFeedback
-    .select("id", "doctorId", "score", "tags", "note", "createdAt")
-    .include("appointment", (a) =>
-      a.select("id", "scheduledAt", "service").include("patient", (p) => p.select("id", "firstName", "middleName", "lastName")),
-    )
-    .where((f) => ("clinicId" in scope ? f.clinicId.eq(scope.clinicId) : f.doctorId.eq(scope.doctorId)))
-    .where((f) => f.score.gte(1));
-  let counted = orm.VisitFeedback.where((f) => ("clinicId" in scope ? f.clinicId.eq(scope.clinicId) : f.doctorId.eq(scope.doctorId))).where((f) => f.score.gte(1));
-  if (active === "attention") {
-    list = list.where((f) => f.score.in(LOW));
-    counted = counted.where((f) => f.score.in(LOW));
-  }
-
-  const total = (await counted.aggregate((agg) => ({ n: agg.count() }))).n;
-  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const requested = Number(typeof pageParam === "string" ? pageParam : 1);
-  const page = Math.min(Math.max(Number.isFinite(requested) ? requested : 1, 1), pages);
-  const items = await list
-    .orderBy((f) => f.createdAt.desc())
-    .limit(PAGE_SIZE)
-    .offset((page - 1) * PAGE_SIZE)
-    .all();
+  const { average, count, good, faves, mentions, items, total, page, pages, doctorName, showDoctor } = await readFeedback(
+    scope,
+    active,
+    Number(typeof pageParam === "string" ? pageParam : 1),
+  );
 
   return (
     <div className="space-y-3">
@@ -100,9 +41,9 @@ export async function FeedbackView({
 
       <StatStrip>
         <Stat label="Average" value={average ? average.toFixed(1) : "—"} hint="out of 5" />
-        <Stat label="Ratings" value={scores.length} />
-        <Stat label="Good or great" value={scores.length ? `${Math.round((good / scores.length) * 100)}%` : "—"} hint="4 or 5" />
-        <Stat label="Faves" value={faves.n} hint={clinicWide ? "patients keeping your doctors close" : "patients keeping you close"} />
+        <Stat label="Ratings" value={count} />
+        <Stat label="Good or great" value={count ? `${Math.round((good / count) * 100)}%` : "—"} hint="4 or 5" />
+        <Stat label="Faves" value={faves} hint={clinicWide ? "patients keeping your doctors close" : "patients keeping you close"} />
       </StatStrip>
 
       {mentions.length > 0 ? (
@@ -177,7 +118,7 @@ export async function FeedbackView({
         <Pager
           page={page}
           pages={pages}
-          pageSize={PAGE_SIZE}
+          pageSize={FEEDBACK_PAGE_SIZE}
           total={total}
           shown={items.length}
           hrefFor={(n) => `${base}?view=${active}${n > 1 ? `&page=${n}` : ""}`}

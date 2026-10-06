@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { or } from "@prisma/orm-postgres/orm-client";
-import { orm } from "./db";
+import bcrypt from "bcryptjs";
+import { db, orm } from "./db";
 import { MARK, seedId } from "./seed-ids";
 import { calendarDateToDb, dayKey, instantToDb } from "../../lib/datetime";
 import { addDays } from "../../lib/scheduling";
@@ -22,7 +23,8 @@ import { addDays } from "../../lib/scheduling";
  * so it is safe to run again: those rows, and any from before with ids starting
  * "drshow-", are removed first. It also sets the allergy / condition /
  * medication status of the charts it fills, which stays. Needs the main seed.
- * Never run against real data.
+ * Never run against real data. Patients and logins it needs beyond the main
+ * seed are made once if missing (see ensureCast).
  *
  *   npm run db:seed-doctor-showcase
  */
@@ -43,6 +45,7 @@ async function main() {
   if (!doctor?.clinicId || !doctor.accountId) throw new Error("No Dr. Ana Reyes: run npm run db:seed first.");
   const clinicId = doctor.clinicId;
 
+  await ensureCast(clinicId, doctor.id);
   const patients = await orm.Patient.select("id", "firstName", "lastName", "accountId").where((p) => p.clinicId.eq(clinicId)).all();
   const who = (first: string) => {
     const p = patients.find((x) => x.firstName === first);
@@ -53,7 +56,7 @@ async function main() {
   const ramon = accountOf("Ramon");
   const paula = accountOf("Paula");
   const corazon = accountOf("Corazon");
-  if (!ramon || !paula || !corazon) throw new Error("Ramon, Paula and Corazon need their logins: run npm run db:seed first.");
+  if (!ramon || !paula || !corazon) throw new Error("Ramon, Paula and Corazon need their logins.");
 
   // Out with the last run's rows, children first. `deleteAndCount`: `delete` removes one row.
   await orm.VisitFeedback.where((f) => or(f.id.like(`${MARK.doctor}-%`), f.id.like("drshow-%"))).deleteAndCount();
@@ -291,6 +294,76 @@ async function main() {
   }
 
   console.log("Doctor showcase added for doctor@medfave.com: today's queue, the week, 3 requests, charts, notes and feedback.");
+}
+
+/** The same per-year counter the app allocates from (lib/patient-number.ts, which is server-only). */
+async function nextPatientNumber() {
+  const year = new Date().getUTCFullYear();
+  await db.transaction(async (tx) => {
+    await tx.execute(
+      db.raw.sql`INSERT INTO "PatientNumberCounter" ("year","lastUsed") VALUES (${year},0) ON CONFLICT ("year") DO NOTHING`.affectedCount().build() as never,
+    );
+    await tx.execute(db.raw.sql`UPDATE "PatientNumberCounter" SET "lastUsed"="lastUsed"+1 WHERE "year"=${year}`.affectedCount().build() as never);
+  });
+  const counter = await orm.PatientNumberCounter.select("lastUsed").where((c) => c.year.eq(year)).first();
+  return `MK-${year}-${String(counter!.lastUsed).padStart(6, "0")}`;
+}
+
+/**
+ * The patients and logins this showcase uses beyond the main seed, made if
+ * they're missing, so it works on a fresh database: Lia (Ramon's daughter),
+ * Paula Santos and Jnmark Agustin with their own households, and patient
+ * logins for Paula (patient2@medfave.com) and Corazon (corazon@medfave.com),
+ * who rate visits. Password `password`. Kept between runs.
+ */
+async function ensureCast(clinicId: string, doctorId: string) {
+  const now = instantToDb(new Date());
+  const find = (first: string) =>
+    orm.Patient.select("id", "householdId", "accountId").where((p) => p.clinicId.eq(clinicId)).where((p) => p.firstName.eq(first)).first();
+  const ramon = await find("Ramon");
+  if (!ramon) throw new Error("No Ramon Dela Cruz: run npm run db:seed first.");
+
+  const household = async (key: string, name: string) => {
+    const hid = seedId(MARK.doctor, `household-${key}`);
+    if (!(await orm.Household.select("id").where((h) => h.id.eq(hid)).first())) {
+      await orm.Household.create({ id: hid, clinicId, doctorId, name, createdAt: now, updatedAt: now } as Parameters<typeof orm.Household.create>[0]);
+    }
+    return hid;
+  };
+  const patient = async (first: string, row: Record<string, unknown>) => {
+    if (await find(first)) return;
+    await orm.Patient.create({
+      id: seedId(MARK.doctor, `patient-${first}`),
+      clinicId,
+      firstName: first,
+      patientNumber: await nextPatientNumber(),
+      createdAt: now,
+      updatedAt: now,
+      ...row,
+    } as Parameters<typeof orm.Patient.create>[0]);
+  };
+  await patient("Lia", { lastName: "Dela Cruz", middleName: "F.", householdId: ramon.householdId, dateOfBirth: calendarDateToDb(new Date("2020-06-15T00:00:00Z")), sex: "FEMALE", relationship: "CHILD" });
+  await patient("Paula", { lastName: "Santos", householdId: await household("santos", "Santos"), dateOfBirth: calendarDateToDb(new Date("1992-07-03T00:00:00Z")), sex: "FEMALE", relationship: "HEAD", contactNumber: "0917 555 0177" });
+  await patient("Jnmark Friedrich", { lastName: "Agustin", householdId: await household("agustin", "Agustin"), dateOfBirth: calendarDateToDb(new Date("2003-01-17T00:00:00Z")), sex: "MALE", relationship: "HEAD" });
+
+  const login = async (first: string, email: string, fullName: string) => {
+    const chart = await find(first);
+    if (!chart || chart.accountId) return;
+    let account = await orm.Account.select("id").where((a) => a.email.eq(email)).first();
+    if (!account) {
+      account = await orm.Account.select("id").create({
+        id: seedId(MARK.doctor, `account-${first}`),
+        email,
+        passwordHash: await bcrypt.hash("password", 12),
+        fullName,
+        createdAt: now,
+        updatedAt: now,
+      } as Parameters<typeof orm.Account.create>[0]);
+    }
+    await orm.Patient.where((p) => p.id.eq(chart.id)).update({ accountId: account.id });
+  };
+  await login("Paula", "patient2@medfave.com", "Paula Santos");
+  await login("Corazon", "corazon@medfave.com", "Corazon Dela Cruz");
 }
 
 main().then(

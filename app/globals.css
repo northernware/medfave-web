@@ -68,8 +68,11 @@
   --warn: light-dark(oklch(0.66 0.14 70), oklch(0.78 0.13 80));
   --warn-soft: light-dark(oklch(0.965 0.05 85), oklch(0.33 0.06 75));
   --warn-ink: light-dark(oklch(0.47 0.11 65), oklch(0.87 0.09 85));
-  /* Text on a solid warn fill (the medical-alerts box): dark in both themes. */
-  --on-warn: light-dark(oklch(0.22 0.05 65), oklch(0.2 0.04 70));
+  /* The allergies and medical-alerts boxes: paper pastels with black text on
+     light, bold solid colour with white text on dark. */
+  --alert-danger: light-dark(oklch(0.92 0.06 22), oklch(0.52 0.19 25));
+  --alert-warn: light-dark(oklch(0.94 0.08 88), oklch(0.56 0.13 62));
+  --on-alert: light-dark(oklch(0.18 0.01 25), #ffffff);
 
   --ok: light-dark(oklch(0.58 0.12 160), oklch(0.72 0.12 160));
   --ok-soft: light-dark(oklch(0.955 0.035 160), oklch(0.3 0.055 160));
@@ -133,7 +136,9 @@
   --color-warn: var(--warn);
   --color-warn-soft: var(--warn-soft);
   --color-warn-ink: var(--warn-ink);
-  --color-on-warn: var(--on-warn);
+  --color-alert-danger: var(--alert-danger);
+  --color-alert-warn: var(--alert-warn);
+  --color-on-alert: var(--on-alert);
 
   --color-ok: var(--ok);
   --color-ok-soft: var(--ok-soft);

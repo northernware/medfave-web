@@ -376,8 +376,8 @@ export default async function PatientPage({
 
         {/* Standing clinical context, kept beside the timeline rather than above it. */}
         <aside className="space-y-3">
-          <AlertBanner alerts={patient.alerts} />
           <AllergyBanner status={patient.allergyStatus} allergies={patient.allergies} />
+          <AlertBanner alerts={patient.alerts} />
       {housemates.length > 0 ? (
         <Card className="p-4">
           <StartHousehold patient={patient} others={housemates} back={`/patients/${patient.id}`} />

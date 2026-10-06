@@ -69,7 +69,7 @@ function AddAllergy({ patientId }: { patientId: string }) {
   );
 }
 
-/** Standing warnings, above the allergies — things to act on before touching the patient. */
+/** Standing warnings, under the allergies — things to act on before touching the patient. */
 export function AlertBanner({ alerts, patientId }: { alerts: { id: string; label: string; notes: string | null }[] } & Editable) {
   if (alerts.length === 0) {
     // Nothing to warn about: beside a note, just the way to add one.

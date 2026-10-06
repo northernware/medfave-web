@@ -335,8 +335,8 @@ export default async function AppointmentPage({
         </div>
         <div className="space-y-3">
           {/* What to know before the visit, at the head of the clinic's side. */}
-          <AlertBanner alerts={patient.alerts} />
           <AllergyBanner status={patient.allergyStatus} allergies={patient.allergies} />
+          <AlertBanner alerts={patient.alerts} />
           <Card>
             <CardHeader title="Clinic use" subtitle="Not shown to the patient." />
             <div className="px-5 py-4">

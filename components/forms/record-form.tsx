@@ -6,7 +6,8 @@ import { Field, FieldGrid, FormError, Select, SubmitButton, TextArea, TextInput 
 import { buttonClass } from "@/components/ui";
 import { formatTime } from "@/lib/datetime";
 import { BLANK_PRESCRIPTION, type PrescriptionRow, type RecordDefaults } from "@/lib/form-defaults";
-import type { AutosaveResult } from "@/app/actions/records";
+import { searchDiagnoses, type AutosaveResult } from "@/app/actions/records";
+import { DiagnosisPicker } from "@/components/forms/diagnosis-picker";
 import { EMPTY_FORM_STATE, type FormState } from "@/lib/validation";
 
 /**
@@ -17,6 +18,9 @@ import { EMPTY_FORM_STATE, type FormState } from "@/lib/validation";
  * the visit. It only fires when something has actually changed.
  */
 const AUTOSAVE_INTERVAL_MS = 10_000;
+
+/** As lib/diagnoses.ts; kept here so this client file doesn't import server code. */
+const ICD11_CREDIT = "ICD-11 MMS © World Health Organization, CC BY-ND 3.0 IGO";
 
 const VITALS = [
   { name: "temperatureC", label: "Temp", unit: "°C", step: "0.1", placeholder: "36.8" },
@@ -251,7 +255,19 @@ export function RecordForm({
 
       <section className="space-y-4 border-t border-border pt-6">
         <h2 className="flex items-center gap-2 font-display text-lg leading-6 font-semibold tracking-[-0.01em] before:h-5 before:w-1 before:rounded-full before:bg-accent">Assessment and plan</h2>
-        <Field label="Assessment / diagnosis" htmlFor="assessment" error={err?.assessment}>
+        <div>
+          <p className="mb-1.5 block text-sm leading-5 font-semibold">Diagnoses (ICD-11)</p>
+          <DiagnosisPicker
+            initial={defaults.diagnoses}
+            search={searchDiagnoses}
+            credit={ICD11_CREDIT}
+            error={err?.diagnoses}
+            onChange={() => {
+              unsaved.current = true;
+            }}
+          />
+        </div>
+        <Field label="Assessment" htmlFor="assessment" hint="Your reasoning. The coded diagnoses are above." error={err?.assessment}>
           <TextArea id="assessment" name="assessment" rows={3} defaultValue={defaults.assessment} />
         </Field>
         <Field label="Treatment plan" htmlFor="treatmentPlan" error={err?.treatmentPlan}>

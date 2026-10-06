@@ -1,0 +1,200 @@
+[
+  {
+    "id": "table.Icd11Code",
+    "label": "Create table \"Icd11Code\"",
+    "summary": "Creates table \"Icd11Code\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Icd11Code"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Icd11Code\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Icd11Code\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Icd11Code\"",
+        "sql": "CREATE TABLE \"public\".\"Icd11Code\" (\n  \"chapter\" text NOT NULL,\n  \"code\" text NOT NULL,\n  \"leaf\" bool NOT NULL,\n  \"release\" text NOT NULL,\n  \"title\" text NOT NULL,\n  \"uri\" text NOT NULL,\n  CONSTRAINT \"Icd11Code_pkey\" PRIMARY KEY (\"code\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Icd11Code\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Icd11Code\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.VisitDiagnosis",
+    "label": "Create table \"VisitDiagnosis\"",
+    "summary": "Creates table \"VisitDiagnosis\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "VisitDiagnosis"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"VisitDiagnosis\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"VisitDiagnosis\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"VisitDiagnosis\"",
+        "sql": "CREATE TABLE \"public\".\"VisitDiagnosis\" (\n  \"code\" text NOT NULL,\n  \"createdAt\" timestamp(3) DEFAULT (now()) NOT NULL,\n  \"id\" text NOT NULL,\n  \"medicalRecordId\" text NOT NULL,\n  \"position\" int4 NOT NULL,\n  \"system\" text NOT NULL,\n  \"title\" text NOT NULL,\n  \"uri\" text NOT NULL,\n  CONSTRAINT \"VisitDiagnosis_pkey\" PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"VisitDiagnosis\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"VisitDiagnosis\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.VisitDiagnosis.VisitDiagnosis_code_idx",
+    "label": "Create index \"VisitDiagnosis_code_idx\" on \"VisitDiagnosis\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "VisitDiagnosis_code_idx",
+        "table": "VisitDiagnosis"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"VisitDiagnosis_code_idx\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"VisitDiagnosis_code_idx\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"VisitDiagnosis_code_idx\"",
+        "sql": "CREATE INDEX \"VisitDiagnosis_code_idx\" ON \"public\".\"VisitDiagnosis\" (\"code\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"VisitDiagnosis_code_idx\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"VisitDiagnosis_code_idx\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.VisitDiagnosis.VisitDiagnosis_medicalRecordId_idx",
+    "label": "Create index \"VisitDiagnosis_medicalRecordId_idx\" on \"VisitDiagnosis\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "VisitDiagnosis_medicalRecordId_idx",
+        "table": "VisitDiagnosis"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"VisitDiagnosis_medicalRecordId_idx\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"VisitDiagnosis_medicalRecordId_idx\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"VisitDiagnosis_medicalRecordId_idx\"",
+        "sql": "CREATE INDEX \"VisitDiagnosis_medicalRecordId_idx\" ON \"public\".\"VisitDiagnosis\" (\"medicalRecordId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"VisitDiagnosis_medicalRecordId_idx\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"VisitDiagnosis_medicalRecordId_idx\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.VisitDiagnosis.VisitDiagnosis_medicalRecordId_fkey",
+    "label": "Add foreign key \"VisitDiagnosis_medicalRecordId_fkey\" on \"VisitDiagnosis\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "VisitDiagnosis_medicalRecordId_fkey",
+        "table": "VisitDiagnosis"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"VisitDiagnosis_medicalRecordId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "VisitDiagnosis_medicalRecordId_fkey",
+          "public",
+          "\"public\".\"VisitDiagnosis\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"VisitDiagnosis_medicalRecordId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"VisitDiagnosis\"\nADD CONSTRAINT \"VisitDiagnosis_medicalRecordId_fkey\"\nFOREIGN KEY (\"medicalRecordId\")\nREFERENCES \"public\".\"MedicalRecord\" (\"id\")\nON DELETE CASCADE\nON UPDATE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"VisitDiagnosis_medicalRecordId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "VisitDiagnosis_medicalRecordId_fkey",
+          "public",
+          "\"public\".\"VisitDiagnosis\""
+        ]
+      }
+    ]
+  }
+]

@@ -8,6 +8,7 @@ export async function recordForApp(doctor: { doctorId: string; clinicId: string 
     .include("prescriptions", (rx) =>
       rx.select("id", "drugName", "dosage", "frequency", "duration", "instructions").orderBy((x) => x.createdAt.asc()),
     )
+    .include("diagnoses", (d) => d.select("code", "title", "uri").orderBy((x) => x.position.asc()))
     .where((x) => x.id.eq(recordId))
     .where((x) => x.clinicId.eq(doctor.clinicId))
     .first();
@@ -43,6 +44,8 @@ export async function recordForApp(doctor: { doctorId: string; clinicId: string 
     followUpDate: r.followUpDate ? toDateInputValue(calendarDateFromDb(r.followUpDate)) : null,
     notes: r.notes,
     prescriptions: r.prescriptions,
+    /** ICD-11, primary first. */
+    diagnoses: r.diagnoses,
     updatedAt: instantFromDb(r.updatedAt).toISOString(),
   };
 }

@@ -80,6 +80,10 @@
       "model": "Household",
       "namespace": "public"
     },
+    "Icd11Code": {
+      "model": "Icd11Code",
+      "namespace": "public"
+    },
     "MedicalRecord": {
       "model": "MedicalRecord",
       "namespace": "public"
@@ -138,6 +142,10 @@
     },
     "StaffInvite": {
       "model": "StaffInvite",
+      "namespace": "public"
+    },
+    "VisitDiagnosis": {
+      "model": "VisitDiagnosis",
       "namespace": "public"
     },
     "VisitFeedback": {
@@ -4224,6 +4232,77 @@
               "table": "Household"
             }
           },
+          "Icd11Code": {
+            "fields": {
+              "chapter": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "code": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "leaf": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/bool@1",
+                  "kind": "scalar"
+                }
+              },
+              "release": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "title": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "uri": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {},
+            "storage": {
+              "fields": {
+                "chapter": {
+                  "column": "chapter"
+                },
+                "code": {
+                  "column": "code"
+                },
+                "leaf": {
+                  "column": "leaf"
+                },
+                "release": {
+                  "column": "release"
+                },
+                "title": {
+                  "column": "title"
+                },
+                "uri": {
+                  "column": "uri"
+                }
+              },
+              "namespaceId": "public",
+              "table": "Icd11Code"
+            }
+          },
           "MedicalRecord": {
             "fields": {
               "appointmentId": {
@@ -4522,6 +4601,21 @@
                 },
                 "to": {
                   "model": "Clinic",
+                  "namespace": "public"
+                }
+              },
+              "diagnoses": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "medicalRecordId"
+                  ]
+                },
+                "to": {
+                  "model": "VisitDiagnosis",
                   "namespace": "public"
                 }
               },
@@ -6645,6 +6739,116 @@
               },
               "namespaceId": "public",
               "table": "StaffInvite"
+            }
+          },
+          "VisitDiagnosis": {
+            "fields": {
+              "code": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamp-string@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "medicalRecordId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "position": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/int4@1",
+                  "kind": "scalar"
+                }
+              },
+              "system": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "title": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "uri": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "medicalRecord": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "medicalRecordId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "MedicalRecord",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "code": {
+                  "column": "code"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "medicalRecordId": {
+                  "column": "medicalRecordId"
+                },
+                "position": {
+                  "column": "position"
+                },
+                "system": {
+                  "column": "system"
+                },
+                "title": {
+                  "column": "title"
+                },
+                "uri": {
+                  "column": "uri"
+                }
+              },
+              "namespaceId": "public",
+              "table": "VisitDiagnosis"
             }
           },
           "VisitFeedback": {
@@ -10056,6 +10260,49 @@
               },
               "uniques": []
             },
+            "Icd11Code": {
+              "columns": {
+                "chapter": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "code": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "leaf": {
+                  "codecId": "pg/bool@1",
+                  "nativeType": "bool",
+                  "nullable": false
+                },
+                "release": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "title": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "uri": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [],
+              "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "code"
+                ],
+                "name": "Icd11Code_pkey"
+              },
+              "uniques": []
+            },
             "MedicalRecord": {
               "columns": {
                 "appointmentId": {
@@ -12126,6 +12373,101 @@
               },
               "uniques": []
             },
+            "VisitDiagnosis": {
+              "columns": {
+                "code": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamp-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamp",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "medicalRecordId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "position": {
+                  "codecId": "pg/int4@1",
+                  "nativeType": "int4",
+                  "nullable": false
+                },
+                "system": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "title": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "uri": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "name": "VisitDiagnosis_medicalRecordId_fkey",
+                  "onDelete": "cascade",
+                  "onUpdate": "cascade",
+                  "source": {
+                    "columns": [
+                      "medicalRecordId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "VisitDiagnosis"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "MedicalRecord"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "code"
+                  ],
+                  "name": "VisitDiagnosis_code_idx",
+                  "unique": false
+                },
+                {
+                  "columns": [
+                    "medicalRecordId"
+                  ],
+                  "name": "VisitDiagnosis_medicalRecordId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ],
+                "name": "VisitDiagnosis_pkey"
+              },
+              "uniques": []
+            },
             "VisitFeedback": {
               "columns": {
                 "accountId": {
@@ -12524,7 +12866,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "bb5b4857a5bcfff9b00d9217c175411a5b1b2a711c33b007fcf1eabac01cc9d1"
+    "storageHash": "1c31c0df9ae457fb95f8925d6faa51493b3781745f5db9c398ee3448f3034a16"
   },
   "capabilities": {
     "postgres": {

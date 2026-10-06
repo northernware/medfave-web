@@ -144,6 +144,8 @@ export type RecordDefaults = {
   followUpDate: string;
   notes: string;
   prescriptions: PrescriptionRow[];
+  /** ICD-11, primary first. */
+  diagnoses: { code: string; title: string }[];
 };
 
 export function blankRecord(visitDate: string): RecordDefaults {
@@ -169,5 +171,6 @@ export function blankRecord(visitDate: string): RecordDefaults {
     followUpDate: "",
     notes: "",
     prescriptions: [],
+    diagnoses: [],
   };
 }

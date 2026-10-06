@@ -7,6 +7,15 @@ import { orm } from "@/src/prisma/db";
 import { instantToDb } from "@/lib/datetime";
 import type { FormState } from "@/lib/validation";
 import { writeConsultation, type Intent } from "@/lib/consultation";
+import { searchIcd11 } from "@/lib/diagnoses";
+
+export type DiagnosisHit = { code: string; title: string };
+
+/** The note form's ICD-11 search. */
+export async function searchDiagnoses(q: string): Promise<DiagnosisHit[]> {
+  await requireDoctor();
+  return (await searchIcd11(String(q))).map(({ code, title }) => ({ code, title }));
+}
 
 function revalidateRecord(recordId: string, patientId: string) {
   revalidatePath(`/patients/${patientId}`);

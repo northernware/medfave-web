@@ -33,7 +33,9 @@ const TEXT = [
  * Saves a note. Body: `{ recordId?, intent: "draft" | "finish", patientId,
  * appointmentId?, visitDate: "YYYY-MM-DDTHH:MM", chiefComplaint, …vitals and
  * text fields, followUpDate?, amendmentReason?, prescriptions: [{ drugName,
- * dosage, frequency, duration?, instructions? }] }` → `{ record }`.
+ * dosage, frequency, duration?, instructions? }], diagnoses?: ["CA23.32", …] }`
+ * → `{ record }`. `diagnoses` are ICD-11 codes, primary first; left out, the
+ * note keeps the ones it has.
  * Leave out `recordId` for a new note; the response's `record.id` is the one
  * to send on every later save. A note for an appointment that already has one
  * of this doctor's continues it.
@@ -70,6 +72,12 @@ export async function POST(request: Request) {
     form.append("rx.frequency", String(r.frequency ?? ""));
     form.append("rx.duration", String(r.duration ?? ""));
     form.append("rx.instructions", String(r.instructions ?? ""));
+  }
+
+  // ICD-11 codes, primary first. Left out (an older app): the note keeps its diagnoses.
+  if (Array.isArray(body.diagnoses)) {
+    form.set("dx.present", "1");
+    for (const code of body.diagnoses) form.append("dx.code", String(code ?? ""));
   }
 
   const intent = body.intent === "finish" ? "finish" : "draft";

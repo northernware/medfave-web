@@ -66,6 +66,7 @@ export async function GET(request: Request, ctx: RouteContext<"/api/v1/doctor/pa
     cares
       ? orm.MedicalRecord
           .select("id", "doctorId", "status", "visitDate", "chiefComplaint", "assessment")
+          .include("diagnoses", (d) => d.select("code", "title").orderBy((x) => x.position.asc()))
           .where((r) => r.patientId.eq(id))
           .where((r) => r.archivedAt.isNull())
           .where((r) => (shared ? r.clinicId.eq(doctor.clinicId) : r.doctorId.eq(doctor.doctorId)))
@@ -131,6 +132,8 @@ export async function GET(request: Request, ctx: RouteContext<"/api/v1/doctor/pa
           visitDate: v.visitDate ? instantFromDb(v.visitDate).toISOString() : null,
           chiefComplaint: v.chiefComplaint,
           assessment: v.assessment,
+          /** ICD-11, primary first. */
+          diagnoses: v.diagnoses,
           mine: v.doctorId === doctor.doctorId,
           author: authors.get(v.doctorId) ?? null,
         }))

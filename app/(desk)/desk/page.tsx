@@ -88,6 +88,8 @@ export default async function DeskPage({ searchParams }: PageProps<"/desk">) {
       .include("doctor", (d) => d.select("fullName"))
       .where((a) => a.clinicId.eq(staff.clinicId))
       .where((a) => a.status.in(QUEUE_STATUSES))
+      // Today's only: a visit left open on an earlier day isn't in today's room.
+      .where((a) => a.scheduledAt.gte(instantToDb(today.start)))
       .all(),
     orm.AppointmentRequest
       .select("id", "preferredDate", "preferredTime", "service", "createdAt", "newFirstName", "newMiddleName", "newLastName", "rescheduleOfId")

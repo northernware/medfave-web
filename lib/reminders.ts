@@ -1,6 +1,7 @@
 import "server-only";
 import { orm } from "@/src/prisma/db";
 import { addDays } from "./scheduling";
+import { ranRecently } from "./throttle";
 import {
   dayKey,
   formatDateTime,
@@ -31,6 +32,9 @@ import { appUrl, sendAppointmentReminder } from "./email";
  * not.
  */
 export async function sendDueReminders(clinicId: string, now = new Date()) {
+  // Screens call this on every read; once a minute per clinic is plenty. A
+  // skipped run loses nothing: the run a moment ago sent what was due.
+  if (ranRecently(`reminders:${clinicId}`)) return { considered: 0, sent: 0, skipped: 0, failed: 0 };
   const tomorrow = addDays(dayKey(now), 1);
   const from = instantToDb(startOfClinicDay(tomorrow));
   const to = instantToDb(startOfClinicDay(addDays(tomorrow, 1)));

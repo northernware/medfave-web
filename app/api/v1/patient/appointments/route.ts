@@ -1,5 +1,5 @@
 import { apiPatient } from "@/lib/api";
-import { instantFromDb, instantToDb } from "@/lib/datetime";
+import { clinicDayRange, instantFromDb, instantToDb } from "@/lib/datetime";
 import { APPOINTMENT_STATUS_LABELS, QUEUE_STATUSES, SERVICE_LABELS } from "@/lib/domain";
 import { cancelBy, cancelCutoffHours } from "@/lib/patient-visits";
 import { canConfirm, CHANGEABLE, splitVisits } from "@/lib/visit-day";
@@ -59,6 +59,8 @@ export async function GET(request: Request) {
         .select("status", "arrivedAt")
         .where((a) => a.doctorId.eq(doctorId))
         .where((a) => a.status.in(QUEUE_STATUSES))
+        // Today's room only, as the doctor's queue.
+        .where((a) => a.scheduledAt.gte(instantToDb(clinicDayRange(new Date()).start)))
         .all(),
     );
   }

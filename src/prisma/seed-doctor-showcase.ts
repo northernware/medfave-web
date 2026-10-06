@@ -1,10 +1,13 @@
 import "dotenv/config";
+import { devOnly } from "./dev-only";
 import { or } from "@prisma/orm-postgres/orm-client";
 import bcrypt from "bcryptjs";
 import { db, orm } from "./db";
 import { MARK, seedId } from "./seed-ids";
 import { calendarDateToDb, dayKey, instantToDb } from "../../lib/datetime";
 import { addDays } from "../../lib/scheduling";
+
+devOnly("db:seed-doctor-showcase");
 
 /*
  * Fills in what the doctor's app shows when there is data for it, for Dr. Ana

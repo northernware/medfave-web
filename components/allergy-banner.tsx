@@ -1,5 +1,6 @@
 import type { AllergySeverity, ClinicalListStatus } from "@/lib/enums";
 import { ALLERGY_SEVERITY_LABELS, sortAllergies } from "@/lib/clinical";
+import { AddDisclosure } from "./add-disclosure";
 import { ChartForm } from "./chart-form";
 import { buttonClass } from "./ui";
 
@@ -35,23 +36,24 @@ function RemoveButton({ patientId, action, id, label }: { patientId: string; act
   );
 }
 
-/** "+ Add …" folded open under a box. */
-function AddDisclosure({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <details className="group mt-2 text-sm">
-      <summary className="cursor-pointer list-none text-xs font-semibold underline-offset-2 hover:underline">+ {label}</summary>
-      <div className="mt-2">{children}</div>
-    </details>
-  );
-}
-
 const field = "w-full rounded-md border border-border bg-surface px-2 py-1 text-sm text-ink";
-/** The app's secondary capsule, small: the same Save as everywhere else, whatever the box colour. */
-const smallButton = buttonClass("secondary", "justify-self-start px-3 py-1 text-xs");
 
-function AddAllergy({ patientId }: { patientId: string }) {
+/**
+ * Save inside a box: on the red and amber boxes a solid capsule in the box's
+ * own text colour (pink would clash); on a plain box the app's primary.
+ */
+type Tone = "danger" | "warn" | "plain";
+const saveClass = (tone: Tone) =>
+  tone === "plain"
+    ? buttonClass("primary", "justify-self-start")
+    : // The same capsule and size as buttonClass, in the box's own text colour.
+      `inline-flex items-center justify-center justify-self-start rounded-full bg-on-alert px-4 py-2 text-sm leading-5 font-semibold hover:opacity-90 ${
+        tone === "danger" ? "text-alert-danger" : "text-alert-warn"
+      }`;
+
+function AddAllergy({ patientId, tone }: { patientId: string; tone: Tone }) {
   return (
-    <AddDisclosure label="Add allergy">
+    <AddDisclosure label="Add allergy" summaryClassName={tone === "plain" ? "text-accent-ink" : ""}>
       <ChartForm patientId={patientId} action="allergy.add" className="grid gap-1.5">
         <input name="label" required placeholder="Allergy (e.g. Sulfa drugs)" className={field} />
         <div className="flex gap-1.5">
@@ -63,7 +65,7 @@ function AddAllergy({ patientId }: { patientId: string }) {
           </select>
           <input name="reaction" placeholder="Reaction" className={field} />
         </div>
-        <button className={smallButton}>Save allergy</button>
+        <button className={saveClass(tone)}>Save allergy</button>
       </ChartForm>
     </AddDisclosure>
   );
@@ -76,7 +78,7 @@ export function AlertBanner({ alerts, patientId }: { alerts: { id: string; label
     if (!patientId) return null;
     return (
       <div className="rounded-md border border-border bg-surface px-3.5 py-2 text-ink-muted">
-        <AddAlert patientId={patientId} />
+        <AddAlert patientId={patientId} tone="plain" />
       </div>
     );
   }
@@ -95,18 +97,18 @@ export function AlertBanner({ alerts, patientId }: { alerts: { id: string; label
           </li>
         ))}
       </ul>
-      {patientId ? <AddAlert patientId={patientId} /> : null}
+      {patientId ? <AddAlert patientId={patientId} tone="warn" /> : null}
     </div>
   );
 }
 
-function AddAlert({ patientId }: { patientId: string }) {
+function AddAlert({ patientId, tone }: { patientId: string; tone: Tone }) {
   return (
-    <AddDisclosure label="Add medical alert">
+    <AddDisclosure label="Add medical alert" summaryClassName={tone === "plain" ? "text-accent-ink" : ""}>
       <ChartForm patientId={patientId} action="alert.add" className="grid gap-1.5">
         <input name="label" required placeholder="What to watch for (e.g. On warfarin)" className={field} />
         <input name="notes" placeholder="Details" className={field} />
-        <button className={smallButton}>Save alert</button>
+        <button className={saveClass(tone)}>Save alert</button>
       </ChartForm>
     </AddDisclosure>
   );
@@ -129,7 +131,7 @@ export function AllergyBanner({
     return (
       <div className="rounded-md border border-border border-l-[3px] border-l-ok bg-surface px-3.5 py-2.5 text-sm text-ink-muted">
         <span className="font-medium text-ink">No known allergies</span> — asked and recorded.
-        {patientId ? <AddAllergy patientId={patientId} /> : null}
+        {patientId ? <AddAllergy patientId={patientId} tone="plain" /> : null}
       </div>
     );
   }
@@ -142,11 +144,11 @@ export function AllergyBanner({
         {patientId ? (
           <div className="mt-2 flex flex-wrap items-start gap-3">
             <ChartForm patientId={patientId} action="allergy.none">
-              <button className={smallButton}>No known allergies</button>
+              <button className={saveClass("warn")}>No known allergies</button>
             </ChartForm>
           </div>
         ) : null}
-        {patientId ? <AddAllergy patientId={patientId} /> : null}
+        {patientId ? <AddAllergy patientId={patientId} tone="warn" /> : null}
       </div>
     );
   }
@@ -178,7 +180,7 @@ export function AllergyBanner({
           </li>
         ))}
       </ul>
-      {patientId ? <AddAllergy patientId={patientId} /> : null}
+      {patientId ? <AddAllergy patientId={patientId} tone="danger" /> : null}
     </div>
   );
 }

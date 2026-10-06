@@ -71,7 +71,12 @@ export async function NoteContext({
             {patient.conditions.map((c) => (
               <li key={c.id} className="flex items-baseline justify-between gap-2">
                 <span>{c.label}</span>
-                <ChartForm patientId={patientId} action="condition.resolve" id={c.id}>
+                <ChartForm
+                  patientId={patientId}
+                  action="condition.resolve"
+                  id={c.id}
+                  confirm={`Mark ${c.label} resolved? It moves to past conditions; you can reopen it.`}
+                >
                   <button className="text-xs text-ink-muted hover:text-ink hover:underline" aria-label={`Mark ${c.label} resolved`}>
                     Resolve
                   </button>
@@ -99,7 +104,12 @@ export async function NoteContext({
                   {[m.label, m.dosage].filter(Boolean).join(" ")}
                   {m.frequency ? <span className="text-ink-muted"> · {m.frequency}</span> : null}
                 </span>
-                <ChartForm patientId={patientId} action="medication.stop" id={m.id}>
+                <ChartForm
+                  patientId={patientId}
+                  action="medication.stop"
+                  id={m.id}
+                  confirm={`Stop ${m.label}? It moves to past medicines; you can restart it.`}
+                >
                   <button className="text-xs text-ink-muted hover:text-ink hover:underline" aria-label={`${m.label}: no longer taken`}>
                     Stop
                   </button>

@@ -3,7 +3,7 @@ import { CrumbName } from "@/components/crumb-names";
 import { DELETE_PHRASES } from "@/lib/confirm-phrase";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { archivePatient, deletePatient, reopenCondition, resolveCondition, restorePatient } from "@/app/actions/patients";
+import { archivePatient, deletePatient, reopenCondition, restorePatient } from "@/app/actions/patients";
 import { ChartForm } from "@/components/chart-form";
 import { requireDoctor } from "@/lib/auth";
 import { StartHousehold } from "@/components/start-household";
@@ -476,8 +476,13 @@ export default async function PatientPage({
                     <span key={c.id} className="inline-flex items-center gap-1 rounded-full bg-accent-soft py-0.5 pr-1 pl-2.5 text-xs font-medium text-accent-ink">
                       {c.code ? <span className="font-mono">{c.code}</span> : null}
                       {c.label}
-                      <form action={resolveCondition}>
-                        <input type="hidden" name="conditionId" value={c.id} />
+                      <ChartForm
+                        patientId={patient.id}
+                        action="condition.resolve"
+                        id={c.id}
+                        confirm={`Mark ${c.label} resolved? It moves to past conditions; you can reopen it.`}
+                        className="inline"
+                      >
                         <button
                           className="rounded-full px-1.5 py-0.5 text-[11px] text-ink-muted hover:bg-surface hover:text-ink"
                           aria-label={`Mark ${c.label} resolved`}
@@ -485,7 +490,7 @@ export default async function PatientPage({
                         >
                           Resolve
                         </button>
-                      </form>
+                      </ChartForm>
                     </span>
                   ))}
                 </span>

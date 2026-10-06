@@ -17,7 +17,7 @@ The old dev database ran out at about 20,000 operations a day, mostly from polli
 ## Tested
 - `tsc` (apart from the missing `@solar-icons/react` install), eslint, `npm test`.
 - `MEDFAVE_ENV=production npm run db:scenario -- late` stops with a message.
-- The routes are checked on this branch's Vercel preview (dev database); see the PR.
+- On this branch's Vercel preview (dev database), with Ramon's checked-in visit moved to yesterday: the queue is Elena, Joaquin, Marilou; `leftovers` lists Ramon; repeat reads of `/doctor/day` take about 0.26 s instead of 0.6 s. The live site, on the old code, still showed Ramon in today's queue.
 
 ## Heads-up
 - Set `MEDFAVE_ENV=production` in Vercel's **Production** environment when the production database exists, and in any shell pointed at it.

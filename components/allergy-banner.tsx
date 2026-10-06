@@ -42,13 +42,13 @@ const field = "w-full rounded-md border border-border bg-surface px-2 py-1 text-
  * Save inside a box: on the red and amber boxes a solid capsule in the box's
  * own text colour (pink would clash); on a plain box the app's primary.
  */
-type Tone = "danger" | "warn" | "ok" | "plain";
+type Tone = "danger" | "warn" | "plain";
 const saveClass = (tone: Tone) =>
   tone === "plain"
     ? buttonClass("primary", "justify-self-start")
     : // The same capsule and size as buttonClass, in the box's own text colour.
       `inline-flex items-center justify-center justify-self-start rounded-full bg-on-alert px-4 py-2 text-sm leading-5 font-semibold hover:opacity-90 ${
-        tone === "danger" ? "text-alert-danger" : tone === "ok" ? "text-alert-ok" : "text-alert-warn"
+        tone === "danger" ? "text-alert-danger" : "text-alert-warn"
       }`;
 
 function AddAllergy({ patientId, tone }: { patientId: string; tone: Tone }) {
@@ -119,8 +119,9 @@ function AddAlert({ patientId, tone }: { patientId: string; tone: Tone }) {
 
 /**
  * Allergies at the top of a chart, in one of three states — and all three say
- * something. An empty list is not "safe": a patient nobody has asked reads as
- * unrecorded, in amber, rather than silently as none.
+ * something. Red when there are allergies; otherwise a plain box that says
+ * either "none known" (asked) or, with a warning, that nobody has asked yet:
+ * an empty list is not "safe".
  */
 export function AllergyBanner({
   status,
@@ -130,31 +131,29 @@ export function AllergyBanner({
   status: ClinicalListStatus;
   allergies: AllergyEntry[];
 } & Editable) {
-  if (status === "NONE_KNOWN" && allergies.length === 0) {
-    return (
-      // The same solid box as the red and amber ones, in green: asked, and none.
-      <div className="rounded-md bg-alert-ok px-3.5 py-3 text-sm text-on-alert shadow-sm">
-        <p className="font-display text-sm font-semibold">Allergies</p>
-        <p className="mt-1.5">None known — asked and recorded.</p>
-        {patientId ? <AddAllergy patientId={patientId} tone="ok" /> : null}
-      </div>
-    );
-  }
-
+  // Colour only when there's something to watch for: no allergies is a plain
+  // box like its neighbours, saying whether anyone has asked.
   if (allergies.length === 0) {
+    const asked = status === "NONE_KNOWN";
     return (
-      <div className="rounded-md bg-alert-warn px-3.5 py-3 text-sm text-on-alert shadow-sm">
-        <p className="font-display text-sm font-semibold">Allergies</p>
-        <p className="mt-1.5">Not recorded: nobody has taken an allergy history for this patient yet.</p>
-        {patientId ? (
-          <div className="mt-2 flex flex-wrap items-start gap-3">
-            <ChartForm patientId={patientId} action="allergy.none">
-              <button className={saveClass("warn")}>No known allergies</button>
-            </ChartForm>
-          </div>
+      <section className="rounded-md border border-border bg-surface px-3.5 py-3 text-sm">
+        <h2 className="mb-1.5 font-display text-sm font-semibold">Allergies</h2>
+        {asked ? (
+          <p className="text-ink-muted">
+            <span aria-hidden className="mr-1 text-ok-ink">✓</span>None known — asked and recorded.
+          </p>
+        ) : (
+          <p className="font-medium text-warn-ink">
+            <span aria-hidden className="mr-1">⚠</span>Not asked yet: take an allergy history.
+          </p>
+        )}
+        {patientId && !asked ? (
+          <ChartForm patientId={patientId} action="allergy.none" className="mt-2">
+            <button className={saveClass("plain")}>No known allergies</button>
+          </ChartForm>
         ) : null}
-        {patientId ? <AddAllergy patientId={patientId} tone="warn" /> : null}
-      </div>
+        {patientId ? <AddAllergy patientId={patientId} tone="plain" /> : null}
+      </section>
     );
   }
 

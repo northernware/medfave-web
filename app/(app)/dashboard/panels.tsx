@@ -241,7 +241,7 @@ export function LastVisitDetails({ visit, doctorName }: { visit: LastVisit | nul
                 : null,
             )}
             {row("Follow-up", record.followUpDate ? formatCalendarDate(record.followUpDate) : null)}
-            {row("Notes", record.notes)}
+            {row("Advice and notes", record.notes)}
           </dl>
           <Link href={`/records/${record.id}`} className={`${buttonClass("secondary")} mt-5`}>
             Open the note

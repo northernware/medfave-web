@@ -7,8 +7,8 @@ import type { PrescriptionRow } from "@/lib/form-defaults";
 /**
  * What a return visit's note starts from: the patient's latest finalized note
  * this doctor may read (their own, or any in a shared-chart clinic). The
- * working diagnosis, the plan and the medicines, for the doctor to keep, edit
- * or clear; and the height, which rarely changes. Nothing measured today is
+ * working diagnosis, the advice and the medicines, for the doctor to keep,
+ * edit or clear; and the height, which rarely changes. Nothing measured today is
  * carried — a copied blood pressure would look like today's reading.
  */
 export type CarryOver = {
@@ -16,14 +16,17 @@ export type CarryOver = {
   from: string;
   heightCm: string;
   assessment: string;
+  /** Always empty now: plans are prescriptions plus advice. Kept for apps that still read it. */
   treatmentPlan: string;
+  /** "Advice and notes", or an older note's treatment plan, which held the advice then. */
+  notes: string;
   prescriptions: PrescriptionRow[];
 };
 
 export async function carryOverFor(doctor: { id: string; clinicId: string }, patientId: string): Promise<CarryOver | null> {
   const shared = await sharesCharts(doctor.clinicId);
   const last = await orm.MedicalRecord
-    .select("id", "visitDate", "heightCm", "assessment", "treatmentPlan")
+    .select("id", "visitDate", "heightCm", "assessment", "treatmentPlan", "notes")
     .include("prescriptions", (rx) => rx.select("drugName", "dosage", "frequency", "duration", "instructions"))
     .where((r) => r.patientId.eq(patientId))
     .where((r) => r.clinicId.eq(doctor.clinicId))
@@ -37,7 +40,8 @@ export async function carryOverFor(doctor: { id: string; clinicId: string }, pat
     from: formatDateTime(instantFromDb(last.visitDate)),
     heightCm: last.heightCm != null ? String(last.heightCm) : "",
     assessment: last.assessment ?? "",
-    treatmentPlan: last.treatmentPlan ?? "",
+    treatmentPlan: "",
+    notes: last.notes?.trim() || last.treatmentPlan || "",
     prescriptions: last.prescriptions.map((rx) => ({
       drugName: rx.drugName,
       dosage: rx.dosage,

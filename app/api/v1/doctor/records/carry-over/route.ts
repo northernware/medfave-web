@@ -4,7 +4,7 @@ import { carryOverFor } from "@/lib/carry-over";
 
 /**
  * What a new note for `?patientId=` starts from → `{ carryOver: { from,
- * heightCm, assessment, treatmentPlan, prescriptions[] } | null }`: the latest
+ * heightCm, assessment, notes, treatmentPlan (always empty), prescriptions[] } | null }`: the latest
  * finalized note this doctor may read. Never today's measurements.
  */
 export async function GET(request: Request) {

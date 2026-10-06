@@ -270,9 +270,13 @@ export function RecordForm({
         <Field label="Assessment" htmlFor="assessment" hint="Your reasoning. The coded diagnoses are above." error={err?.assessment}>
           <TextArea id="assessment" name="assessment" rows={3} defaultValue={defaults.assessment} />
         </Field>
-        <Field label="Treatment plan" htmlFor="treatmentPlan" error={err?.treatmentPlan}>
-          <TextArea id="treatmentPlan" name="treatmentPlan" rows={4} defaultValue={defaults.treatmentPlan} />
-        </Field>
+        {/* Treatment plans are now the prescriptions plus "Advice and notes". A
+            note written with a plan keeps showing it, so saving can't erase it. */}
+        {defaults.treatmentPlan ? (
+          <Field label="Treatment plan" htmlFor="treatmentPlan" hint="From before plans moved to prescriptions and advice." error={err?.treatmentPlan}>
+            <TextArea id="treatmentPlan" name="treatmentPlan" rows={4} defaultValue={defaults.treatmentPlan} />
+          </Field>
+        ) : null}
         <FieldGrid>
           <Field label="Follow-up date" htmlFor="followUpDate" error={err?.followUpDate}>
             <TextInput
@@ -365,7 +369,7 @@ export function RecordForm({
       </section>
 
       <section className="border-t border-border pt-6">
-        <Field label="Additional notes" htmlFor="notes" error={err?.notes}>
+        <Field label="Advice and notes" htmlFor="notes" hint="Lifestyle advice, handouts, labs to get, referrals: anything that isn't a medicine." error={err?.notes}>
           <TextArea id="notes" name="notes" rows={3} defaultValue={defaults.notes} />
         </Field>
       </section>

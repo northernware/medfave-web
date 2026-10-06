@@ -221,7 +221,7 @@ export default async function RecordPage({ params }: PageProps<"/records/[id]">)
         ) : null}
         <Prose label="Assessment" text={record.assessment} />
         <Prose label="Treatment plan" text={record.treatmentPlan} />
-        <Prose label="Notes" text={record.notes} />
+        <Prose label="Advice and notes" text={record.notes} />
         {record.followUpDate ? (
           <Detail
             label="Follow-up"

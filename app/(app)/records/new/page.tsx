@@ -63,7 +63,7 @@ export default async function NewRecordPage({ searchParams }: PageProps<"/record
   if (last) {
     if (last.heightCm) defaults.heightCm = last.heightCm;
     defaults.assessment = last.assessment;
-    defaults.treatmentPlan = last.treatmentPlan;
+    defaults.notes = last.notes;
     defaults.prescriptions = last.prescriptions;
   }
 

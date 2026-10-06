@@ -4,8 +4,9 @@ import { carryOverFor } from "@/lib/carry-over";
 
 /**
  * What a new note for `?patientId=` starts from → `{ carryOver: { from,
- * heightCm, assessment, notes, treatmentPlan (always empty), prescriptions[] } | null }`: the latest
- * finalized note this doctor may read. Never today's measurements.
+ * heightCm, diagnoses[], notes, prescriptions[], assessment, treatmentPlan }
+ * | null }`: the latest finalized note this doctor may read. `assessment` and
+ * `treatmentPlan` are always empty now. Never today's measurements.
  */
 export async function GET(request: Request) {
   const doctor = await apiDoctor(request);

@@ -42,7 +42,7 @@ export default async function NewDocumentPage({ searchParams }: PageProps<"/docu
         title="Request a document"
         subtitle="Recorded as a request first, prepared, then handed over — so the chart says who got what."
       />
-      <Card className="p-5 sm:p-6">
+      <Card className="max-w-3xl p-5 sm:p-6">
         <DocumentForm
           action={createDocumentRequest}
           patients={patients}

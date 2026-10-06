@@ -31,7 +31,7 @@ export default async function NewHouseholdMemberPage({ params }: PageProps<"/hou
   return (
     <div className="space-y-3">
       <PageHeader title="Add patient" subtitle={`Joining the ${household.name} household`} />
-      <Card className="p-5 sm:p-6">
+      <Card className="max-w-3xl p-5 sm:p-6">
         <PatientForm
           action={createPatient}
           defaults={blankPatient(household.id)}

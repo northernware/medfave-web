@@ -34,7 +34,7 @@ export default async function DeskNewPatientPage({ searchParams }: PageProps<"/d
         title="Add patient"
         subtitle="Registration details. Allergies and conditions are recorded by the doctor at the visit."
       />
-      <Card className="p-5 sm:p-6">
+      <Card className="max-w-3xl p-5 sm:p-6">
         <PatientForm
           action={createPatient}
           defaults={blankPatient(preselected)}

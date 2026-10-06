@@ -29,7 +29,7 @@ export default async function EditAppointmentPage({ params }: PageProps<"/appoin
   return (
     <div className="space-y-3">
       <PageHeader title="Edit appointment" />
-      <Card className="p-5 sm:p-6">
+      <Card className="max-w-3xl p-5 sm:p-6">
         <AppointmentForm
           action={updateAppointment.bind(null, appointment.id)}
           patients={patients}

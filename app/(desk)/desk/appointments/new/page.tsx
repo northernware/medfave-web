@@ -69,7 +69,7 @@ export default async function DeskNewAppointmentPage({
     return (
       <div className="space-y-6">
         <PageHeader title={source === "WALK_IN" ? "Register walk-in" : "Book appointment"} subtitle="Choose the doctor first." />
-        <Card className="p-5 sm:p-6">{picker}</Card>
+        <Card className="max-w-3xl p-5 sm:p-6">{picker}</Card>
       </div>
     );
   }

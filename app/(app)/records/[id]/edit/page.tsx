@@ -9,7 +9,7 @@ import { fullName } from "@/lib/domain";
 import { RecordForm } from "@/components/forms/record-form";
 import { Card, PageHeader } from "@/components/ui";
 
-export const metadata: Metadata = { title: "Edit record" };
+export const metadata: Metadata = { title: "Visit note" };
 
 /** Prisma nulls become the empty strings the form's inputs expect. */
 const text = (v: string | null) => v ?? "";
@@ -39,7 +39,7 @@ export default async function EditRecordPage({ params }: PageProps<"/records/[id
   return (
     <div className="space-y-3">
       <PageHeader
-        title={record.status === "DRAFT" ? "Consultation notes" : "Amend record"}
+        title={record.status === "DRAFT" ? "Visit note (draft)" : "Amend note"}
         subtitle={
           record.status === "DRAFT"
             ? fullName(record.patient)

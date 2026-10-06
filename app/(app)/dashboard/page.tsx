@@ -329,7 +329,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
                             }
                             className={buttonClass("secondary")}
                           >
-                            {a.medicalRecord ? "Open notes" : "Write notes"}
+                            {a.medicalRecord ? "Open note" : "Write note"}
                           </Link>
                         </>
                       ) : (

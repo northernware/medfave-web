@@ -186,7 +186,7 @@ export default async function PatientPage({
           ) : (
           <>
             <Link href={`/records/new?patientId=${patient.id}`} className={buttonClass("primary")}>
-              Document visit
+              Write note
             </Link>
             <Link href={`/appointments/new?patientId=${patient.id}`} className={buttonClass("secondary")}>
               Book
@@ -244,7 +244,7 @@ export default async function PatientPage({
                 href={`/records/new?patientId=${patient.id}`}
                 className="font-medium text-accent-ink hover:underline"
               >
-                Document visit
+                Write note
               </Link>
             )
           }
@@ -257,7 +257,7 @@ export default async function PatientPage({
             action={
               archived ? undefined : (
                 <Link href={`/records/new?patientId=${patient.id}`} className={buttonClass("primary")}>
-                  Document visit
+                  Write note
                 </Link>
               )
             }

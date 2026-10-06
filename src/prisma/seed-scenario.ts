@@ -1,5 +1,7 @@
 import "dotenv/config";
+import { or } from "@prisma/orm-postgres/orm-client";
 import { orm } from "./db";
+import { MARK, seedId } from "./seed-ids";
 import { instantToDb } from "../../lib/datetime";
 
 /*
@@ -24,11 +26,12 @@ async function late() {
   const doctor = await orm.Doctor.select("id", "accountId").where((d) => d.clinicId.eq(ramon.clinicId)).where((d) => d.fullName.eq("Dr. Ana Reyes")).first();
   if (!doctor) throw new Error("No Dr. Ana Reyes at the demo clinic.");
 
-  await orm.Appointment.where((a) => a.id.eq("scenario-late")).deleteAndCount();
+  const lateId = seedId(MARK.scenario, "late");
+  await orm.Appointment.where((a) => or(a.id.eq(lateId), a.id.eq("scenario-late"))).deleteAndCount();
   const now = instantToDb(new Date());
   const at = new Date(Math.floor(Date.now() / 60_000) * 60_000 - 2 * 60_000);
   await orm.Appointment.create({
-    id: "scenario-late",
+    id: lateId,
     clinicId: ramon.clinicId,
     patientId: ramon.id,
     doctorId: doctor.id,

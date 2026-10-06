@@ -459,7 +459,7 @@ export default async function PatientPage({
                           aria-label={`Mark ${c.label} resolved`}
                           title="No longer current: move to past conditions"
                         >
-                          Resolved
+                          Resolve
                         </button>
                       </form>
                     </span>

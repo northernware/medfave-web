@@ -57,7 +57,7 @@ export default async function DeskEditPatientPage({
   return (
     <div className="space-y-3">
       <PageHeader title="Edit details" subtitle={fullName(patient)} />
-      <Card className="p-5 sm:p-6">
+      <Card className="max-w-3xl p-5 sm:p-6">
         <PatientForm
           action={updatePatient.bind(null, patient.id)}
           households={households}

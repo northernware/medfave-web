@@ -68,7 +68,7 @@ export default async function NewAppointmentPage({ searchParams }: PageProps<"/a
   return (
     <div className="space-y-3">
       <PageHeader title="Book appointment" />
-      <Card className="p-5 sm:p-6">
+      <Card className="max-w-3xl p-5 sm:p-6">
         <AppointmentForm
           action={createAppointment}
           patients={patients}

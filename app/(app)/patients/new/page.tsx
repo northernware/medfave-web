@@ -43,7 +43,7 @@ export default async function NewPatientPage({ searchParams }: PageProps<"/patie
         title="Add patient"
         subtitle="Choose a household or create one here — no need to go and make it first."
       />
-      <Card className="p-5 sm:p-6">
+      <Card className="max-w-3xl p-5 sm:p-6">
         <PatientForm
           action={createPatient}
           defaults={blankPatient(preselected)}

@@ -54,7 +54,7 @@ export default async function EditPatientPage({ params }: PageProps<"/patients/[
   return (
     <div className="space-y-3">
       <PageHeader title={`Edit ${fullName(patient)}`} />
-      <Card className="p-5 sm:p-6">
+      <Card className="max-w-3xl p-5 sm:p-6">
         <PatientForm
           action={action}
           households={households}

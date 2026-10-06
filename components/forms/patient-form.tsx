@@ -247,12 +247,12 @@ export function PatientForm({
           />
 
           <ClinicalPicker
-            legend="Chronic conditions"
+            legend="Ongoing conditions"
             fieldName="condition"
             statusName="conditionStatus"
             groups={CONDITION_GROUPS}
             placeholder="Search or select conditions…"
-            noneLabel="No known chronic conditions"
+            noneLabel="No known ongoing conditions"
             defaultStatus={defaults.conditionStatus as "RECORDED" | "NONE_KNOWN" | "UNKNOWN"}
             defaultItems={defaults.conditions}
             detailFields={["notes"]}

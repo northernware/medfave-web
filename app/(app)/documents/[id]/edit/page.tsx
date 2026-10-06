@@ -33,7 +33,7 @@ export default async function EditDocumentPage({ params }: PageProps<"/documents
         title={`Edit ${DOCUMENT_TYPE_LABELS[request.type].toLowerCase()}`}
         subtitle={fullName(request.patient)}
       />
-      <Card className="p-5 sm:p-6">
+      <Card className="max-w-3xl p-5 sm:p-6">
         <DocumentForm
           action={updateDocumentRequest.bind(null, request.id)}
           patients={patients}

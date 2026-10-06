@@ -24,6 +24,7 @@
     "db:seed-patient-showcase": "tsx src/prisma/seed-patient-showcase.ts",
     "db:seed-doctor-showcase": "tsx src/prisma/seed-doctor-showcase.ts",
     "db:scenario": "tsx src/prisma/seed-scenario.ts",
+    "icd11:import": "tsx src/prisma/import-icd11.ts",
     "admin:grant": "tsx src/prisma/grant-admin.ts",
     "db:backfill-names": "tsx src/prisma/backfill-name-parts.ts"
   },

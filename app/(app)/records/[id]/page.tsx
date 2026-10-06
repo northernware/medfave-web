@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ICD11_CREDIT } from "@/lib/diagnoses";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { archiveMedicalRecord, restoreMedicalRecord } from "@/app/actions/records";
@@ -58,6 +59,7 @@ export default async function RecordPage({ params }: PageProps<"/records/[id]">)
         .orderBy((x) => x.version.desc()),
     )
     .include("followUpAppointment", (a) => a.select("id", "scheduledAt", "status"))
+    .include("diagnoses", (d) => d.select("code", "title").orderBy((x) => x.position.asc()))
     .include("prescriptions", (rx) =>
       rx
         .select("id", "drugName", "dosage", "frequency", "duration", "instructions")
@@ -200,6 +202,23 @@ export default async function RecordPage({ params }: PageProps<"/records/[id]">)
       <Card className="space-y-5 p-5">
         <Prose label="History of present illness" text={record.historyOfPresentIllness} />
         <Prose label="Physical examination" text={record.physicalExamination} />
+        {record.diagnoses.length > 0 ? (
+          <div>
+            <p className="text-xs font-medium uppercase tracking-wide text-ink-faint">Diagnoses (ICD-11)</p>
+            <ol className="mt-1.5 space-y-1 text-sm">
+              {record.diagnoses.map((d, i) => (
+                <li key={d.code} className="flex gap-3">
+                  <span className="w-16 shrink-0 font-mono text-xs font-semibold">{d.code}</span>
+                  <span>
+                    {d.title}
+                    {i === 0 && record.diagnoses.length > 1 ? <span className="ml-2 text-xs text-ink-muted">Primary</span> : null}
+                  </span>
+                </li>
+              ))}
+            </ol>
+            <p className="mt-1.5 text-xs text-ink-faint">{ICD11_CREDIT}</p>
+          </div>
+        ) : null}
         <Prose label="Assessment" text={record.assessment} />
         <Prose label="Treatment plan" text={record.treatmentPlan} />
         <Prose label="Notes" text={record.notes} />

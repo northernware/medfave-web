@@ -35,6 +35,8 @@ export type RecordSnapshot = {
     duration: string | null;
     instructions: string | null;
   }[];
+  /** ICD-11, primary first. Versions written before diagnoses existed have none. */
+  diagnoses: { code: string; title: string }[];
 };
 
 /** Field order and wording for the history, so a change reads as a sentence. */
@@ -108,6 +110,17 @@ export function changesBetween(before: RecordSnapshot, after: RecordSnapshot): F
     });
   }
 
+  // Diagnoses, like prescriptions, change as a list: order matters (the first is primary).
+  const wasDx = before.diagnoses.map((d) => `${d.code} ${d.title}`);
+  const nowDx = after.diagnoses.map((d) => `${d.code} ${d.title}`);
+  if (wasDx.join("\n") !== nowDx.join("\n")) {
+    changes.push({
+      label: "Diagnoses",
+      from: wasDx.length > 0 ? wasDx.join("; ") : EMPTY,
+      to: nowDx.length > 0 ? nowDx.join("; ") : EMPTY,
+    });
+  }
+
   return changes;
 }
 
@@ -116,7 +129,7 @@ export function parseSnapshot(json: string): RecordSnapshot | null {
   try {
     const value = JSON.parse(json) as Partial<RecordSnapshot>;
     if (typeof value !== "object" || value === null) return null;
-    return { ...value, prescriptions: value.prescriptions ?? [] } as RecordSnapshot;
+    return { ...value, prescriptions: value.prescriptions ?? [], diagnoses: value.diagnoses ?? [] } as RecordSnapshot;
   } catch {
     return null;
   }

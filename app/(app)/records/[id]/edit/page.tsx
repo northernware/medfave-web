@@ -22,6 +22,7 @@ export default async function EditRecordPage({ params }: PageProps<"/records/[id
   const record = await orm.MedicalRecord
     .include("patient", (p) => p.select("id", "firstName", "middleName", "lastName"))
     .include("appointment", (a) => a.select("id", "scheduledAt", "reason", "visitType"))
+    .include("diagnoses", (d) => d.select("code", "title").orderBy((x) => x.position.asc()))
     .include("prescriptions", (p) =>
       p
         .select("id", "drugName", "dosage", "frequency", "duration", "instructions")
@@ -88,6 +89,7 @@ export default async function EditRecordPage({ params }: PageProps<"/records/[id
               duration: text(rx.duration),
               instructions: text(rx.instructions),
             })),
+            diagnoses: record.diagnoses,
           }}
           cancelHref={`/records/${record.id}`}
         />

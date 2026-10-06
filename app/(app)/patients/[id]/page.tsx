@@ -85,6 +85,7 @@ export default async function PatientPage({
           "weightKg",
         )
         .include("prescriptions", (rx) => rx.count())
+        .include("diagnoses", (d) => d.select("code", "title").orderBy((x) => x.position.asc()))
         // Visit notes are their author's (layer 3), unless the clinic shares charts.
         .where((x) => (shared ? x.clinicId.eq(doctor.clinicId) : x.doctorId.eq(doctor.id)))
         .orderBy((x) => x.visitDate.desc()),
@@ -283,7 +284,11 @@ export default async function PatientPage({
                         {record.doctorId !== doctor.id ? (
                           <span className="mt-0.5 block text-xs text-ink-faint">by {authorName(record.doctorId)}</span>
                         ) : null}
-                        {record.assessment ? (
+                        {record.diagnoses.length > 0 ? (
+                          <span className="mt-0.5 block truncate text-xs text-ink-muted">
+                            {record.diagnoses.map((d) => `${d.code} ${d.title}`).join(" · ")}
+                          </span>
+                        ) : record.assessment ? (
                           <span className="mt-0.5 block truncate text-xs text-ink-muted">
                             {record.assessment}
                           </span>

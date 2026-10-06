@@ -5,6 +5,7 @@ import { db, orm } from "@/src/prisma/db";
 import { calendarDateFromDb, calendarDateToDb, instantFromDb, instantToDb } from "@/lib/datetime";
 import { newId } from "@/lib/ids";
 import type { RecordSnapshot } from "@/lib/record-versions";
+import { readDiagnoses, writeDiagnoses } from "@/lib/diagnoses";
 import { fromDateInputValue, fromDateTimeLocalValue } from "@/lib/datetime";
 import {
   medicalRecordDraftSchema,
@@ -127,6 +128,7 @@ async function ensureBaselineVersion(tx: Tx, recordId: string, fallbackAuthorId:
         .select("drugName", "dosage", "frequency", "duration", "instructions")
         .orderBy((x) => x.createdAt.asc()),
     )
+    .include("diagnoses", (d) => d.select("code", "title").orderBy((x) => x.position.asc()))
     .where((r) => r.id.eq(recordId))
     .first();
   if (!record) return;
@@ -151,6 +153,7 @@ async function ensureBaselineVersion(tx: Tx, recordId: string, fallbackAuthorId:
       : null,
     notes: record.notes,
     prescriptions: record.prescriptions.map((rx) => ({ ...rx })),
+    diagnoses: record.diagnoses.map((d) => ({ ...d })),
   };
 
   await t.MedicalRecordVersion.create({
@@ -341,6 +344,8 @@ export async function writeConsultation(
 
   const { rows, error } = readPrescriptions(formData);
   if (error) return { error };
+  const { rows: diagnoses, keep: keepDiagnoses, error: dxError } = await readDiagnoses(formData);
+  if (dxError) return { error: dxError };
 
   const savedAt = new Date();
   const now = instantToDb(savedAt);
@@ -407,6 +412,14 @@ export async function writeConsultation(
         .where((f, fns) => fns.eq(f.medicalRecordId, existing.id))
         .build();
       await tx.execute(clear as never);
+      // The same for diagnoses: the list is edited as a whole, in order.
+      if (!keepDiagnoses) {
+        const clearDx = tx.sql.public.VisitDiagnosis
+          .delete()
+          .where((f, fns) => fns.eq(f.medicalRecordId, existing.id))
+          .build();
+        await tx.execute(clearDx as never);
+      }
     } else {
       const created = await t.MedicalRecord.select("id").create({
         ...scalars,
@@ -424,6 +437,7 @@ export async function writeConsultation(
     }
 
     await writePrescriptions(t, targetId, rows);
+    if (!keepDiagnoses) await writeDiagnoses(t, targetId, diagnoses);
 
     // Finishing the consultation is what completes the visit — saving a draft
     // is not. The appointment used to be marked done the moment a record row
@@ -474,6 +488,13 @@ export async function writeConsultation(
         followUpDate: followUp ? followUp.toISOString().slice(0, 10) : null,
         notes: scalars.notes,
         prescriptions: rows,
+        // Kept as they were when this save didn't carry them.
+        diagnoses: keepDiagnoses
+          ? await t.VisitDiagnosis.select("code", "title")
+              .where((d) => d.medicalRecordId.eq(targetId))
+              .orderBy((d) => d.position.asc())
+              .all()
+          : diagnoses.map((d) => ({ code: d.code, title: d.title })),
       };
 
       const previous = await t.MedicalRecordVersion

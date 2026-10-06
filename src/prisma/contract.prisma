@@ -309,6 +309,7 @@ namespace public {
     followUpClosedById      String?
 
     prescriptions           Prescription[]
+    diagnoses               VisitDiagnosis[]
     versions                MedicalRecordVersion[]
     clinic                  Clinic         @relation(fields: [clinicId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "MedicalRecord_clinicId_fkey")
     documentRequests        DocumentRequest[]
@@ -1110,6 +1111,47 @@ namespace public {
     @@index([medicalRecordId], map: "Prescription_medicalRecordId_idx")
 
     @@map("Prescription")
+  }
+
+  /// WHO ICD-11 for Mortality and Morbidity Statistics (MMS): one row per
+  /// category (coded entity), loaded by `npm run icd11:import` from WHO's
+  /// release files. Used under CC BY-ND 3.0 IGO: codes and titles exactly as
+  /// WHO publishes them, each with its URI, and WHO credited where shown.
+  model Icd11Code {
+    code    String  @id(map: "Icd11Code_pkey")
+    title   String
+    /// The release URI, e.g. http://id.who.int/icd/release/11/mms/1656445230.
+    uri     String
+    /// The chapter number ("01" … "26", "V", "X").
+    chapter String
+    /// Has no subcategories: the most specific choice in its branch.
+    leaf    Boolean
+    /// The WHO release it came from, e.g. "2026-01".
+    release String
+
+    @@map("Icd11Code")
+  }
+
+  /// A diagnosis on a visit note, in the doctor's order: position 0 is the
+  /// primary diagnosis. Code, title and URI are copied from the classification
+  /// when the note is saved, so a note keeps saying what it said when a later
+  /// release changes the list.
+  model VisitDiagnosis {
+    id              String        @id(map: "VisitDiagnosis_pkey")
+    medicalRecordId String
+    /// The classification: "ICD-11".
+    system          String
+    code            String
+    title           String
+    uri             String
+    position        Int
+    createdAt       TimestampString(3)  @default(now())
+    medicalRecord   MedicalRecord @relation(fields: [medicalRecordId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "VisitDiagnosis_medicalRecordId_fkey")
+
+    @@index([medicalRecordId], map: "VisitDiagnosis_medicalRecordId_idx")
+    @@index([code], map: "VisitDiagnosis_code_idx")
+
+    @@map("VisitDiagnosis")
   }
 
   native_enum AllergySeverity {

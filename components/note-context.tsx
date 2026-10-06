@@ -4,6 +4,7 @@ import { formatDate, instantFromDb } from "@/lib/datetime";
 import { orm } from "@/src/prisma/db";
 import { AlertBanner, AllergyBanner } from "@/components/allergy-banner";
 import { ChartForm } from "@/components/chart-form";
+import { buttonClass } from "@/components/ui";
 
 /**
  * What a doctor checks while writing a note, beside the form: allergies and
@@ -170,7 +171,7 @@ export async function NoteContext({
 }
 
 const input = "w-full rounded-md border border-border bg-surface px-2 py-1 text-sm";
-const saveButton = "justify-self-start rounded-md bg-accent px-2.5 py-1 text-xs font-semibold text-on-accent";
+const saveButton = buttonClass("secondary", "justify-self-start px-3 py-1 text-xs");
 
 /** "+ Add …" folded open under a list. */
 function Add({ label, children }: { label: string; children: ReactNode }) {

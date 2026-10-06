@@ -1,6 +1,7 @@
 import type { AllergySeverity, ClinicalListStatus } from "@/lib/enums";
 import { ALLERGY_SEVERITY_LABELS, sortAllergies } from "@/lib/clinical";
 import { ChartForm } from "./chart-form";
+import { buttonClass } from "./ui";
 
 export type AllergyEntry = {
   id: string;
@@ -44,7 +45,9 @@ function AddDisclosure({ label, children }: { label: string; children: React.Rea
   );
 }
 
-const field = "w-full rounded-md border border-current/30 bg-surface px-2 py-1 text-sm text-ink";
+const field = "w-full rounded-md border border-border bg-surface px-2 py-1 text-sm text-ink";
+/** The app's secondary capsule, small: the same Save as everywhere else, whatever the box colour. */
+const smallButton = buttonClass("secondary", "justify-self-start px-3 py-1 text-xs");
 
 function AddAllergy({ patientId }: { patientId: string }) {
   return (
@@ -60,7 +63,7 @@ function AddAllergy({ patientId }: { patientId: string }) {
           </select>
           <input name="reaction" placeholder="Reaction" className={field} />
         </div>
-        <button className="justify-self-start rounded-md bg-on-alert px-2.5 py-1 text-xs font-semibold text-alert-danger">Save allergy</button>
+        <button className={smallButton}>Save allergy</button>
       </ChartForm>
     </AddDisclosure>
   );
@@ -103,7 +106,7 @@ function AddAlert({ patientId }: { patientId: string }) {
       <ChartForm patientId={patientId} action="alert.add" className="grid gap-1.5">
         <input name="label" required placeholder="What to watch for (e.g. On warfarin)" className={field} />
         <input name="notes" placeholder="Details" className={field} />
-        <button className="justify-self-start rounded-md bg-on-alert px-2.5 py-1 text-xs font-semibold text-alert-warn">Save alert</button>
+        <button className={smallButton}>Save alert</button>
       </ChartForm>
     </AddDisclosure>
   );
@@ -139,7 +142,7 @@ export function AllergyBanner({
         {patientId ? (
           <div className="mt-2 flex flex-wrap items-start gap-3">
             <ChartForm patientId={patientId} action="allergy.none">
-              <button className="rounded-md bg-on-alert px-2.5 py-1 text-xs font-semibold text-alert-warn">No known allergies</button>
+              <button className={smallButton}>No known allergies</button>
             </ChartForm>
           </div>
         ) : null}

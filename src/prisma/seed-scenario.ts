@@ -1,8 +1,11 @@
 import "dotenv/config";
+import { devOnly } from "./dev-only";
 import { or } from "@prisma/orm-postgres/orm-client";
 import { orm } from "./db";
 import { MARK, seedId } from "./seed-ids";
 import { instantToDb } from "../../lib/datetime";
+
+devOnly("db:scenario");
 
 /*
  * Test scenarios that need a visit at a particular moment, for showing and

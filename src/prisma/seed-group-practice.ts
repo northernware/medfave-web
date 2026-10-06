@@ -1,10 +1,13 @@
 import "dotenv/config";
+import { devOnly } from "./dev-only";
 import bcrypt from "bcryptjs";
 import { createHash, randomBytes } from "node:crypto";
 import { db, orm } from "./db";
 import { calendarDateToDb, instantToDb } from "../../lib/datetime";
 import { newId } from "../../lib/ids";
 import { ClinicalListStatus, Relationship, Sex } from "../../lib/enums";
+
+devOnly("db:seed-group-practice");
 
 /*
  * A test group practice: two doctors and one desk in one clinic.

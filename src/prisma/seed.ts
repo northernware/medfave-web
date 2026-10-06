@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { devOnly } from "./dev-only";
 import bcrypt from "bcryptjs";
 import { backfillAccountsAndClinics } from "./backfill-accounts";
 import { db, orm } from "./db";
@@ -22,6 +23,8 @@ import {
   Sex,
   VisitPriority,
 } from "../../lib/enums";
+
+devOnly("db:seed");
 
 const DEMO_EMAIL = "doctor@medfave.com";
 const DEMO_PASSWORD = "password";

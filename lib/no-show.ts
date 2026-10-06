@@ -1,6 +1,7 @@
 import "server-only";
 import { db } from "@/src/prisma/db";
 import { instantToDb } from "./datetime";
+import { ranRecently } from "./throttle";
 
 /**
  * How long a booked visit is given past its time before the clinic assumes the
@@ -34,6 +35,8 @@ export const NO_SHOW_GRACE_MINUTES = 15;
  * nothing.
  */
 export async function sweepNoShows(doctorId: string, now = new Date()): Promise<number> {
+  // Once a minute is enough; open screens poll far more often than that.
+  if (ranRecently(`no-show:${doctorId}`)) return 0;
   const cutoff = instantToDb(new Date(now.getTime() - NO_SHOW_GRACE_MINUTES * 60_000));
   const at = instantToDb(now);
 

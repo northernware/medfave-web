@@ -31,7 +31,7 @@ export async function GET(request: Request) {
   const start = startOfClinicDay(date);
   const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
 
-  const [rows, queueRows, pending] = await Promise.all([
+  const [rows, queueRows, pending, leftoverRows] = await Promise.all([
     orm.Appointment
       .select(...APPOINTMENT_COLUMNS)
       .include("patient", (p) => p.select("id", "firstName", "middleName", "lastName", "householdId"))
@@ -46,6 +46,8 @@ export async function GET(request: Request) {
           .include("patient", (p) => p.select("id", "firstName", "middleName", "lastName", "householdId"))
           .where((a) => a.doctorId.eq(doctor.doctorId))
           .where((a) => a.status.in(QUEUE_STATUSES))
+          // Today's room: a visit left open on an earlier day is a leftover, below.
+          .where((a) => a.scheduledAt.gte(instantToDb(start)))
           .all()
       : Promise.resolve([]),
     orm.AppointmentRequest
@@ -53,6 +55,18 @@ export async function GET(request: Request) {
       .where((r) => r.doctorId.eq(doctor.doctorId))
       .where((r) => r.status.eq("PENDING"))
       .aggregate((agg) => ({ n: agg.count() })),
+    // Left open on an earlier day: checked in or with the doctor, never finished.
+    date === today
+      ? orm.Appointment
+          .select(...APPOINTMENT_COLUMNS)
+          .include("patient", (p) => p.select("id", "firstName", "middleName", "lastName", "householdId"))
+          .where((a) => a.doctorId.eq(doctor.doctorId))
+          .where((a) => a.status.in(QUEUE_STATUSES))
+          .where((a) => a.scheduledAt.lt(instantToDb(start)))
+          .orderBy((a) => a.scheduledAt.desc())
+          .limit(20)
+          .all()
+      : Promise.resolve([]),
   ]);
 
   // With the doctor first, then the waiting room by arrival (lib/visit-day.ts).
@@ -64,5 +78,7 @@ export async function GET(request: Request) {
     appointments: rows.map(shapeAppointment),
     queue: queue.map(shapeAppointment),
     pendingRequests: pending.n,
+    /** Today only: visits from earlier days still checked in or in consultation, to complete or cancel. */
+    leftovers: leftoverRows.map(shapeAppointment),
   });
 }

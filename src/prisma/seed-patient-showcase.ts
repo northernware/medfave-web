@@ -1,10 +1,13 @@
 import "dotenv/config";
+import { devOnly } from "./dev-only";
 import bcrypt from "bcryptjs";
 import { or } from "@prisma/orm-postgres/orm-client";
 import { orm } from "./db";
 import { MARK, seedId } from "./seed-ids";
 import { addDays } from "../../lib/scheduling";
 import { calendarDateToDb, dayKey, fromDateTimeLocalValue, instantToDb } from "../../lib/datetime";
+
+devOnly("db:seed-patient-showcase");
 
 /*
  * Fills in what the patient app only shows when there is data for it, for the

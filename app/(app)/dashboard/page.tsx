@@ -60,6 +60,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
     draftRows,
     missedRows,
     upcomingCount,
+    leftoverRows,
   ] =
     await Promise.all([
       appointmentListQuery()
@@ -85,6 +86,8 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         .include("medicalRecord", (r) => r.select("id"))
         .where((a) => a.doctorId.eq(doctor.id))
         .where((a) => a.status.in(QUEUE_STATUSES))
+        // Today's: someone left checked in yesterday isn't in today's room (see leftovers).
+        .where((a) => a.scheduledAt.gte(instantToDb(today.start)))
         .orderBy((a) => a.scheduledAt.asc())
         .all(),
       followUpsDue(doctor.id),
@@ -115,6 +118,17 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
         .where((a) => a.scheduledAt.gte(instantToDb(today.end)))
         .where((a) => a.status.in(ACTIVE_STATUSES))
         .aggregate((agg) => ({ n: agg.count() })),
+      // Left open on an earlier day: checked in or with the doctor, never finished.
+      // Not in today's room any more, so they're listed here to close.
+      orm.Appointment
+        .select("id", "scheduledAt", "status", "reason")
+        .include("patient", (p) => p.select("id", "firstName", "middleName", "lastName"))
+        .where((a) => a.doctorId.eq(doctor.id))
+        .where((a) => a.status.in(QUEUE_STATUSES))
+        .where((a) => a.scheduledAt.lt(instantToDb(today.start)))
+        .orderBy((a) => a.scheduledAt.desc())
+        .limit(10)
+        .all(),
     ]);
 
   // The patients list: who is coming, soonest first; and the chosen one's last visit with this doctor.
@@ -356,6 +370,29 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
             <LastVisitDetails visit={lastVisit} doctorName={doctor.fullName} />
           </div>
 
+          {leftoverRows.length > 0 ? (
+            <Card as="section" className="divide-y divide-border">
+              <div className="flex items-baseline gap-2 px-5 pt-5 pb-3">
+                <h2 className="font-display text-lg font-semibold">Left open</h2>
+                <span className="truncate text-xs text-ink-faint">Earlier visits never completed</span>
+              </div>
+              {leftoverRows.map((a) => (
+                <div key={a.id} className="flex flex-wrap items-center gap-3 px-5 py-2.5">
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-medium">{fullName(a.patient)}</span>
+                    <span className="block truncate text-xs text-ink-muted">
+                      {APPOINTMENT_STATUS_LABELS[a.status]} · {formatDate(instantFromDb(a.scheduledAt))}
+                      {a.reason ? ` · ${a.reason}` : ""}
+                    </span>
+                  </span>
+                  <Link href={`/appointments/${a.id}`} className={buttonClass("secondary")}>
+                    Close visit
+                  </Link>
+                </div>
+              ))}
+            </Card>
+          ) : null}
+
           {drafts.length > 0 ? (
             <Card as="section" className="divide-y divide-border">
               {/* Title inside the card, like the other panels. */}
@@ -375,7 +412,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
                       </span>
                     </span>
                     <Link href={`/records/${r.id}/edit`} className={buttonClass("secondary")}>
-                      Continue
+                      Continue note
                     </Link>
                   </div>
                 ))}

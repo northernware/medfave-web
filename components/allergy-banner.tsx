@@ -14,7 +14,7 @@ export function AlertBanner({ alerts }: { alerts: { id: string; label: string; n
   if (alerts.length === 0) return null;
   return (
     // Solid, not tinted: an alert has to stand out from everything else on the page.
-    <div className="rounded-md bg-warn px-3.5 py-3 text-on-warn shadow-sm">
+    <div className="rounded-md bg-alert-warn px-3.5 py-3 text-on-alert shadow-sm">
       <p className="font-display text-sm font-semibold">Medical alerts</p>
       <ul className="mt-1.5 space-y-1">
         {alerts.map((a) => (
@@ -50,7 +50,7 @@ export function AllergyBanner({
 
   if (allergies.length === 0) {
     return (
-      <p className="rounded-md bg-warn px-3.5 py-2.5 text-sm text-on-warn shadow-sm">
+      <p className="rounded-md bg-alert-warn px-3.5 py-2.5 text-sm text-on-alert shadow-sm">
         <span className="font-medium">Allergies not recorded.</span> Nobody has taken an allergy
         history for this patient yet.
       </p>
@@ -58,7 +58,7 @@ export function AllergyBanner({
   }
 
   return (
-    <div className="rounded-md bg-danger px-3.5 py-3 text-on-danger shadow-sm">
+    <div className="rounded-md bg-alert-danger px-3.5 py-3 text-on-alert shadow-sm">
       <p className="font-display text-sm font-semibold">Allergies</p>
       <ul className="mt-1.5 space-y-1.5">
         {sortAllergies(allergies).map((a) => (
@@ -66,10 +66,10 @@ export function AllergyBanner({
             <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
               <span className="font-medium">{a.label}</span>
               {a.severity ? (
-                // On the solid red, coloured badges clash: severe is filled, the rest outlined.
+                // Coloured badges clash with the box: severe is filled, the rest outlined.
                 <span
                   className={`rounded-full px-2 py-px text-xs font-semibold ${
-                    a.severity === "SEVERE" ? "bg-on-danger text-danger" : "border border-current/40"
+                    a.severity === "SEVERE" ? "bg-on-alert text-alert-danger" : "border border-current/40"
                   }`}
                 >
                   {ALLERGY_SEVERITY_LABELS[a.severity]}

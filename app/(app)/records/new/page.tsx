@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { NoteContext, NoteLayout } from "@/components/note-context";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { autosaveConsultation, saveMedicalRecord } from "@/app/actions/records";
@@ -9,7 +10,6 @@ import { formatDateTime, toDateTimeLocalValue } from "@/lib/datetime";
 import { ageFrom, CONSULTED_STATUSES, fullName, SEX_LABELS } from "@/lib/domain";
 import { RecordForm } from "@/components/forms/record-form";
 import { blankRecord } from "@/lib/form-defaults";
-import { AlertBanner, AllergyBanner } from "@/components/allergy-banner";
 import { buttonClass, Card, PageHeader } from "@/components/ui";
 import { carryOverFor } from "@/lib/carry-over";
 
@@ -82,35 +82,45 @@ export default async function NewRecordPage({ searchParams }: PageProps<"/record
         }
       />
 
-      <AlertBanner alerts={patient.alerts} />
-      <AllergyBanner status={patient.allergyStatus} allergies={patient.allergies} />
+      <NoteLayout
+        context={
+          <NoteContext
+            doctor={{ id: doctor.id, clinicId: doctor.clinicId }}
+            patientId={patient.id}
+            reason={locked ? undocumented.find((a) => a.id === locked.id)?.reason : null}
+          />
+        }
+        form={
+          <>
+            {carriedFrom ? (
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-accent/30 bg-accent-tint px-4 py-3 text-sm">
+                <p>
+                  <span className="font-medium">Filled from the visit on {carriedFrom}:</span>{" "}
+                  <span className="text-ink-muted">assessment, advice, medicines and height. Today&rsquo;s complaint, vitals and examination start blank.</span>
+                </p>
+                <Link
+                  href={`/records/new?patientId=${patient.id}${locked ? `&appointmentId=${locked.id}` : ""}&fresh=1`}
+                  className={buttonClass("secondary")}
+                >
+                  Start blank
+                </Link>
+              </div>
+            ) : null}
 
-      {carriedFrom ? (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-accent/30 bg-accent-tint px-4 py-3 text-sm">
-          <p>
-            <span className="font-medium">Filled from the visit on {carriedFrom}:</span>{" "}
-            <span className="text-ink-muted">assessment, plan, medicines and height. Today&rsquo;s complaint, vitals and examination start blank.</span>
-          </p>
-          <Link
-            href={`/records/new?patientId=${patient.id}${locked ? `&appointmentId=${locked.id}` : ""}&fresh=1`}
-            className={buttonClass("secondary")}
-          >
-            Start blank
-          </Link>
-        </div>
-      ) : null}
-
-      <Card className="p-5 sm:p-6">
-        <RecordForm
-          action={saveMedicalRecord}
-          autosave={autosaveConsultation}
-          patientId={patient.id}
-          defaults={defaults}
-          openAppointments={options}
-          lockedAppointment={locked}
-          cancelHref={`/patients/${patient.id}`}
-        />
-      </Card>
+            <Card className="p-5 sm:p-6">
+              <RecordForm
+                action={saveMedicalRecord}
+                autosave={autosaveConsultation}
+                patientId={patient.id}
+                defaults={defaults}
+                openAppointments={options}
+                lockedAppointment={locked}
+                cancelHref={`/patients/${patient.id}`}
+              />
+            </Card>
+          </>
+        }
+      />
     </div>
   );
 }

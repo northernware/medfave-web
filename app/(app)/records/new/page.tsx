@@ -6,7 +6,7 @@ import { notFound, redirect } from "next/navigation";
 import { autosaveConsultation, saveMedicalRecord } from "@/app/actions/records";
 import { requireDoctor } from "@/lib/auth";
 import { orm } from "@/src/prisma/db";
-import { clinicDayRange, instantFromDb } from "@/lib/datetime";
+import { clinicDayRange, instantFromDb, instantToDb } from "@/lib/datetime";
 import { formatDateTime, toDateTimeLocalValue } from "@/lib/datetime";
 import { CONSULTED_STATUSES } from "@/lib/domain";
 import { RecordForm } from "@/components/forms/record-form";
@@ -57,6 +57,18 @@ export default async function NewRecordPage({ searchParams }: PageProps<"/record
 
   const defaults = blankRecord(toDateTimeLocalValue(new Date()));
   if (locked) defaults.appointmentId = locked.id;
+  // Their visit today is already being written up: continue that note rather
+  // than start a second, unlinked one.
+  if (!locked && typeof appointmentId !== "string") {
+    const started = await orm.MedicalRecord.select("id")
+      .where((r) => r.patientId.eq(patient.id))
+      .where((r) => r.doctorId.eq(doctor.id))
+      .where((r) => r.status.eq("DRAFT"))
+      .where((r) => r.archivedAt.isNull())
+      .where((r) => r.appointment.some((x) => x.scheduledAt.gte(instantToDb(clinicDayRange(new Date()).start))))
+      .first();
+    if (started) redirect(`/records/${started.id}/edit`);
+  }
   // Opened from the patient's page: if they're with the doctor today (or were
   // seen today and it isn't written up), this note is most likely for that
   // visit. Still changeable. Only visits that took place can be linked.

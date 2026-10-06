@@ -276,6 +276,10 @@ const STATUS_DOT: Record<AppointmentListItem["status"], string> = {
 };
 
 const HOUR = 160; // px per hour on the timeline: about five hours in view
+/** The shortest card: one line, for a visit of a quarter of an hour or less. */
+const MIN_CARD = 36;
+/** Below this a card drops to the compact layout (a 30-minute visit is 76 px). */
+const FULL_CARD = 100;
 
 /** The week as a strip, then today as a timeline with a line at the current time. */
 export function ScheduleRail({
@@ -331,9 +335,9 @@ export function ScheduleRail({
   const nowMinute = minuteOfDay(now);
   const top = (minute: number) => ((minute - firstHour * 60) / 60) * HOUR;
 
-  // Side-by-side lanes for visits whose cards overlap (a card is at least its
-  // minimum height, so two short visits back to back can overlap too).
-  const cardMinutes = (104 / HOUR) * 60;
+  // Side-by-side lanes only for visits that overlap in time. Cards are as tall
+  // as their visit (short ones go compact), so back-to-back visits stack.
+  const cardMinutes = (MIN_CARD / HOUR) * 60;
   const spans = todays.map((a, i) => {
     const start = minuteOfDay(a.scheduledAt);
     return { i, start, end: start + Math.max(a.durationMinutes, cardMinutes) };
@@ -436,8 +440,10 @@ export function ScheduleRail({
           ))}
           {todays.map((a, idx) => {
             const start = minuteOfDay(a.scheduledAt);
-            // Tall enough for its details even when short; a long visit grows with its length.
-            const height = Math.max(104, (a.durationMinutes / 60) * HOUR - 4);
+            // As tall as the visit, so neighbours never overlap; short ones go compact.
+            const height = Math.max(MIN_CARD, (a.durationMinutes / 60) * HOUR - 4);
+            const compact = height < FULL_CARD;
+            const oneLine = height < 60;
             const done = a.status === "COMPLETED" || a.status === "CANCELLED" || a.status === "NO_SHOW";
             const end = new Date(a.scheduledAt.getTime() + a.durationMinutes * 60_000);
             const action =
@@ -463,37 +469,67 @@ export function ScheduleRail({
             return (
               <div
                 key={a.id}
-                className={`absolute z-[1] flex flex-col gap-1.5 overflow-hidden rounded-xl border px-4 py-3 ${lanes[idx].of > 1 ? "px-3" : ""} ${done ? "border-border bg-surface [&>*]:opacity-60" : "border-border-strong bg-surface-muted"}`}
+                className={`absolute z-[1] flex flex-col overflow-hidden rounded-xl border ${
+                  compact ? "justify-center gap-0.5 px-3 py-1.5" : `gap-1.5 py-3 ${lanes[idx].of > 1 ? "px-3" : "px-4"}`
+                } ${done ? "border-border bg-surface [&>*]:opacity-60" : "border-border-strong bg-surface-muted"}`}
                 style={{
                   top: top(start) + 2,
                   height,
-                  // Visits that overlap on screen sit side by side.
+                  // Visits that overlap in time sit side by side.
                   left: `calc(76px + (100% - 76px) * ${lanes[idx].lane} / ${lanes[idx].of})`,
                   width: `calc((100% - 76px) / ${lanes[idx].of} - ${lanes[idx].of > 1 ? 4 : 0}px)`,
                 }}
               >
-                {/* Status, name, what for, time — nothing else. */}
-                <div className="flex items-center justify-between gap-2">
-                  {/* The status as a quiet line with a coloured dot, like the rest of the card. */}
-                  <span className="flex items-center gap-1.5 text-[11px] leading-4 font-medium text-ink-muted">
-                    <span aria-hidden className={`size-1.5 rounded-full ${STATUS_DOT[a.status]}`} />
-                    {APPOINTMENT_STATUS_LABELS[a.status]}
-                    {a.patientConfirmedAt && (a.status === "PENDING" || a.status === "CONFIRMED") ? (
-                      <span className="text-ok-ink" title="The patient said they'll be there">· Coming</span>
-                    ) : null}
-                  </span>
-                  {action}
-                </div>
-                <Link href={itemHref(a.id)} className="min-w-0">
-                  <span className="block truncate text-[13px] leading-5 font-semibold hover:underline">{fullName(a.patient)}</span>
-                  {/* What the visit is for (the service); the booking's own words on hover. */}
-                  <span title={a.reason ?? undefined} className="block truncate text-[11px] leading-4 text-ink-muted">
-                    {SERVICE_LABELS[a.service]}
-                  </span>
-                  <span className="tabular block truncate text-[11px] leading-4 text-ink-faint">
-                    {formatTime(a.scheduledAt)} – {formatTime(end)}
-                  </span>
-                </Link>
+                {compact ? (
+                  // Short visit: status dot, name and its button; then time and service (one line if very short).
+                  <>
+                    <div className="flex items-center gap-2">
+                      <span aria-hidden title={APPOINTMENT_STATUS_LABELS[a.status]} className={`size-1.5 shrink-0 rounded-full ${STATUS_DOT[a.status]}`} />
+                      <Link href={itemHref(a.id)} className="min-w-0 flex-1 truncate text-[13px] leading-5 font-semibold hover:underline">
+                        {fullName(a.patient)}
+                        {oneLine ? <span className="tabular ml-2 text-[11px] font-normal text-ink-faint">{formatTime(a.scheduledAt)}</span> : null}
+                      </Link>
+                      {action}
+                    </div>
+                    {oneLine ? null : (
+                      <span title={a.reason ?? undefined} className="block truncate pl-3.5 text-[11px] leading-4 text-ink-muted">
+                        <span className="tabular text-ink-faint">
+                          {formatTime(a.scheduledAt)} – {formatTime(end)}
+                        </span>
+                        {" · "}
+                        {APPOINTMENT_STATUS_LABELS[a.status]}
+                        {a.patientConfirmedAt && (a.status === "PENDING" || a.status === "CONFIRMED") ? " · Coming" : ""}
+                        {" · "}
+                        {SERVICE_LABELS[a.service]}
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {/* Status, name, what for, time — nothing else. */}
+                    <div className="flex items-center justify-between gap-2">
+                      {/* The status as a quiet line with a coloured dot, like the rest of the card. */}
+                      <span className="flex items-center gap-1.5 text-[11px] leading-4 font-medium text-ink-muted">
+                        <span aria-hidden className={`size-1.5 rounded-full ${STATUS_DOT[a.status]}`} />
+                        {APPOINTMENT_STATUS_LABELS[a.status]}
+                        {a.patientConfirmedAt && (a.status === "PENDING" || a.status === "CONFIRMED") ? (
+                          <span className="text-ok-ink" title="The patient said they'll be there">· Coming</span>
+                        ) : null}
+                      </span>
+                      {action}
+                    </div>
+                    <Link href={itemHref(a.id)} className="min-w-0">
+                      <span className="block truncate text-[13px] leading-5 font-semibold hover:underline">{fullName(a.patient)}</span>
+                      {/* What the visit is for (the service); the booking's own words on hover. */}
+                      <span title={a.reason ?? undefined} className="block truncate text-[11px] leading-4 text-ink-muted">
+                        {SERVICE_LABELS[a.service]}
+                      </span>
+                      <span className="tabular block truncate text-[11px] leading-4 text-ink-faint">
+                        {formatTime(a.scheduledAt)} – {formatTime(end)}
+                      </span>
+                    </Link>
+                  </>
+                )}
               </div>
             );
           })}

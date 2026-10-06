@@ -13,12 +13,22 @@ export type AllergyEntry = {
 /** With a patient id, the boxes can be changed in place (the note's side column). */
 type Editable = { patientId?: string };
 
-/** A small inline button on a coloured box: remove one entry. */
+/** A small × at the end of an entry: remove it, after asking. */
 function RemoveButton({ patientId, action, id, label }: { patientId: string; action: string; id: string; label: string }) {
   return (
-    <ChartForm patientId={patientId} action={action} id={id} className="inline">
-      <button className="ml-1 rounded px-1 text-xs underline-offset-2 opacity-75 hover:underline hover:opacity-100" aria-label={`Remove ${label}: recorded by mistake`}>
-        Remove
+    <ChartForm
+      patientId={patientId}
+      action={action}
+      id={id}
+      confirm={`Remove ${label}? Only if it was recorded by mistake.`}
+      className="ml-auto shrink-0"
+    >
+      <button
+        className="grid size-5 place-items-center rounded-full text-sm leading-none opacity-70 hover:bg-black/10 hover:opacity-100"
+        aria-label={`Remove ${label}: recorded by mistake`}
+        title="Remove (recorded by mistake)"
+      >
+        ×
       </button>
     </ChartForm>
   );
@@ -73,9 +83,11 @@ export function AlertBanner({ alerts, patientId }: { alerts: { id: string; label
       <p className="font-display text-sm font-semibold">Medical alerts</p>
       <ul className="mt-1.5 space-y-1">
         {alerts.map((a) => (
-          <li key={a.id} className="text-sm">
-            <span className="font-medium">{a.label}</span>
-            {a.notes ? <span className="opacity-90"> — {a.notes}</span> : null}
+          <li key={a.id} className="flex items-start gap-2 text-sm">
+            <span>
+              <span className="font-medium">{a.label}</span>
+              {a.notes ? <span className="opacity-90"> — {a.notes}</span> : null}
+            </span>
             {patientId ? <RemoveButton patientId={patientId} action="alert.remove" id={a.id} label={a.label} /> : null}
           </li>
         ))}
@@ -141,22 +153,24 @@ export function AllergyBanner({
       <p className="font-display text-sm font-semibold">Allergies</p>
       <ul className="mt-1.5 space-y-1.5">
         {sortAllergies(allergies).map((a) => (
-          <li key={a.id} className="text-sm">
-            <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-              <span className="font-medium">{a.label}</span>
-              {a.severity ? (
-                // Coloured badges clash with the box: severe is filled, the rest outlined.
-                <span
-                  className={`rounded-full px-2 py-px text-xs font-semibold ${
-                    a.severity === "SEVERE" ? "bg-on-alert text-alert-danger" : "border border-current/40"
-                  }`}
-                >
-                  {ALLERGY_SEVERITY_LABELS[a.severity]}
-                </span>
-              ) : null}
-              {a.reaction ? <span className="opacity-90">{a.reaction}</span> : null}
+          <li key={a.id} className="flex items-start gap-2 text-sm">
+            <span className="min-w-0">
+              <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                <span className="font-medium">{a.label}</span>
+                {a.severity ? (
+                  // Coloured badges clash with the box: severe is filled, the rest outlined.
+                  <span
+                    className={`rounded-full px-2 py-px text-xs font-semibold ${
+                      a.severity === "SEVERE" ? "bg-on-alert text-alert-danger" : "border border-current/40"
+                    }`}
+                  >
+                    {ALLERGY_SEVERITY_LABELS[a.severity]}
+                  </span>
+                ) : null}
+                {a.reaction ? <span className="opacity-90">{a.reaction}</span> : null}
+              </span>
+              {a.notes ? <span className="mt-0.5 block text-xs opacity-75">{a.notes}</span> : null}
             </span>
-            {a.notes ? <span className="mt-0.5 block text-xs opacity-75">{a.notes}</span> : null}
             {patientId ? <RemoveButton patientId={patientId} action="allergy.remove" id={a.id} label={a.label} /> : null}
           </li>
         ))}

@@ -6203,6 +6203,23 @@
                   "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
+              },
+              "stoppedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamp-string@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
+              "stoppedById": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
               }
             },
             "relations": {
@@ -6244,6 +6261,12 @@
                 },
                 "patientId": {
                   "column": "patientId"
+                },
+                "stoppedAt": {
+                  "column": "stoppedAt"
+                },
+                "stoppedById": {
+                  "column": "stoppedById"
                 }
               },
               "namespaceId": "public",
@@ -11884,6 +11907,19 @@
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": false
+                },
+                "stoppedAt": {
+                  "codecId": "pg/timestamp-string@1",
+                  "nativeType": "timestamp",
+                  "nullable": true,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
+                "stoppedById": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
                 }
               },
               "foreignKeys": [
@@ -12917,7 +12953,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "c8dd5721f1d129ec771c3dbd61a476add1017444bbf49c8661eb9d8e83bf841c"
+    "storageHash": "70db03074a2788f41483b72201b82a9a55687c094f312e00c4fdb0b12c7343c2"
   },
   "capabilities": {
     "postgres": {

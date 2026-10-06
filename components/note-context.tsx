@@ -3,6 +3,7 @@ import { sharesCharts } from "@/lib/care";
 import { formatDate, instantFromDb } from "@/lib/datetime";
 import { orm } from "@/src/prisma/db";
 import { AlertBanner, AllergyBanner } from "@/components/allergy-banner";
+import { ChartForm } from "@/components/chart-form";
 
 /**
  * What a doctor checks while writing a note, beside the form: allergies and
@@ -30,7 +31,7 @@ export async function NoteContext({
       .include("allergies", (a) => a.select("id", "label", "reaction", "severity", "notes"))
       .include("alerts", (x) => x.select("id", "label", "notes").orderBy((y) => y.label.asc()))
       .include("conditions", (c) => c.select("id", "label").where((y) => y.resolvedAt.isNull()).orderBy((y) => y.label.asc()))
-      .include("medications", (m) => m.select("id", "label", "dosage", "frequency").orderBy((y) => y.label.asc()))
+      .include("medications", (m) => m.select("id", "label", "dosage", "frequency").where((y) => y.stoppedAt.isNull()).orderBy((y) => y.label.asc()))
       .where((p) => p.id.eq(patientId))
       .where((p) => p.clinicId.eq(doctor.clinicId))
       .first(),
@@ -64,25 +65,59 @@ export async function NoteContext({
 
       <Box title="Ongoing conditions" hint="On the chart">
         {patient.conditions.length ? (
-          <ul className="space-y-0.5">{patient.conditions.map((c) => <li key={c.id}>{c.label}</li>)}</ul>
+          <ul className="space-y-0.5">
+            {patient.conditions.map((c) => (
+              <li key={c.id} className="flex items-baseline justify-between gap-2">
+                <span>{c.label}</span>
+                <ChartForm patientId={patientId} action="condition.resolve" id={c.id}>
+                  <button className="text-xs text-ink-muted hover:text-ink hover:underline" aria-label={`Mark ${c.label} resolved`}>
+                    Resolve
+                  </button>
+                </ChartForm>
+              </li>
+            ))}
+          </ul>
         ) : (
           <p className="text-ink-muted">{listOr(patient.conditionStatus, "None known")}</p>
         )}
+        <Add label="Add condition">
+          <ChartForm patientId={patientId} action="condition.add" className="grid gap-1.5">
+            <input name="label" required placeholder="Condition (e.g. Hypertension)" className={input} />
+            <button className={saveButton}>Save condition</button>
+          </ChartForm>
+        </Add>
       </Box>
 
       <Box title="Current medicines">
         {patient.medications.length ? (
           <ul className="space-y-0.5">
             {patient.medications.map((m) => (
-              <li key={m.id}>
-                {[m.label, m.dosage].filter(Boolean).join(" ")}
-                {m.frequency ? <span className="text-ink-muted"> · {m.frequency}</span> : null}
+              <li key={m.id} className="flex items-baseline justify-between gap-2">
+                <span>
+                  {[m.label, m.dosage].filter(Boolean).join(" ")}
+                  {m.frequency ? <span className="text-ink-muted"> · {m.frequency}</span> : null}
+                </span>
+                <ChartForm patientId={patientId} action="medication.stop" id={m.id}>
+                  <button className="text-xs text-ink-muted hover:text-ink hover:underline" aria-label={`${m.label}: no longer taken`}>
+                    Stop
+                  </button>
+                </ChartForm>
               </li>
             ))}
           </ul>
         ) : (
           <p className="text-ink-muted">{listOr(patient.medicationStatus, "None")}</p>
         )}
+        <Add label="Add medicine">
+          <ChartForm patientId={patientId} action="medication.add" className="grid gap-1.5">
+            <input name="label" required placeholder="Medicine (e.g. Amlodipine)" className={input} />
+            <div className="flex gap-1.5">
+              <input name="dosage" placeholder="Dose (5 mg)" className={input} />
+              <input name="frequency" placeholder="How often" className={input} />
+            </div>
+            <button className={saveButton}>Save medicine</button>
+          </ChartForm>
+        </Add>
       </Box>
 
       <Box title={last ? `Last visit · ${formatDate(instantFromDb(last.visitDate))}` : "Last visit"}>
@@ -120,8 +155,9 @@ export async function NoteContext({
 
   return (
     <div className="space-y-3">
-      <AlertBanner alerts={patient.alerts} />
-      <AllergyBanner status={patient.allergyStatus} allergies={patient.allergies} />
+      {/* Changed in place: what the doctor learns at the visit goes straight on the chart. */}
+      <AlertBanner alerts={patient.alerts} patientId={patientId} />
+      <AllergyBanner status={patient.allergyStatus} allergies={patient.allergies} patientId={patientId} />
 
       {/* Safety first everywhere; the rest beside the form when wide, folded away above it when narrow. */}
       <div className="hidden space-y-3 lg:block">{more}</div>
@@ -130,6 +166,19 @@ export async function NoteContext({
         <div className="space-y-3 px-3.5 pb-3.5">{more}</div>
       </details>
     </div>
+  );
+}
+
+const input = "w-full rounded-md border border-border bg-surface px-2 py-1 text-sm";
+const saveButton = "justify-self-start rounded-md bg-accent px-2.5 py-1 text-xs font-semibold text-on-accent";
+
+/** "+ Add …" folded open under a list. */
+function Add({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <details className="mt-2">
+      <summary className="cursor-pointer list-none text-xs font-semibold text-accent-ink hover:underline">+ {label}</summary>
+      <div className="mt-2">{children}</div>
+    </details>
   );
 }
 

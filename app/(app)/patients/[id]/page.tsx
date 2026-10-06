@@ -4,6 +4,7 @@ import { DELETE_PHRASES } from "@/lib/confirm-phrase";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { archivePatient, deletePatient, reopenCondition, resolveCondition, restorePatient } from "@/app/actions/patients";
+import { ChartForm } from "@/components/chart-form";
 import { requireDoctor } from "@/lib/auth";
 import { StartHousehold } from "@/components/start-household";
 import { caresFor, logChartAccess, sharesCharts } from "@/lib/care";
@@ -65,7 +66,7 @@ export default async function PatientPage({
     )
     .include("medications", (m) =>
       m
-        .select("id", "label", "dosage", "frequency", "notes")
+        .select("id", "label", "dosage", "frequency", "notes", "stoppedAt")
         .orderBy((x) => x.label.asc()),
     )
     .include("alerts", (a) => a.select("id", "label", "notes").orderBy((x) => x.label.asc()))
@@ -150,12 +151,15 @@ export default async function PatientPage({
   // Current conditions show; resolved ones are history, listed apart with their date.
   const activeConditions = patient.conditions.filter((c) => !c.resolvedAt);
   const pastConditions = patient.conditions.filter((c) => c.resolvedAt);
+  // Medicines likewise: the ones taken now, and those stopped, with their date.
+  const currentMedications = patient.medications.filter((m) => !m.stoppedAt);
+  const pastMedications = patient.medications.filter((m) => m.stoppedAt);
   const hasHistory =
     anyNotes !== null ||
     patient.appointments > 0 ||
     patient.documentRequests > 0 ||
     patient.appointmentRequests > 0 ||
-    patient.allergies.length + activeConditions.length + patient.medications.length + patient.alerts.length > 0 ||
+    patient.allergies.length + activeConditions.length + currentMedications.length + patient.alerts.length > 0 ||
     patient.accountId !== null;
 
   return (
@@ -420,9 +424,9 @@ export default async function PatientPage({
             className="col-span-2"
             label="Current medications"
             value={
-              patient.medications.length > 0 ? (
+              currentMedications.length > 0 ? (
                 <ul className="space-y-0.5">
-                  {patient.medications.map((m) => (
+                  {currentMedications.map((m) => (
                     <li key={m.id}>
                       {m.label}
                       {[m.dosage, m.frequency].filter(Boolean).length > 0 ? (
@@ -441,6 +445,26 @@ export default async function PatientPage({
               )
             }
           />
+          {pastMedications.length > 0 ? (
+            <Detail
+              className="col-span-2"
+              label="Past medicines"
+              value={
+                <span className="flex flex-wrap gap-x-3 gap-y-1 text-sm text-ink-muted">
+                  {pastMedications.map((m) => (
+                    <span key={m.id} className="inline-flex items-center gap-1">
+                      {[m.label, m.dosage].filter(Boolean).join(" ")} · stopped {formatDate(instantFromDb(m.stoppedAt!))}
+                      <ChartForm patientId={patient.id} action="medication.restart" id={m.id} className="inline">
+                        <button className="text-xs text-accent-ink hover:underline" aria-label={`${m.label} is taken again`}>
+                          Restart
+                        </button>
+                      </ChartForm>
+                    </span>
+                  ))}
+                </span>
+              }
+            />
+          ) : null}
           <Detail label="Visits recorded" value={visits.length} />
           <Detail
             className="col-span-2"

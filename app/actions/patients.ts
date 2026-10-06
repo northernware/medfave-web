@@ -142,10 +142,9 @@ async function clearClinicalLists(
   tx: { sql: typeof db.sql; execute: (plan: never) => Promise<unknown> },
   patientId: string,
 ) {
-  // Conditions are not here: they keep their history (see syncConditions).
+  // Conditions and medicines are not here: they keep their history (syncConditions, syncMedications).
   const tables = [
     tx.sql.public.PatientAllergy,
-    tx.sql.public.PatientMedication,
     tx.sql.public.PatientAlert,
   ];
   for (const table of tables) {
@@ -178,6 +177,26 @@ async function syncConditions(t: typeof orm, patientId: string, listed: Clinical
   }
   for (const c of existing) {
     if (!c.resolvedAt && !keep.has(c.id)) await t.PatientCondition.where((x) => x.id.eq(c.id)).delete();
+  }
+}
+
+/** The chart's current medicines as the edit form lists them, kept like conditions: stopped ones stay as history. */
+async function syncMedications(t: typeof orm, patientId: string, listed: ClinicalLists["medications"]) {
+  const now = instantToDb(new Date());
+  const existing = await t.PatientMedication.select("id", "label", "stoppedAt").where((m) => m.patientId.eq(patientId)).all();
+  const byLabel = new Map(existing.map((m) => [m.label.toLowerCase(), m]));
+  const keep = new Set<string>();
+  for (const m of listed) {
+    const found = byLabel.get(m.label.toLowerCase());
+    if (found) {
+      keep.add(found.id);
+      await t.PatientMedication.where((x) => x.id.eq(found.id)).update({ dosage: m.dosage, frequency: m.frequency, notes: m.notes, stoppedAt: null, stoppedById: null });
+    } else {
+      await t.PatientMedication.create({ id: newId(), patientId, label: m.label, dosage: m.dosage, frequency: m.frequency, notes: m.notes, createdAt: now });
+    }
+  }
+  for (const m of existing) {
+    if (!m.stoppedAt && !keep.has(m.id)) await t.PatientMedication.where((x) => x.id.eq(m.id)).delete();
   }
 }
 
@@ -535,8 +554,9 @@ export async function updatePatient(
     // empty set from a form that did not show them.
     if (staff.role !== "SECRETARY") {
       await clearClinicalLists(tx, patientId);
-      await writeClinicalLists(t, patientId, { ...parsed.lists, conditions: [] });
+      await writeClinicalLists(t, patientId, { ...parsed.lists, conditions: [], medications: [] });
       await syncConditions(t, patientId, parsed.lists.conditions);
+      await syncMedications(t, patientId, parsed.lists.medications);
     }
 
     // Same reasoning as on registration: the only member of a household made

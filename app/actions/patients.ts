@@ -788,13 +788,6 @@ export async function startOwnHousehold(formData: FormData) {
 }
 
 
-/** "Resolved" on the patient page: the condition moves to past conditions, with its date. */
-export async function resolveCondition(formData: FormData) {
-  const doctor = await requireDoctor();
-  const result = await setConditionResolved(doctor, String(formData.get("conditionId") ?? ""), true);
-  if (result.ok) revalidatePath(`/patients/${result.patientId}`);
-}
-
 /** "Reopen" on a past condition: current again. */
 export async function reopenCondition(formData: FormData) {
   const doctor = await requireDoctor();

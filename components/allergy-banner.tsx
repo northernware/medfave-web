@@ -42,13 +42,13 @@ const field = "w-full rounded-md border border-border bg-surface px-2 py-1 text-
  * Save inside a box: on the red and amber boxes a solid capsule in the box's
  * own text colour (pink would clash); on a plain box the app's primary.
  */
-type Tone = "danger" | "warn" | "plain";
+type Tone = "danger" | "warn" | "ok" | "plain";
 const saveClass = (tone: Tone) =>
   tone === "plain"
     ? buttonClass("primary", "justify-self-start")
     : // The same capsule and size as buttonClass, in the box's own text colour.
       `inline-flex items-center justify-center justify-self-start rounded-full bg-on-alert px-4 py-2 text-sm leading-5 font-semibold hover:opacity-90 ${
-        tone === "danger" ? "text-alert-danger" : "text-alert-warn"
+        tone === "danger" ? "text-alert-danger" : tone === "ok" ? "text-alert-ok" : "text-alert-warn"
       }`;
 
 function AddAllergy({ patientId, tone }: { patientId: string; tone: Tone }) {
@@ -132,18 +132,20 @@ export function AllergyBanner({
 } & Editable) {
   if (status === "NONE_KNOWN" && allergies.length === 0) {
     return (
-      <div className="rounded-md border border-border border-l-[3px] border-l-ok bg-surface px-3.5 py-2.5 text-sm text-ink-muted">
-        <span className="font-medium text-ink">No known allergies</span> — asked and recorded.
-        {patientId ? <AddAllergy patientId={patientId} tone="plain" /> : null}
+      // The same solid box as the red and amber ones, in green: asked, and none.
+      <div className="rounded-md bg-alert-ok px-3.5 py-3 text-sm text-on-alert shadow-sm">
+        <p className="font-display text-sm font-semibold">Allergies</p>
+        <p className="mt-1.5">None known — asked and recorded.</p>
+        {patientId ? <AddAllergy patientId={patientId} tone="ok" /> : null}
       </div>
     );
   }
 
   if (allergies.length === 0) {
     return (
-      <div className="rounded-md bg-alert-warn px-3.5 py-2.5 text-sm text-on-alert shadow-sm">
-        <span className="font-medium">Allergies not recorded.</span> Nobody has taken an allergy
-        history for this patient yet.
+      <div className="rounded-md bg-alert-warn px-3.5 py-3 text-sm text-on-alert shadow-sm">
+        <p className="font-display text-sm font-semibold">Allergies</p>
+        <p className="mt-1.5">Not recorded: nobody has taken an allergy history for this patient yet.</p>
         {patientId ? (
           <div className="mt-2 flex flex-wrap items-start gap-3">
             <ChartForm patientId={patientId} action="allergy.none">

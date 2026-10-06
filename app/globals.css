@@ -72,6 +72,8 @@
      light, bold solid colour with white text on dark. */
   --alert-danger: light-dark(oklch(0.92 0.06 22), oklch(0.52 0.19 25));
   --alert-warn: light-dark(oklch(0.94 0.08 88), oklch(0.56 0.13 62));
+  /* "No known allergies": the same box, in green. */
+  --alert-ok: light-dark(oklch(0.93 0.06 160), oklch(0.5 0.11 160));
   --on-alert: light-dark(oklch(0.18 0.01 25), #ffffff);
 
   --ok: light-dark(oklch(0.58 0.12 160), oklch(0.72 0.12 160));
@@ -138,6 +140,7 @@
   --color-warn-ink: var(--warn-ink);
   --color-alert-danger: var(--alert-danger);
   --color-alert-warn: var(--alert-warn);
+  --color-alert-ok: var(--alert-ok);
   --color-on-alert: var(--on-alert);
 
   --color-ok: var(--ok);

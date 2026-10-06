@@ -273,6 +273,19 @@ async function main() {
       createdAt: at,
       updatedAt: at,
     } as Parameters<typeof orm.MedicalRecord.create>[0]);
+    // Coded diagnoses, as WHO publishes them; skipped if the ICD-11 list isn't loaded.
+    for (const [position, code] of (DIAGNOSES[v.key] ?? []).entries()) {
+      const c = await orm.Icd11Code.select("code", "title", "uri").where((x) => x.code.eq(code)).first();
+      if (!c) continue;
+      await orm.VisitDiagnosis.create({
+        id: id(`dx-${v.key}-${position}`),
+        medicalRecordId: id(`note-${v.key}`),
+        system: "ICD-11",
+        ...c,
+        position,
+        createdAt: at,
+      });
+    }
     if (v.score && v.rater) {
       await orm.VisitFeedback.create({
         id: id(`feedback-${v.key}`),
@@ -368,6 +381,14 @@ async function ensureCast(clinicId: string, doctorId: string) {
   await login("Paula", "patient2@medfave.com", "Paula Santos");
   await login("Corazon", "corazon@medfave.com", "Corazon Dela Cruz");
 }
+
+/** ICD-11 diagnoses for the past visits' notes (\`npm run icd11:import\` loads the list). */
+const DIAGNOSES: Record<string, string[]> = {
+  marilou: ["5A11"], // Type 2 diabetes mellitus
+  corazon: ["BA00.Z"], // Essential hypertension, unspecified
+  joaquin: ["CA23.30"], // Unspecified asthma with exacerbation
+  lia: ["MG26"], // Fever of other or unknown origin
+};
 
 main().then(
   () => process.exit(0),

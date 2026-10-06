@@ -345,6 +345,14 @@ export const medicalRecordSchema = z.object({
 
   assessment: optionalText(4000),
   treatmentPlan: optionalText(4000),
+  // Only for a note with no visit linked; cleared when one is (lib/consultation.ts).
+  noteKind: z
+    .string()
+    .trim()
+    .transform((v) => (v === "" ? null : v))
+    .nullable()
+    .optional()
+    .refine((v) => v == null || ["PHONE", "RESULTS", "OTHER"].includes(v), { message: "Pick what kind of note it is" }),
   followUpDate: z
     .string()
     .trim()

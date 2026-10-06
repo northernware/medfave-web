@@ -87,6 +87,7 @@ export default async function EditRecordPage({ params }: PageProps<"/records/[id
                   savedAt: instantFromDb(record.updatedAt).toISOString(),
                   visitDate: toDateTimeLocalValue(instantFromDb(record.visitDate)),
                   appointmentId: record.appointmentId ?? "",
+            noteKind: record.noteKind ?? "",
                   chiefComplaint: record.chiefComplaint,
                   historyOfPresentIllness: text(record.historyOfPresentIllness),
                   physicalExamination: text(record.physicalExamination),

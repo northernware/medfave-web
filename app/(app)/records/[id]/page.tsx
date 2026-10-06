@@ -21,6 +21,7 @@ import {
   bloodPressure,
   bmi,
   fullName,
+  NOTE_KIND_LABELS,
   RECORD_STATUS_LABELS,
   RECORD_STATUS_TONE,
   SEX_LABELS,
@@ -170,10 +171,12 @@ export default async function RecordPage({ params }: PageProps<"/records/[id]">)
         </p>
       ) : null}
 
-      <div>
+      <div className="flex flex-wrap gap-1.5">
         <Badge dot tone={RECORD_STATUS_TONE[record.status]}>
           {RECORD_STATUS_LABELS[record.status]}
         </Badge>
+        {/* A note with no visit says why it exists. */}
+        {record.noteKind ? <Badge>{NOTE_KIND_LABELS[record.noteKind] ?? record.noteKind}</Badge> : null}
       </div>
 
       <AllergyBanner status={patient.allergyStatus} allergies={patient.allergies} />

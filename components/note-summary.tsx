@@ -4,7 +4,7 @@ import { requireDoctor } from "@/lib/auth";
 import { canReadNote, logChartAccess } from "@/lib/care";
 import { calendarDateFromDb, formatCalendarDate, formatDateTime, instantFromDb } from "@/lib/datetime";
 import { ICD11_CREDIT } from "@/lib/diagnoses";
-import { bloodPressure, bmi, fullName, RECORD_STATUS_LABELS, RECORD_STATUS_TONE } from "@/lib/domain";
+import { bloodPressure, bmi, fullName, NOTE_KIND_LABELS, RECORD_STATUS_LABELS, RECORD_STATUS_TONE } from "@/lib/domain";
 import { orm } from "@/src/prisma/db";
 import { AlertBanner, AllergyBanner } from "@/components/allergy-banner";
 import { Badge, Prose, buttonClass } from "@/components/ui";
@@ -51,6 +51,7 @@ export async function NoteSummary({ id }: { id: string }) {
       <div className="space-y-1.5">
         <div className="flex flex-wrap items-center gap-2">
           <Badge tone={RECORD_STATUS_TONE[record.status]}>{RECORD_STATUS_LABELS[record.status]}</Badge>
+          {record.noteKind ? <Badge>{NOTE_KIND_LABELS[record.noteKind] ?? record.noteKind}</Badge> : null}
           {record.archivedAt ? <Badge>Archived</Badge> : null}
         </div>
         <h2 className="font-display text-xl font-semibold text-pretty">{record.chiefComplaint || "Untitled draft"}</h2>

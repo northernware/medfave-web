@@ -4464,6 +4464,13 @@
                   "kind": "scalar"
                 }
               },
+              "noteKind": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "notes": {
                 "nullable": true,
                 "type": {
@@ -4804,6 +4811,9 @@
                 },
                 "id": {
                   "column": "id"
+                },
+                "noteKind": {
+                  "column": "noteKind"
                 },
                 "notes": {
                   "column": "notes"
@@ -10482,6 +10492,11 @@
                   "nativeType": "text",
                   "nullable": false
                 },
+                "noteKind": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "notes": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
@@ -12953,7 +12968,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "70db03074a2788f41483b72201b82a9a55687c094f312e00c4fdb0b12c7343c2"
+    "storageHash": "228bca9984e62f86efa14fbf5f3eabcbfef29a035a47af3a1eee8a7b139b12c0"
   },
   "capabilities": {
     "postgres": {

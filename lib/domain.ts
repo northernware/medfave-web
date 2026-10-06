@@ -62,6 +62,13 @@ export const APPOINTMENT_STATUS_TONE: Record<
   NO_SHOW: "warn",
 };
 
+/** Why a note has no visit linked (MedicalRecord.noteKind). */
+export const NOTE_KIND_LABELS: Record<string, string> = {
+  PHONE: "Phone advice",
+  RESULTS: "Results",
+  OTHER: "Other",
+};
+
 export const RECORD_STATUS_LABELS: Record<RecordStatus, string> = {
   DRAFT: "Draft",
   FINALIZED: "Signed",

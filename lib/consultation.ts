@@ -354,6 +354,8 @@ export async function writeConsultation(
 
   const scalars = {
     ...rest,
+    // A note documenting a visit needs no kind; one without says why it exists.
+    noteKind: linkedAppointmentId ? null : (rest.noteKind ?? null),
     visitDate: instantToDb(visitedAt),
     followUpDate: followUp ? calendarDateToDb(followUp) : null,
     updatedAt: now,

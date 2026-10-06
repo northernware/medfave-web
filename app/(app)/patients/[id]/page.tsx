@@ -19,6 +19,7 @@ import {
   fullName,
   RELATIONSHIP_LABELS,
   SEX_LABELS,
+  NOTE_KIND_LABELS,
 } from "@/lib/domain";
 import { AppointmentList } from "@/components/appointment-list";
 import { AlertBanner, AllergyBanner } from "@/components/allergy-banner";
@@ -80,6 +81,7 @@ export default async function PatientPage({
           "visitDate",
           "chiefComplaint",
           "assessment",
+          "noteKind",
           "systolic",
           "diastolic",
           "temperatureC",
@@ -287,7 +289,12 @@ export default async function PatientPage({
                         {formatDate(instantFromDb(record.visitDate))}
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-sm font-medium">{record.chiefComplaint}</span>
+                        <span className="block truncate text-sm font-medium">
+                          {record.chiefComplaint}
+                          {record.noteKind ? (
+                            <span className="ml-2 text-xs font-normal text-ink-muted">· {NOTE_KIND_LABELS[record.noteKind] ?? record.noteKind}</span>
+                          ) : null}
+                        </span>
                         {record.doctorId !== doctor.id ? (
                           <span className="mt-0.5 block text-xs text-ink-faint">by {authorName(record.doctorId)}</span>
                         ) : null}

@@ -128,6 +128,8 @@ export type RecordDefaults = {
   savedAt: string | null;
   visitDate: string;
   appointmentId: string;
+  /** PHONE, RESULTS, OTHER or "", for a note with no visit. */
+  noteKind: string;
   chiefComplaint: string;
   historyOfPresentIllness: string;
   physicalExamination: string;
@@ -155,6 +157,7 @@ export function blankRecord(visitDate: string): RecordDefaults {
     savedAt: null,
     visitDate,
     appointmentId: "",
+    noteKind: "",
     chiefComplaint: "",
     historyOfPresentIllness: "",
     physicalExamination: "",

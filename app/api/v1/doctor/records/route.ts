@@ -26,7 +26,7 @@ export async function GET(request: Request) {
 const TEXT = [
   "patientId", "appointmentId", "visitDate", "chiefComplaint", "historyOfPresentIllness", "physicalExamination",
   "temperatureC", "heartRate", "respiratoryRate", "systolic", "diastolic", "weightKg", "heightCm",
-  "oxygenSaturation", "assessment", "treatmentPlan", "followUpDate", "notes", "amendmentReason",
+  "oxygenSaturation", "assessment", "treatmentPlan", "followUpDate", "notes", "noteKind", "amendmentReason",
 ] as const;
 
 /**

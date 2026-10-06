@@ -176,8 +176,8 @@ export default async function RecordPage({ params }: PageProps<"/records/[id]">)
         </Badge>
       </div>
 
-      <AlertBanner alerts={patient.alerts} />
       <AllergyBanner status={patient.allergyStatus} allergies={patient.allergies} />
+      <AlertBanner alerts={patient.alerts} />
 
       {vitals.length > 0 ? (
         <Card>

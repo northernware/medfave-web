@@ -157,8 +157,8 @@ export async function NoteContext({
   return (
     <div className="space-y-3">
       {/* Changed in place: what the doctor learns at the visit goes straight on the chart. */}
-      <AlertBanner alerts={patient.alerts} patientId={patientId} />
       <AllergyBanner status={patient.allergyStatus} allergies={patient.allergies} patientId={patientId} />
+      <AlertBanner alerts={patient.alerts} patientId={patientId} />
 
       {/* Safety first everywhere; the rest beside the form when wide, folded away above it when narrow. */}
       <div className="hidden space-y-3 lg:block">{more}</div>

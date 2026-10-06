@@ -146,7 +146,7 @@ export function RecordForm({
           </Field>
 
           {lockedAppointment ? (
-            <Field label="Documenting appointment" htmlFor="appointmentLabel">
+            <Field label="Visit" htmlFor="appointmentLabel">
               <input type="hidden" name="appointmentId" value={lockedAppointment.id} />
               <TextInput id="appointmentLabel" defaultValue={lockedAppointment.label} disabled />
             </Field>
@@ -172,7 +172,11 @@ export function RecordForm({
               </Select>
             </Field>
           ) : (
-            <input type="hidden" name="appointmentId" value="" />
+            // No visit to link (or a saved note's is settled): say so, rather than leave a gap.
+            <Field label="Visit" htmlFor="appointmentLabel">
+              <input type="hidden" name="appointmentId" value="" />
+              <TextInput id="appointmentLabel" defaultValue="Walk-in — no appointment" disabled />
+            </Field>
           )}
         </FieldGrid>
 

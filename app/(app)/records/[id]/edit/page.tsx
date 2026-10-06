@@ -5,10 +5,10 @@ import { requireDoctor } from "@/lib/auth";
 import { orm } from "@/src/prisma/db";
 import { calendarDateFromDb, instantFromDb } from "@/lib/datetime";
 import { formatDateTime, toDateInputValue, toDateTimeLocalValue } from "@/lib/datetime";
-import { fullName } from "@/lib/domain";
 import { RecordForm } from "@/components/forms/record-form";
-import { Card, PageHeader } from "@/components/ui";
+import { Card } from "@/components/ui";
 import { NoteContext, NoteLayout } from "@/components/note-context";
+import { NoteHeader } from "@/components/note-header";
 
 export const metadata: Metadata = { title: "Visit note" };
 
@@ -21,7 +21,9 @@ export default async function EditRecordPage({ params }: PageProps<"/records/[id
   const { id } = await params;
 
   const record = await orm.MedicalRecord
-    .include("patient", (p) => p.select("id", "firstName", "middleName", "lastName"))
+    .include("patient", (p) =>
+      p.select("id", "firstName", "middleName", "lastName", "sex", "dateOfBirth").include("household", (h) => h.select("name")),
+    )
     .include("appointment", (a) => a.select("id", "scheduledAt", "reason", "visitType"))
     .include("diagnoses", (d) => d.select("code", "title").orderBy((x) => x.position.asc()))
     .include("prescriptions", (p) =>
@@ -44,12 +46,13 @@ export default async function EditRecordPage({ params }: PageProps<"/records/[id
 
   return (
     <div className="space-y-3">
-      <PageHeader
+      <NoteHeader
         title={record.status === "DRAFT" ? "Visit note (draft)" : "Amend note"}
-        subtitle={
+        patient={record.patient}
+        status={
           record.status === "DRAFT"
-            ? fullName(record.patient)
-            : `${fullName(record.patient)} · the previous text is kept`
+            ? `Draft · last saved ${formatDateTime(instantFromDb(record.updatedAt))}`
+            : "Signed · amending keeps the previous text, with your reason"
         }
       />
       <NoteLayout

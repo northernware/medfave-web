@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
 import { NoteContext, NoteLayout } from "@/components/note-context";
+import { NoteHeader } from "@/components/note-header";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { autosaveConsultation, saveMedicalRecord } from "@/app/actions/records";
 import { requireDoctor } from "@/lib/auth";
 import { orm } from "@/src/prisma/db";
-import { calendarDateFromDb, instantFromDb } from "@/lib/datetime";
+import { instantFromDb } from "@/lib/datetime";
 import { formatDateTime, toDateTimeLocalValue } from "@/lib/datetime";
-import { ageFrom, CONSULTED_STATUSES, fullName, SEX_LABELS } from "@/lib/domain";
+import { CONSULTED_STATUSES } from "@/lib/domain";
 import { RecordForm } from "@/components/forms/record-form";
 import { blankRecord } from "@/lib/form-defaults";
-import { buttonClass, Card, PageHeader } from "@/components/ui";
+import { buttonClass, Card } from "@/components/ui";
 import { carryOverFor } from "@/lib/carry-over";
 
 export const metadata: Metadata = { title: "New visit note" };
@@ -74,18 +75,7 @@ export default async function NewRecordPage({ searchParams }: PageProps<"/record
 
   return (
     <div className="space-y-3">
-      <PageHeader
-        title="New visit note"
-        subtitle={
-          <>
-            <Link href={`/patients/${patient.id}`} className="text-accent-ink hover:underline">
-              {fullName(patient)}
-            </Link>
-            {" · "}
-            {SEX_LABELS[patient.sex]} · {ageFrom(calendarDateFromDb(patient.dateOfBirth))} · {patient.household.name} household
-          </>
-        }
-      />
+      <NoteHeader title="New visit note" patient={patient} />
 
       <NoteLayout
         context={

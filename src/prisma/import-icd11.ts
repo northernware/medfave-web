@@ -14,15 +14,18 @@ import { db } from "./db";
  *
  * ICD-11 is © World Health Organization, used under CC BY-ND 3.0 IGO: codes
  * and titles are stored exactly as published (the leading "- - " depth marks
- * in WHO's text file are layout, not title), each with its URI. Rerunning
- * updates titles and adds new codes; nothing is deleted, since visit notes
- * keep their own copies anyway. Needs `unzip` on the PATH.
+ * and the quotes around titles in WHO's text file are layout, not title),
+ * each with its URI. Rerunning updates titles and adds new codes; nothing is
+ * deleted, since visit notes keep their own copies anyway. Needs `unzip`.
  */
 
 const RELEASE = process.argv[2] ?? "2026-01";
 const URL = `https://icdcdn.who.int/static/releasefiles/${RELEASE}/SimpleTabulation-ICD-11-MMS-en.zip`;
 const FILE = "SimpleTabulation-ICD-11-MMS-en.txt";
 const BATCH = 2000;
+
+/** A tab-separated field as WHO writes it: maybe in double quotes, with "" for a quote inside. */
+const unquote = (s: string) => (s.startsWith('"') && s.endsWith('"') ? s.slice(1, -1).replace(/""/g, '"') : s);
 
 type Row = {
   code: string;
@@ -74,7 +77,7 @@ async function main() {
     if (f[cKind] !== "category" || !f[cCode]) continue;
     rows.push({
       code: f[cCode],
-      title: f[cTitle].replace(/^(- )+/, "").trim(),
+      title: unquote(f[cTitle]).replace(/^(- )+/, "").trim(),
       uri: f[cUri],
       chapter: f[cChapter],
       leaf: f[cLeaf].toLowerCase() === "true",

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { likeSafe, looksLikeCode, queryWords, rankHits } from "@/lib/diagnosis-rank";
+import { likeSafe, looksLikeCode, queryWords, rankHits, synonymCodes } from "@/lib/diagnosis-rank";
 
 const hit = (code: string, title: string, leaf = true) => ({ code, title, leaf });
 
@@ -36,5 +36,23 @@ describe("rankHits", () => {
 
   it("puts the exact title first, then titles starting with the words, leaves before branches", () => {
     expect(rankHits(hits, "asthma").map((h) => h.code)).toEqual(["CA23", "1B12", "CA23.32", "CA23.3"]);
+  });
+});
+
+describe("common diagnoses and synonyms", () => {
+  const hypertension = [
+    hit("9C61.01", "Ocular hypertension"),
+    hit("KB45", "Neonatal hypertension"),
+    hit("BA00", "Essential hypertension", false),
+  ];
+
+  it("ranks a common diagnosis first among equal matches", () => {
+    expect(rankHits(hypertension, "hypertension")[0].code).toBe("BA00");
+  });
+
+  it("finds a code by a word that isn't in its title", () => {
+    expect(synonymCodes("High blood pressure")).toEqual(["BA00"]);
+    expect(rankHits([hit("MD12", "Cough"), hit("BA00", "Essential hypertension", false)], "htn")[0].code).toBe("BA00");
+    expect(synonymCodes("asthma")).toEqual([]);
   });
 });

@@ -43,6 +43,8 @@ export async function recordForApp(doctor: { doctorId: string; clinicId: string 
     treatmentPlan: r.treatmentPlan,
     followUpDate: r.followUpDate ? toDateInputValue(calendarDateFromDb(r.followUpDate)) : null,
     notes: r.notes,
+    /** Why a note has no visit: PHONE, RESULTS or OTHER; null when it documents one. */
+    noteKind: r.noteKind,
     prescriptions: r.prescriptions,
     /** ICD-11, primary first. */
     diagnoses: r.diagnoses,

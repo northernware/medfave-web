@@ -5,6 +5,7 @@ import { useActionState, useEffect, useId, useRef, useState } from "react";
 import { Field, FieldGrid, FormError, Select, SubmitButton, TextArea, TextInput } from "@/components/form";
 import { buttonClass } from "@/components/ui";
 import { formatTime } from "@/lib/datetime";
+import { NOTE_KIND_LABELS } from "@/lib/domain";
 import { BLANK_PRESCRIPTION, type PrescriptionRow, type RecordDefaults } from "@/lib/form-defaults";
 import { searchDiagnoses, type AutosaveResult } from "@/app/actions/records";
 import { DiagnosisPicker, type ChartCondition } from "@/components/forms/diagnosis-picker";
@@ -152,7 +153,7 @@ export function RecordForm({
             </Field>
           ) : openAppointments.length > 0 ? (
             <Field
-              label="Link to appointment"
+              label="Visit"
               htmlFor="appointmentId"
               error={err?.appointmentId}
               hint="Linking marks that appointment completed."
@@ -163,7 +164,7 @@ export function RecordForm({
                 value={appointmentId}
                 onChange={(e) => setAppointmentId(e.target.value)}
               >
-                <option value="">Walk-in — no appointment</option>
+                <option value="">Not linked to a visit</option>
                 {openAppointments.map((a) => (
                   <option key={a.id} value={a.id}>
                     {a.label}
@@ -175,10 +176,33 @@ export function RecordForm({
             // No visit to link (or a saved note's is settled): say so, rather than leave a gap.
             <Field label="Visit" htmlFor="appointmentLabel">
               <input type="hidden" name="appointmentId" value="" />
-              <TextInput id="appointmentLabel" defaultValue="Walk-in — no appointment" disabled />
+              <TextInput id="appointmentLabel" defaultValue="Not linked to a visit" disabled />
             </Field>
           )}
         </FieldGrid>
+
+        {/* No visit linked: say why the note exists, and point a patient seen now to a walk-in. */}
+        {!lockedAppointment && !appointmentId ? (
+          <div className="grid gap-3 rounded-xl border border-border bg-surface-muted p-4 sm:grid-cols-[minmax(0,14rem)_1fr] sm:items-center">
+            <Field label="Kind of note" htmlFor="noteKind" error={err?.noteKind}>
+              <Select id="noteKind" name="noteKind" defaultValue={defaults.noteKind}>
+                <option value="">Choose…</option>
+                {Object.entries(NOTE_KIND_LABELS).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+            <p className="text-sm text-ink-muted">
+              Seeing them now?{" "}
+              <Link href={`/appointments/new?source=WALK_IN&patientId=${patientId}`} className="font-medium text-accent-ink hover:underline">
+                Register a walk-in
+              </Link>{" "}
+              so the visit is in today&rsquo;s list and counts, then write the note for it.
+            </p>
+          </div>
+        ) : null}
 
         <Field label="Chief complaint" htmlFor="chiefComplaint" error={err?.chiefComplaint} required>
           <TextInput

@@ -280,6 +280,9 @@ namespace public {
     updatedAt               TimestampString(3)
     followUpAppointmentId   String?
     physicalExamination     String?
+    /// Why a note has no visit: PHONE (advice by phone or chat), RESULTS (on
+    /// results that came in), OTHER. Null when it documents a visit.
+    noteKind                String?
 
     /// Where the note stands. A DRAFT is the doctor's working copy and can be
     /// changed freely; FINALIZED means it has been signed, and after that every

@@ -1,0 +1,44 @@
+[
+  {
+    "id": "column.public.MedicalRecord.noteKind",
+    "label": "Add column \"noteKind\" to \"MedicalRecord\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "noteKind",
+        "table": "MedicalRecord"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"noteKind\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "MedicalRecord",
+          "noteKind"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"noteKind\"",
+        "sql": "ALTER TABLE \"public\".\"MedicalRecord\" ADD COLUMN \"noteKind\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"noteKind\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "MedicalRecord",
+          "noteKind"
+        ]
+      }
+    ]
+  }
+]

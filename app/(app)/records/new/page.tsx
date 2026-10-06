@@ -6,7 +6,7 @@ import { notFound, redirect } from "next/navigation";
 import { autosaveConsultation, saveMedicalRecord } from "@/app/actions/records";
 import { requireDoctor } from "@/lib/auth";
 import { orm } from "@/src/prisma/db";
-import { instantFromDb } from "@/lib/datetime";
+import { clinicDayRange, instantFromDb } from "@/lib/datetime";
 import { formatDateTime, toDateTimeLocalValue } from "@/lib/datetime";
 import { CONSULTED_STATUSES } from "@/lib/domain";
 import { RecordForm } from "@/components/forms/record-form";
@@ -37,7 +37,7 @@ export default async function NewRecordPage({ searchParams }: PageProps<"/record
   // Only visits that actually happened can be written up, so only those are
   // offered. A booking still to come has nothing to say yet.
   const undocumented = await orm.Appointment
-    .select("id", "scheduledAt", "reason", "visitType")
+    .select("id", "scheduledAt", "reason", "visitType", "status")
     .where((a) => a.patientId.eq(patient.id))
     .where((a) => a.doctorId.eq(doctor.id))
     .where((a) => a.status.in(CONSULTED_STATUSES))
@@ -57,6 +57,15 @@ export default async function NewRecordPage({ searchParams }: PageProps<"/record
 
   const defaults = blankRecord(toDateTimeLocalValue(new Date()));
   if (locked) defaults.appointmentId = locked.id;
+  // Opened from the patient's page: if they're with the doctor today (or were
+  // seen today and it isn't written up), this note is most likely for that
+  // visit. Still changeable. Only visits that took place can be linked.
+  else {
+    const todayStart = clinicDayRange(new Date()).start;
+    const today = undocumented.filter((a) => instantFromDb(a.scheduledAt) >= todayStart);
+    const here = today.find((a) => a.status === "IN_CONSULTATION") ?? today.find((a) => a.status === "COMPLETED");
+    if (here) defaults.appointmentId = here.id;
+  }
 
   // A return visit picks up where the last one left off (lib/carry-over.ts).
   const last = fresh === "1" ? null : await carryOverFor(doctor, patient.id);

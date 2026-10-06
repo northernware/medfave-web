@@ -11,12 +11,15 @@ export function ChartForm({
   patientId,
   action,
   id,
+  confirm,
   className = "",
   children,
 }: {
   patientId: string;
   action: string;
   id?: string;
+  /** Asked first; nothing happens unless the doctor agrees. */
+  confirm?: string;
   className?: string;
   children: ReactNode;
 }) {
@@ -29,7 +32,15 @@ export function ChartForm({
     form.current?.closest("details")?.removeAttribute("open");
   }, [state]);
   return (
-    <form ref={form} action={formAction} className={className} aria-busy={pending || undefined}>
+    <form
+      ref={form}
+      action={formAction}
+      onSubmit={(e) => {
+        if (confirm && !window.confirm(confirm)) e.preventDefault();
+      }}
+      className={className}
+      aria-busy={pending || undefined}
+    >
       <input type="hidden" name="patientId" value={patientId} />
       <input type="hidden" name="action" value={action} />
       {id ? <input type="hidden" name="id" value={id} /> : null}

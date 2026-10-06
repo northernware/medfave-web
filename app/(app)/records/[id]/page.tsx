@@ -30,7 +30,7 @@ import { AlertBanner, AllergyBanner } from "@/components/allergy-banner";
 import { DangerZone } from "@/components/danger-zone";
 import { Badge, Card, CardHeader, Detail, PageHeader, Prose, buttonClass } from "@/components/ui";
 
-export const metadata: Metadata = { title: "Medical record" };
+export const metadata: Metadata = { title: "Visit note" };
 
 /** Long prose in a change line is a wall; the point is which field moved. */
 function brief(value: string, max = 110) {
@@ -124,14 +124,14 @@ export default async function RecordPage({ params }: PageProps<"/records/[id]">)
           !mine ? null : archived ? (
             <form action={restoreMedicalRecord}>
               <input type="hidden" name="recordId" value={record.id} />
-              <button className={buttonClass("primary")}>Restore record</button>
+              <button className={buttonClass("primary")}>Restore note</button>
             </form>
           ) : (
             <Link
               href={`/records/${record.id}/edit`}
               className={buttonClass(draft ? "primary" : "secondary")}
             >
-              {draft ? "Continue writing" : "Amend record"}
+              {draft ? "Continue note" : "Amend note"}
             </Link>
           )
         }
@@ -380,9 +380,9 @@ export default async function RecordPage({ params }: PageProps<"/records/[id]">)
           fieldName="recordId"
           fieldValue={record.id}
           variant="secondary"
-          summary="Archive this record"
+          summary="Archive this note"
           warning="Takes this encounter out of the patient's chart. It stays readable and can be restored — a clinical record is evidence of what was decided, so nothing here is destroyed. Amending is usually the right answer for a note that is merely wrong."
-          confirmLabel="Archive record"
+          confirmLabel="Archive note"
         >
           <label className="block">
             <span className="mb-1.5 block text-sm font-medium">Reason</span>

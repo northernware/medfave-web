@@ -13,7 +13,7 @@ import { AlertBanner, AllergyBanner } from "@/components/allergy-banner";
 import { buttonClass, Card, PageHeader } from "@/components/ui";
 import { carryOverFor } from "@/lib/carry-over";
 
-export const metadata: Metadata = { title: "Document visit" };
+export const metadata: Metadata = { title: "New visit note" };
 
 export default async function NewRecordPage({ searchParams }: PageProps<"/records/new">) {
   const doctor = await requireDoctor();
@@ -70,7 +70,7 @@ export default async function NewRecordPage({ searchParams }: PageProps<"/record
   return (
     <div className="space-y-3">
       <PageHeader
-        title="Document visit"
+        title="New visit note"
         subtitle={
           <>
             <Link href={`/patients/${patient.id}`} className="text-accent-ink hover:underline">

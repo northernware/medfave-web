@@ -97,14 +97,14 @@ export default async function AppointmentPage({
         actions={
           appointment.medicalRecord ? (
             <Link href={`/records/${appointment.medicalRecord.id}`} className={buttonClass("primary")}>
-              View record
+              Open note
             </Link>
           ) : (
             <Link
               href={`/records/new?patientId=${patient.id}&appointmentId=${appointment.id}`}
               className={buttonClass("primary")}
             >
-              Document visit
+              Write note
             </Link>
           )
         }
@@ -313,7 +313,7 @@ export default async function AppointmentPage({
               {movesFor(appointment).length === 0 ? (
                 <p className="text-sm text-ink-muted">
                   {appointment.status === "COMPLETED"
-                    ? "This visit is finished. Its record is where anything further belongs."
+                    ? "This visit is finished. Its visit note is where anything further belongs."
                     : "Its time has passed. Book a new visit if they still need one."}
                 </p>
               ) : null}

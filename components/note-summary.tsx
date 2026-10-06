@@ -136,7 +136,7 @@ export async function NoteSummary({ id }: { id: string }) {
         </a>
         {mine && !record.archivedAt ? (
           <a href={`/records/${record.id}/edit`} className={buttonClass(draft ? "primary" : "secondary")}>
-            {draft ? "Continue writing" : "Amend"}
+            {draft ? "Continue note" : "Amend note"}
           </a>
         ) : null}
       </div>

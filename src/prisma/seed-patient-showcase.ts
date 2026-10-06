@@ -1,6 +1,8 @@
 import "dotenv/config";
 import bcrypt from "bcryptjs";
+import { or } from "@prisma/orm-postgres/orm-client";
 import { orm } from "./db";
+import { MARK, seedId } from "./seed-ids";
 import { addDays } from "../../lib/scheduling";
 import { calendarDateToDb, dayKey, fromDateTimeLocalValue, instantToDb } from "../../lib/datetime";
 
@@ -16,7 +18,8 @@ import { calendarDateToDb, dayKey, fromDateTimeLocalValue, instantToDb } from ".
  *  - a carer who sees his records (Profile → people who see my records)
  *  - Dr. Ana Reyes in his faves ("Your doctors" on Home)
  *
- * Every row it makes has an id starting "showcase-", so it is safe to run
+ * Every row it makes has an id from `seedId(MARK.patient, …)` (./seed-ids.ts),
+ * or an older "showcase-" one, so it is safe to run
  * again: those rows are removed first and nothing else is touched. Needs the
  * main seed. Never run against real data.
  *
@@ -26,7 +29,7 @@ import { calendarDateToDb, dayKey, fromDateTimeLocalValue, instantToDb } from ".
 const PATIENT_EMAIL = "patient@medfave.com";
 const CARER_EMAIL = "marilou@medfave.com";
 const PASSWORD = "password";
-const id = (name: string) => `showcase-${name}`;
+const id = (name: string) => seedId(MARK.patient, name);
 
 /** A clinic day `offset` days on, skipping Sundays, at hh:mm. */
 function at(offset: number, hour: number, minute = 0) {
@@ -47,11 +50,11 @@ async function main() {
   if (!doctor?.accountId) throw new Error("No Dr. Ana Reyes at the demo clinic.");
 
   // Out with the last run's rows. `deleteAndCount`, not `delete`: that removes one row.
-  await orm.AppointmentRequest.where((r) => r.id.like("showcase-%")).deleteAndCount();
-  await orm.Appointment.where((a) => a.id.like("showcase-%")).deleteAndCount();
-  await orm.DocumentRequest.where((d) => d.id.like("showcase-%")).deleteAndCount();
-  await orm.CareLink.where((c) => c.id.like("showcase-%")).deleteAndCount();
-  await orm.Fave.where((f) => f.id.like("showcase-%")).deleteAndCount();
+  await orm.AppointmentRequest.where((r) => or(r.id.like(`${MARK.patient}-%`), r.id.like("showcase-%"))).deleteAndCount();
+  await orm.Appointment.where((a) => or(a.id.like(`${MARK.patient}-%`), a.id.like("showcase-%"))).deleteAndCount();
+  await orm.DocumentRequest.where((d) => or(d.id.like(`${MARK.patient}-%`), d.id.like("showcase-%"))).deleteAndCount();
+  await orm.CareLink.where((c) => or(c.id.like(`${MARK.patient}-%`), c.id.like("showcase-%"))).deleteAndCount();
+  await orm.Fave.where((f) => or(f.id.like(`${MARK.patient}-%`), f.id.like("showcase-%"))).deleteAndCount();
 
   const now = instantToDb(new Date());
   const base = { clinicId: chart.clinicId, patientId: chart.id, doctorId: doctor.id, createdAt: now, updatedAt: now };

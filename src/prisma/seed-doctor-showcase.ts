@@ -1,5 +1,7 @@
 import "dotenv/config";
+import { or } from "@prisma/orm-postgres/orm-client";
 import { orm } from "./db";
+import { MARK, seedId } from "./seed-ids";
 import { calendarDateToDb, dayKey, instantToDb } from "../../lib/datetime";
 import { addDays } from "../../lib/scheduling";
 
@@ -16,15 +18,16 @@ import { addDays } from "../../lib/scheduling";
  *  - visit notes from past visits (the last note in a card)
  *  - patient feedback with good and low ratings, tags and notes, and faves
  *
- * Every row it makes has an id starting "drshow-", so it is safe to run again:
- * those rows are removed first. It also sets the allergy / condition /
+ * Every row it makes has an id from `seedId(MARK.doctor, …)` (./seed-ids.ts),
+ * so it is safe to run again: those rows, and any from before with ids starting
+ * "drshow-", are removed first. It also sets the allergy / condition /
  * medication status of the charts it fills, which stays. Needs the main seed.
  * Never run against real data.
  *
  *   npm run db:seed-doctor-showcase
  */
 
-const id = (name: string) => `drshow-${name}`;
+const id = (name: string) => seedId(MARK.doctor, name);
 const MIN = 60_000;
 /** An instant `minutes` from now, for the database. */
 const fromNow = (minutes: number) => instantToDb(new Date(Date.now() + minutes * MIN));
@@ -53,15 +56,15 @@ async function main() {
   if (!ramon || !paula || !corazon) throw new Error("Ramon, Paula and Corazon need their logins: run npm run db:seed first.");
 
   // Out with the last run's rows, children first. `deleteAndCount`: `delete` removes one row.
-  await orm.VisitFeedback.where((f) => f.id.like("drshow-%")).deleteAndCount();
-  await orm.Fave.where((f) => f.id.like("drshow-%")).deleteAndCount();
-  await orm.MedicalRecord.where((r) => r.id.like("drshow-%")).deleteAndCount();
-  await orm.AppointmentRequest.where((r) => r.id.like("drshow-%")).deleteAndCount();
-  await orm.Appointment.where((a) => a.id.like("drshow-%")).deleteAndCount();
-  await orm.PatientAllergy.where((x) => x.id.like("drshow-%")).deleteAndCount();
-  await orm.PatientAlert.where((x) => x.id.like("drshow-%")).deleteAndCount();
-  await orm.PatientCondition.where((x) => x.id.like("drshow-%")).deleteAndCount();
-  await orm.PatientMedication.where((x) => x.id.like("drshow-%")).deleteAndCount();
+  await orm.VisitFeedback.where((f) => or(f.id.like(`${MARK.doctor}-%`), f.id.like("drshow-%"))).deleteAndCount();
+  await orm.Fave.where((f) => or(f.id.like(`${MARK.doctor}-%`), f.id.like("drshow-%"))).deleteAndCount();
+  await orm.MedicalRecord.where((r) => or(r.id.like(`${MARK.doctor}-%`), r.id.like("drshow-%"))).deleteAndCount();
+  await orm.AppointmentRequest.where((r) => or(r.id.like(`${MARK.doctor}-%`), r.id.like("drshow-%"))).deleteAndCount();
+  await orm.Appointment.where((a) => or(a.id.like(`${MARK.doctor}-%`), a.id.like("drshow-%"))).deleteAndCount();
+  await orm.PatientAllergy.where((x) => or(x.id.like(`${MARK.doctor}-%`), x.id.like("drshow-%"))).deleteAndCount();
+  await orm.PatientAlert.where((x) => or(x.id.like(`${MARK.doctor}-%`), x.id.like("drshow-%"))).deleteAndCount();
+  await orm.PatientCondition.where((x) => or(x.id.like(`${MARK.doctor}-%`), x.id.like("drshow-%"))).deleteAndCount();
+  await orm.PatientMedication.where((x) => or(x.id.like(`${MARK.doctor}-%`), x.id.like("drshow-%"))).deleteAndCount();
 
   const now = instantToDb(new Date());
   const base = { clinicId, doctorId: doctor.id, createdAt: now, updatedAt: now, bookedById: doctor.accountId };

@@ -383,7 +383,7 @@ export function RecordForm({
             label="Reason for this amendment"
             htmlFor="amendmentReason"
             error={err?.amendmentReason}
-            hint="Kept with the previous text, so the record shows what changed and why."
+            hint="Kept with the previous text, so the note shows what changed and why."
             required
           >
             <TextArea

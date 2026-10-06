@@ -68,6 +68,8 @@
   --warn: light-dark(oklch(0.66 0.14 70), oklch(0.78 0.13 80));
   --warn-soft: light-dark(oklch(0.965 0.05 85), oklch(0.33 0.06 75));
   --warn-ink: light-dark(oklch(0.47 0.11 65), oklch(0.87 0.09 85));
+  /* Text on a solid warn fill (the medical-alerts box): dark in both themes. */
+  --on-warn: light-dark(oklch(0.22 0.05 65), oklch(0.2 0.04 70));
 
   --ok: light-dark(oklch(0.58 0.12 160), oklch(0.72 0.12 160));
   --ok-soft: light-dark(oklch(0.955 0.035 160), oklch(0.3 0.055 160));
@@ -131,6 +133,7 @@
   --color-warn: var(--warn);
   --color-warn-soft: var(--warn-soft);
   --color-warn-ink: var(--warn-ink);
+  --color-on-warn: var(--on-warn);
 
   --color-ok: var(--ok);
   --color-ok-soft: var(--ok-soft);

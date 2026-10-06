@@ -183,7 +183,7 @@ const FEATURES = [
   },
   {
     title: "Visit records",
-    body: "Document each visit with vitals, assessment, plan and prescriptions — and print the prescription on the spot.",
+    body: "Document each visit with vitals, ICD-11 diagnoses, prescriptions and advice — and print the prescription on the spot.",
     icon: DocumentTextIcon,
   },
   {

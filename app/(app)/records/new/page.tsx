@@ -62,7 +62,7 @@ export default async function NewRecordPage({ searchParams }: PageProps<"/record
   const carriedFrom = last?.from ?? null;
   if (last) {
     if (last.heightCm) defaults.heightCm = last.heightCm;
-    defaults.assessment = last.assessment;
+    defaults.diagnoses = last.diagnoses;
     defaults.notes = last.notes;
     defaults.prescriptions = last.prescriptions;
   }
@@ -96,7 +96,7 @@ export default async function NewRecordPage({ searchParams }: PageProps<"/record
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-accent/30 bg-accent-tint px-4 py-3 text-sm">
                 <p>
                   <span className="font-medium">Filled from the visit on {carriedFrom}:</span>{" "}
-                  <span className="text-ink-muted">assessment, advice, medicines and height. Today&rsquo;s complaint, vitals and examination start blank.</span>
+                  <span className="text-ink-muted">diagnoses, advice, medicines and height. Today&rsquo;s complaint, vitals and examination start blank.</span>
                 </p>
                 <Link
                   href={`/records/new?patientId=${patient.id}${locked ? `&appointmentId=${locked.id}` : ""}&fresh=1`}

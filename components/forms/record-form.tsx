@@ -267,9 +267,13 @@ export function RecordForm({
             }}
           />
         </div>
-        <Field label="Assessment" htmlFor="assessment" hint="Your reasoning. The coded diagnoses are above." error={err?.assessment}>
-          <TextArea id="assessment" name="assessment" rows={3} defaultValue={defaults.assessment} />
-        </Field>
+        {/* Notes are coded now: the diagnoses above say it. A note written with a
+            free-text assessment keeps showing it, so saving can't erase it. */}
+        {defaults.assessment ? (
+          <Field label="Assessment" htmlFor="assessment" hint="From before diagnoses were coded." error={err?.assessment}>
+            <TextArea id="assessment" name="assessment" rows={3} defaultValue={defaults.assessment} />
+          </Field>
+        ) : null}
         {/* Treatment plans are now the prescriptions plus "Advice and notes". A
             note written with a plan keeps showing it, so saving can't erase it. */}
         {defaults.treatmentPlan ? (

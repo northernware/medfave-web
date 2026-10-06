@@ -37,6 +37,11 @@ export default async function EditRecordPage({ params }: PageProps<"/records/[id
   // and offers to put it back.
   if (record.archivedAt) redirect(`/records/${record.id}`);
 
+  const onChart = await orm.PatientCondition.select("code", "label")
+    .where((c) => c.patientId.eq(record.patientId))
+    .where((c) => c.resolvedAt.isNull())
+    .all();
+
   return (
     <div className="space-y-3">
       <PageHeader
@@ -59,6 +64,7 @@ export default async function EditRecordPage({ params }: PageProps<"/records/[id
         form={
             <Card className="p-5 sm:p-6">
               <RecordForm
+                onChart={onChart}
                 action={saveMedicalRecord}
                 autosave={autosaveConsultation}
                 patientId={record.patientId}

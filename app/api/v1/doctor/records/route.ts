@@ -78,6 +78,8 @@ export async function POST(request: Request) {
   if (Array.isArray(body.diagnoses)) {
     form.set("dx.present", "1");
     for (const code of body.diagnoses) form.append("dx.code", String(code ?? ""));
+    // Those to add to the patient's ongoing conditions when the note is signed.
+    if (Array.isArray(body.ongoing)) for (const code of body.ongoing) form.append("dx.ongoing", String(code ?? ""));
   }
 
   const intent = body.intent === "finish" ? "finish" : "draft";

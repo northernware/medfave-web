@@ -6039,6 +6039,13 @@
           },
           "PatientCondition": {
             "fields": {
+              "code": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "createdAt": {
                 "nullable": false,
                 "type": {
@@ -6076,6 +6083,23 @@
                   "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
+              },
+              "resolvedAt": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/timestamp-string@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
+              "resolvedById": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
               }
             },
             "relations": {
@@ -6097,6 +6121,9 @@
             },
             "storage": {
               "fields": {
+                "code": {
+                  "column": "code"
+                },
                 "createdAt": {
                   "column": "createdAt"
                 },
@@ -6111,6 +6138,12 @@
                 },
                 "patientId": {
                   "column": "patientId"
+                },
+                "resolvedAt": {
+                  "column": "resolvedAt"
+                },
+                "resolvedById": {
+                  "column": "resolvedById"
                 }
               },
               "namespaceId": "public",
@@ -11711,6 +11744,11 @@
             },
             "PatientCondition": {
               "columns": {
+                "code": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "createdAt": {
                   "codecId": "pg/timestamp-string@1",
                   "default": {
@@ -11742,6 +11780,19 @@
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": false
+                },
+                "resolvedAt": {
+                  "codecId": "pg/timestamp-string@1",
+                  "nativeType": "timestamp",
+                  "nullable": true,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
+                "resolvedById": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
                 }
               },
               "foreignKeys": [
@@ -12866,7 +12917,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "1c31c0df9ae457fb95f8925d6faa51493b3781745f5db9c398ee3448f3034a16"
+    "storageHash": "c8dd5721f1d129ec771c3dbd61a476add1017444bbf49c8661eb9d8e83bf841c"
   },
   "capabilities": {
     "postgres": {

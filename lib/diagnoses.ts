@@ -76,12 +76,14 @@ export async function searchIcd11(q: string, limit = 20): Promise<(Diagnosis & {
  * an older app that knows nothing of diagnoses must not wipe the ones set on
  * the web. `keep` means leave them as they are.
  */
-export async function readDiagnoses(formData: FormData): Promise<{ rows: Diagnosis[]; keep?: boolean; error?: FormState }> {
-  if (!formData.has("dx.present")) return { rows: [], keep: true };
+export async function readDiagnoses(formData: FormData): Promise<{ rows: Diagnosis[]; ongoing: string[]; keep?: boolean; error?: FormState }> {
+  // Codes the doctor marked "Ongoing condition": they join the chart when the note is signed.
+  const ongoing = formData.getAll("dx.ongoing").map((c) => String(c).trim().toUpperCase()).filter(Boolean);
+  if (!formData.has("dx.present")) return { rows: [], ongoing: [], keep: true };
   const codes = [...new Set(formData.getAll("dx.code").map((c) => String(c).trim().toUpperCase()).filter(Boolean))];
-  if (codes.length === 0) return { rows: [] };
+  if (codes.length === 0) return { rows: [], ongoing: [] };
   if (codes.length > MAX_DIAGNOSES) {
-    return { rows: [], error: { message: `Keep it to ${MAX_DIAGNOSES} diagnoses.`, fieldErrors: { diagnoses: ["Too many"] } } };
+    return { rows: [], ongoing: [], error: { message: `Keep it to ${MAX_DIAGNOSES} diagnoses.`, fieldErrors: { diagnoses: ["Too many"] } } };
   }
   const found = await orm.Icd11Code.select("code", "title", "uri")
     .where((c) => c.code.in(codes))
@@ -92,10 +94,11 @@ export async function readDiagnoses(formData: FormData): Promise<{ rows: Diagnos
   if (missing.length) {
     return {
       rows: [],
+      ongoing: [],
       error: { message: `Not an ICD-11 code: ${missing.join(", ")}. Pick it from the search.`, fieldErrors: { diagnoses: ["Unknown code"] } },
     };
   }
-  return { rows: codes.map((c) => ({ system: ICD11, ...byCode.get(c)! })) };
+  return { rows: codes.map((c) => ({ system: ICD11, ...byCode.get(c)! })), ongoing: ongoing.filter((c) => byCode.has(c)) };
 }
 
 /** A transaction's ORM, or the plain one. */

@@ -82,3 +82,15 @@ export function rankHits<T extends CodeHit>(hits: T[], q: string): T[] {
       a.code.localeCompare(b.code),
   );
 }
+
+/**
+ * ICD-11 codes that are usually long-term, so "Ongoing condition" starts on for
+ * them when picked on a note: diabetes, hypertension and other circulatory
+ * disease, asthma and COPD, chronic kidney disease, thyroid, epilepsy,
+ * depression and anxiety, osteoarthritis, rheumatoid arthritis, gout, HIV,
+ * tuberculosis. The doctor can switch it either way.
+ */
+const LONG_TERM = [
+  "5A1", "BA0", "BA4", "BA8", "BD1", "CA22", "CA23", "GB61", "5A0", "8A6", "6A7", "6B0", "FA0", "FA20", "FA25", "1C6", "1B1",
+];
+export const looksLongTerm = (code: string) => LONG_TERM.some((p) => code.toUpperCase().startsWith(p));

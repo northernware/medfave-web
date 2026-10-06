@@ -3,8 +3,11 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { TextInput } from "@/components/form";
 import type { DiagnosisHit } from "@/app/actions/records";
+import { looksLongTerm } from "@/lib/diagnosis-rank";
 
 export type DiagnosisRow = { code: string; title: string };
+/** A current condition on the patient's chart, to tell "already there" from "add it". */
+export type ChartCondition = { code: string | null; label: string };
 
 /**
  * Coded diagnoses for a note, in WHO ICD-11: search by code or words, pick one
@@ -13,12 +16,14 @@ export type DiagnosisRow = { code: string; title: string };
  */
 export function DiagnosisPicker({
   initial,
+  onChart,
   search,
   credit,
   error,
   onChange,
 }: {
   initial: DiagnosisRow[];
+  onChart: ChartCondition[];
   search: (q: string) => Promise<DiagnosisHit[]>;
   credit: string;
   error?: string[];
@@ -27,6 +32,12 @@ export function DiagnosisPicker({
 }) {
   const id = useId();
   const [rows, setRows] = useState(initial);
+  const already = (r: DiagnosisRow) =>
+    onChart.some((c) => c.code === r.code || c.label.toLowerCase() === r.title.toLowerCase());
+  // "Ongoing condition": on for long-term diagnoses not yet on the chart. Joins the chart when the note is signed.
+  const [ongoing, setOngoing] = useState<Set<string>>(
+    () => new Set(initial.filter((r) => looksLongTerm(r.code) && !already(r)).map((r) => r.code)),
+  );
   const [q, setQ] = useState("");
   const [hits, setHits] = useState<DiagnosisHit[]>([]);
   const [active, setActive] = useState(0);
@@ -53,7 +64,11 @@ export function DiagnosisPicker({
   }
 
   function pick(hit: DiagnosisHit) {
-    if (!rows.some((r) => r.code === hit.code)) change([...rows, { code: hit.code, title: hit.title }]);
+    if (!rows.some((r) => r.code === hit.code)) {
+      const row = { code: hit.code, title: hit.title };
+      if (looksLongTerm(row.code) && !already(row)) setOngoing((s) => new Set(s).add(row.code));
+      change([...rows, row]);
+    }
     setQ("");
     setHits([]);
   }
@@ -67,6 +82,9 @@ export function DiagnosisPicker({
       {rows.map((r) => (
         <input key={r.code} type="hidden" name="dx.code" value={r.code} />
       ))}
+      {rows.filter((r) => ongoing.has(r.code) && !already(r)).map((r) => (
+        <input key={`o-${r.code}`} type="hidden" name="dx.ongoing" value={r.code} />
+      ))}
 
       {rows.length > 0 ? (
         <ol className="divide-y divide-border rounded-xl border border-border">
@@ -76,6 +94,28 @@ export function DiagnosisPicker({
               <span className="min-w-0 flex-1">
                 {r.title}
                 {i === 0 ? <span className="ml-2 rounded-full bg-accent-soft px-2 py-0.5 text-xs font-medium text-accent-ink">Primary</span> : null}
+                <span className="mt-0.5 block text-xs text-ink-muted">
+                  {already(r) ? (
+                    "On the chart"
+                  ) : (
+                    <label className="inline-flex cursor-pointer items-center gap-1.5">
+                      <input
+                        type="checkbox"
+                        checked={ongoing.has(r.code)}
+                        onChange={(e) => {
+                          setOngoing((s) => {
+                            const next = new Set(s);
+                            if (e.target.checked) next.add(r.code);
+                            else next.delete(r.code);
+                            return next;
+                          });
+                          onChange();
+                        }}
+                      />
+                      Ongoing condition (add to the chart when signed)
+                    </label>
+                  )}
+                </span>
               </span>
               {i > 0 ? (
                 <button type="button" className="text-xs font-medium text-ink-muted hover:text-ink" onClick={() => change([r, ...rows.filter((x) => x.code !== r.code)])}>

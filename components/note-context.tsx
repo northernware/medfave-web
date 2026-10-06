@@ -29,7 +29,7 @@ export async function NoteContext({
       .select("allergyStatus", "conditionStatus", "medicationStatus")
       .include("allergies", (a) => a.select("id", "label", "reaction", "severity", "notes"))
       .include("alerts", (x) => x.select("id", "label", "notes").orderBy((y) => y.label.asc()))
-      .include("conditions", (c) => c.select("id", "label").orderBy((y) => y.label.asc()))
+      .include("conditions", (c) => c.select("id", "label").where((y) => y.resolvedAt.isNull()).orderBy((y) => y.label.asc()))
       .include("medications", (m) => m.select("id", "label", "dosage", "frequency").orderBy((y) => y.label.asc()))
       .where((p) => p.id.eq(patientId))
       .where((p) => p.clinicId.eq(doctor.clinicId))
@@ -62,7 +62,7 @@ export async function NoteContext({
         </Box>
       ) : null}
 
-      <Box title="Conditions">
+      <Box title="Ongoing conditions" hint="On the chart">
         {patient.conditions.length ? (
           <ul className="space-y-0.5">{patient.conditions.map((c) => <li key={c.id}>{c.label}</li>)}</ul>
         ) : (
@@ -133,10 +133,13 @@ export async function NoteContext({
   );
 }
 
-function Box({ title, children }: { title: string; children: ReactNode }) {
+function Box({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
   return (
     <section className="rounded-md border border-border bg-surface px-3.5 py-3 text-sm">
-      <h2 className="mb-1.5 font-display text-sm font-semibold">{title}</h2>
+      <h2 className="mb-1.5 font-display text-sm font-semibold">
+        {title}
+        {hint ? <span className="ml-1.5 text-xs font-normal text-ink-faint">{hint}</span> : null}
+      </h2>
       {children}
     </section>
   );

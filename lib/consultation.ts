@@ -6,6 +6,7 @@ import { calendarDateFromDb, calendarDateToDb, instantFromDb, instantToDb } from
 import { newId } from "@/lib/ids";
 import type { RecordSnapshot } from "@/lib/record-versions";
 import { readDiagnoses, writeDiagnoses } from "@/lib/diagnoses";
+import { addConditionsFromDiagnoses } from "@/lib/conditions";
 import { fromDateInputValue, fromDateTimeLocalValue } from "@/lib/datetime";
 import {
   medicalRecordDraftSchema,
@@ -344,7 +345,7 @@ export async function writeConsultation(
 
   const { rows, error } = readPrescriptions(formData);
   if (error) return { error };
-  const { rows: diagnoses, keep: keepDiagnoses, error: dxError } = await readDiagnoses(formData);
+  const { rows: diagnoses, ongoing, keep: keepDiagnoses, error: dxError } = await readDiagnoses(formData);
   if (dxError) return { error: dxError };
 
   const savedAt = new Date();
@@ -438,6 +439,10 @@ export async function writeConsultation(
 
     await writePrescriptions(t, targetId, rows);
     if (!keepDiagnoses) await writeDiagnoses(t, targetId, diagnoses);
+    // Signed: diagnoses marked ongoing join the patient's conditions (lib/conditions.ts).
+    if (intent === "finish" && ongoing.length) {
+      await addConditionsFromDiagnoses(t, patientId, diagnoses.filter((d) => ongoing.includes(d.code)));
+    }
 
     // Finishing the consultation is what completes the visit — saving a draft
     // is not. The appointment used to be marked done the moment a record row

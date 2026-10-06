@@ -23,8 +23,9 @@ export default async function EditPatientPage({ params }: PageProps<"/patients/[
     .include("allergies", (a) =>
       a.select("id", "label", "reaction", "severity", "notes").orderBy((x) => x.createdAt.asc()),
     )
+    // The form edits current conditions; resolved ones are history and stay out of it.
     .include("conditions", (c) =>
-      c.select("id", "label", "notes").orderBy((x) => x.createdAt.asc()),
+      c.select("id", "label", "notes").where((x) => x.resolvedAt.isNull()).orderBy((x) => x.createdAt.asc()),
     )
     .include("medications", (m) =>
       m

@@ -3,7 +3,7 @@ import { CrumbName } from "@/components/crumb-names";
 import { DELETE_PHRASES } from "@/lib/confirm-phrase";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { archivePatient, deletePatient, restorePatient } from "@/app/actions/patients";
+import { archivePatient, deletePatient, reopenCondition, resolveCondition, restorePatient } from "@/app/actions/patients";
 import { requireDoctor } from "@/lib/auth";
 import { StartHousehold } from "@/components/start-household";
 import { caresFor, logChartAccess, sharesCharts } from "@/lib/care";
@@ -61,7 +61,7 @@ export default async function PatientPage({
     .include("household", (h) => h.select("id", "name", "contactNumber"))
     .include("allergies", (a) => a.select("id", "label", "reaction", "severity", "notes"))
     .include("conditions", (c) =>
-      c.select("id", "label", "notes").orderBy((x) => x.label.asc()),
+      c.select("id", "label", "notes", "code", "resolvedAt").orderBy((x) => x.label.asc()),
     )
     .include("medications", (m) =>
       m
@@ -147,12 +147,15 @@ export default async function PatientPage({
   // action would accept.
   // Everyone's notes count here, not only the ones this doctor can read.
   const anyNotes = await orm.MedicalRecord.select("id").where((r) => r.patientId.eq(patient.id)).first();
+  // Current conditions show; resolved ones are history, listed apart with their date.
+  const activeConditions = patient.conditions.filter((c) => !c.resolvedAt);
+  const pastConditions = patient.conditions.filter((c) => c.resolvedAt);
   const hasHistory =
     anyNotes !== null ||
     patient.appointments > 0 ||
     patient.documentRequests > 0 ||
     patient.appointmentRequests > 0 ||
-    patient.allergies.length + patient.conditions.length + patient.medications.length + patient.alerts.length > 0 ||
+    patient.allergies.length + activeConditions.length + patient.medications.length + patient.alerts.length > 0 ||
     patient.accountId !== null;
 
   return (
@@ -441,14 +444,25 @@ export default async function PatientPage({
           <Detail label="Visits recorded" value={visits.length} />
           <Detail
             className="col-span-2"
-            label="Chronic conditions"
+            label="Ongoing conditions"
             value={
-              patient.conditions.length > 0 ? (
+              activeConditions.length > 0 ? (
                 <span className="flex flex-wrap gap-1.5">
-                  {patient.conditions.map((c) => (
-                    <Badge key={c.id} tone="accent">
+                  {activeConditions.map((c) => (
+                    <span key={c.id} className="inline-flex items-center gap-1 rounded-full bg-accent-soft py-0.5 pr-1 pl-2.5 text-xs font-medium text-accent-ink">
+                      {c.code ? <span className="font-mono">{c.code}</span> : null}
                       {c.label}
-                    </Badge>
+                      <form action={resolveCondition}>
+                        <input type="hidden" name="conditionId" value={c.id} />
+                        <button
+                          className="rounded-full px-1.5 py-0.5 text-[11px] text-ink-muted hover:bg-surface hover:text-ink"
+                          aria-label={`Mark ${c.label} resolved`}
+                          title="No longer current: move to past conditions"
+                        >
+                          Resolve
+                        </button>
+                      </form>
+                    </span>
                   ))}
                 </span>
               ) : patient.conditionStatus === "NONE_KNOWN" ? (
@@ -458,10 +472,31 @@ export default async function PatientPage({
               )
             }
           />
+          {pastConditions.length > 0 ? (
+            <Detail
+              className="col-span-2"
+              label="Past conditions"
+              value={
+                <span className="flex flex-wrap gap-x-3 gap-y-1 text-sm text-ink-muted">
+                  {pastConditions.map((c) => (
+                    <span key={c.id} className="inline-flex items-center gap-1">
+                      {c.label} · resolved {formatDate(instantFromDb(c.resolvedAt!))}
+                      <form action={reopenCondition}>
+                        <input type="hidden" name="conditionId" value={c.id} />
+                        <button className="text-xs text-accent-ink hover:underline" aria-label={`${c.label} is current again`}>
+                          Reopen
+                        </button>
+                      </form>
+                    </span>
+                  ))}
+                </span>
+              }
+            />
+          ) : null}
         </dl>
-        {patient.conditions.some((c) => c.notes) ? (
+        {activeConditions.some((c) => c.notes) ? (
           <dl className="mt-4 space-y-2 border-t border-border pt-4">
-            {patient.conditions
+            {activeConditions
               .filter((c) => c.notes)
               .map((c) => (
                 <div key={c.id}>

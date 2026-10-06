@@ -74,12 +74,15 @@ function AddAllergy({ patientId, tone }: { patientId: string; tone: Tone }) {
 /** Standing warnings, under the allergies — things to act on before touching the patient. */
 export function AlertBanner({ alerts, patientId }: { alerts: { id: string; label: string; notes: string | null }[] } & Editable) {
   if (alerts.length === 0) {
-    // Nothing to warn about: beside a note, just the way to add one.
+    // Nothing to warn about: beside a note, a plain box like its neighbours
+    // (conditions, medicines) saying so, with the way to add one.
     if (!patientId) return null;
     return (
-      <div className="rounded-md border border-border bg-surface px-3.5 py-2 text-ink-muted">
+      <section className="rounded-md border border-border bg-surface px-3.5 py-3 text-sm">
+        <h2 className="mb-1.5 font-display text-sm font-semibold">Medical alerts</h2>
+        <p className="text-ink-muted">None</p>
         <AddAlert patientId={patientId} tone="plain" />
-      </div>
+      </section>
     );
   }
   return (

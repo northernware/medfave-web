@@ -3,6 +3,7 @@ import { sharesCharts } from "@/lib/care";
 import { formatDate, instantFromDb } from "@/lib/datetime";
 import { orm } from "@/src/prisma/db";
 import { AlertBanner, AllergyBanner } from "@/components/allergy-banner";
+import { AddDisclosure } from "@/components/add-disclosure";
 import { ChartForm } from "@/components/chart-form";
 import { buttonClass } from "@/components/ui";
 
@@ -171,15 +172,14 @@ export async function NoteContext({
 }
 
 const input = "w-full rounded-md border border-border bg-surface px-2 py-1 text-sm";
-const saveButton = buttonClass("secondary", "justify-self-start px-3 py-1 text-xs");
+const saveButton = buttonClass("primary", "justify-self-start");
 
-/** "+ Add …" folded open under a list. */
+/** "+ Add …" under a list; closes on a click elsewhere. */
 function Add({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <details className="mt-2">
-      <summary className="cursor-pointer list-none text-xs font-semibold text-accent-ink hover:underline">+ {label}</summary>
-      <div className="mt-2">{children}</div>
-    </details>
+    <AddDisclosure label={label} summaryClassName="text-accent-ink">
+      {children}
+    </AddDisclosure>
   );
 }
 

@@ -8,6 +8,7 @@ import { formatDateTime, toDateInputValue, toDateTimeLocalValue } from "@/lib/da
 import { fullName } from "@/lib/domain";
 import { RecordForm } from "@/components/forms/record-form";
 import { Card, PageHeader } from "@/components/ui";
+import { NoteContext, NoteLayout } from "@/components/note-context";
 
 export const metadata: Metadata = { title: "Visit note" };
 
@@ -46,54 +47,66 @@ export default async function EditRecordPage({ params }: PageProps<"/records/[id
             : `${fullName(record.patient)} · the previous text is kept`
         }
       />
-      <Card className="p-5 sm:p-6">
-        <RecordForm
-          action={saveMedicalRecord}
-          autosave={autosaveConsultation}
-          patientId={record.patientId}
-          openAppointments={[]}
-          lockedAppointment={
-            record.appointment
-              ? {
-                  id: record.appointment.id,
-                  label: `${formatDateTime(instantFromDb(record.appointment.scheduledAt))} — ${record.appointment.reason}`,
-                  remote: record.appointment.visitType === "TELECONSULTATION",
+      <NoteLayout
+        context={
+          <NoteContext
+            doctor={{ id: doctor.id, clinicId: doctor.clinicId }}
+            patientId={record.patientId}
+            excludeRecordId={record.id}
+            reason={record.appointment?.reason}
+          />
+        }
+        form={
+            <Card className="p-5 sm:p-6">
+              <RecordForm
+                action={saveMedicalRecord}
+                autosave={autosaveConsultation}
+                patientId={record.patientId}
+                openAppointments={[]}
+                lockedAppointment={
+                  record.appointment
+                    ? {
+                        id: record.appointment.id,
+                        label: `${formatDateTime(instantFromDb(record.appointment.scheduledAt))} — ${record.appointment.reason}`,
+                        remote: record.appointment.visitType === "TELECONSULTATION",
+                      }
+                    : undefined
                 }
-              : undefined
-          }
-          defaults={{
-            recordId: record.id,
-            status: record.status,
-            savedAt: instantFromDb(record.updatedAt).toISOString(),
-            visitDate: toDateTimeLocalValue(instantFromDb(record.visitDate)),
-            appointmentId: record.appointmentId ?? "",
-            chiefComplaint: record.chiefComplaint,
-            historyOfPresentIllness: text(record.historyOfPresentIllness),
-            physicalExamination: text(record.physicalExamination),
-            temperatureC: num(record.temperatureC),
-            heartRate: num(record.heartRate),
-            respiratoryRate: num(record.respiratoryRate),
-            systolic: num(record.systolic),
-            diastolic: num(record.diastolic),
-            weightKg: num(record.weightKg),
-            heightCm: num(record.heightCm),
-            oxygenSaturation: num(record.oxygenSaturation),
-            assessment: text(record.assessment),
-            treatmentPlan: text(record.treatmentPlan),
-            followUpDate: record.followUpDate ? toDateInputValue(calendarDateFromDb(record.followUpDate)) : "",
-            notes: text(record.notes),
-            prescriptions: record.prescriptions.map((rx) => ({
-              drugName: rx.drugName,
-              dosage: rx.dosage,
-              frequency: rx.frequency,
-              duration: text(rx.duration),
-              instructions: text(rx.instructions),
-            })),
-            diagnoses: record.diagnoses,
-          }}
-          cancelHref={`/records/${record.id}`}
-        />
-      </Card>
+                defaults={{
+                  recordId: record.id,
+                  status: record.status,
+                  savedAt: instantFromDb(record.updatedAt).toISOString(),
+                  visitDate: toDateTimeLocalValue(instantFromDb(record.visitDate)),
+                  appointmentId: record.appointmentId ?? "",
+                  chiefComplaint: record.chiefComplaint,
+                  historyOfPresentIllness: text(record.historyOfPresentIllness),
+                  physicalExamination: text(record.physicalExamination),
+                  temperatureC: num(record.temperatureC),
+                  heartRate: num(record.heartRate),
+                  respiratoryRate: num(record.respiratoryRate),
+                  systolic: num(record.systolic),
+                  diastolic: num(record.diastolic),
+                  weightKg: num(record.weightKg),
+                  heightCm: num(record.heightCm),
+                  oxygenSaturation: num(record.oxygenSaturation),
+                  assessment: text(record.assessment),
+                  treatmentPlan: text(record.treatmentPlan),
+                  followUpDate: record.followUpDate ? toDateInputValue(calendarDateFromDb(record.followUpDate)) : "",
+                  notes: text(record.notes),
+                  prescriptions: record.prescriptions.map((rx) => ({
+                    drugName: rx.drugName,
+                    dosage: rx.dosage,
+                    frequency: rx.frequency,
+                    duration: text(rx.duration),
+                    instructions: text(rx.instructions),
+                  })),
+                  diagnoses: record.diagnoses,
+                }}
+                cancelHref={`/records/${record.id}`}
+              />
+            </Card>
+        }
+      />
     </div>
   );
 }

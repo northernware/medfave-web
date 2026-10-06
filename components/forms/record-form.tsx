@@ -7,7 +7,7 @@ import { buttonClass } from "@/components/ui";
 import { formatTime } from "@/lib/datetime";
 import { BLANK_PRESCRIPTION, type PrescriptionRow, type RecordDefaults } from "@/lib/form-defaults";
 import { searchDiagnoses, type AutosaveResult } from "@/app/actions/records";
-import { DiagnosisPicker } from "@/components/forms/diagnosis-picker";
+import { DiagnosisPicker, type ChartCondition } from "@/components/forms/diagnosis-picker";
 import { EMPTY_FORM_STATE, type FormState } from "@/lib/validation";
 
 /**
@@ -41,6 +41,7 @@ export function RecordForm({
   openAppointments,
   cancelHref,
   lockedAppointment,
+  onChart = [],
 }: {
   action: (state: FormState, formData: FormData) => Promise<FormState>;
   /** Writes the open note in the background; returns the id it was written to. */
@@ -51,6 +52,8 @@ export function RecordForm({
   cancelHref: string;
   /** Set when documenting a specific booking — the link is fixed, not chosen. */
   lockedAppointment?: { id: string; label: string; remote: boolean };
+  /** The patient's current conditions, so a diagnosis already there isn't offered again. */
+  onChart?: ChartCondition[];
 }) {
   const [state, formAction] = useActionState(action, EMPTY_FORM_STATE);
   const [rx, setRx] = useState<PrescriptionRow[]>(defaults.prescriptions);
@@ -187,6 +190,7 @@ export function RecordForm({
         <Field
           label="History of present illness"
           htmlFor="historyOfPresentIllness"
+          hint="Today's complaint: when it started, how it's changed, what helped or didn't."
           error={err?.historyOfPresentIllness}
         >
           <TextArea
@@ -259,6 +263,7 @@ export function RecordForm({
           <p className="mb-1.5 block text-sm leading-5 font-semibold">Diagnoses (ICD-11)</p>
           <DiagnosisPicker
             initial={defaults.diagnoses}
+            onChart={onChart}
             search={searchDiagnoses}
             credit={ICD11_CREDIT}
             error={err?.diagnoses}

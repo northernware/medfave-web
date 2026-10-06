@@ -67,6 +67,11 @@ export default async function NewRecordPage({ searchParams }: PageProps<"/record
     defaults.prescriptions = last.prescriptions;
   }
 
+  const onChart = await orm.PatientCondition.select("code", "label")
+    .where((c) => c.patientId.eq(patient.id))
+    .where((c) => c.resolvedAt.isNull())
+    .all();
+
   return (
     <div className="space-y-3">
       <PageHeader
@@ -109,6 +114,7 @@ export default async function NewRecordPage({ searchParams }: PageProps<"/record
 
             <Card className="p-5 sm:p-6">
               <RecordForm
+                onChart={onChart}
                 action={saveMedicalRecord}
                 autosave={autosaveConsultation}
                 patientId={patient.id}

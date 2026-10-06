@@ -59,7 +59,7 @@ export async function GET(request: Request, ctx: RouteContext<"/api/v1/doctor/pa
       ? Promise.all([
           orm.PatientAllergy.select("id", "label", "reaction", "severity", "notes").where((x) => x.patientId.eq(id)).all(),
           orm.PatientAlert.select("id", "label", "notes").where((x) => x.patientId.eq(id)).all(),
-          orm.PatientCondition.select("id", "label", "notes").where((x) => x.patientId.eq(id)).all(),
+          orm.PatientCondition.select("id", "label", "notes").where((x) => x.patientId.eq(id)).where((x) => x.resolvedAt.isNull()).all(),
           orm.PatientMedication.select("id", "label", "dosage", "frequency", "notes").where((x) => x.patientId.eq(id)).all(),
         ])
       : null,

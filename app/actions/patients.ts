@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { AllergySeverity } from "@/lib/enums";
 import { requireDoctor, requireStaff } from "@/lib/auth";
+import { setConditionResolved } from "@/lib/conditions";
 import { caresFor } from "@/lib/care";
 import { pickDoctor } from "@/lib/clinic";
 import { db, orm } from "@/src/prisma/db";
@@ -141,15 +142,42 @@ async function clearClinicalLists(
   tx: { sql: typeof db.sql; execute: (plan: never) => Promise<unknown> },
   patientId: string,
 ) {
+  // Conditions are not here: they keep their history (see syncConditions).
   const tables = [
     tx.sql.public.PatientAllergy,
-    tx.sql.public.PatientCondition,
     tx.sql.public.PatientMedication,
     tx.sql.public.PatientAlert,
   ];
   for (const table of tables) {
     const plan = table.delete().where((f, fns) => fns.eq(f.patientId, patientId)).build();
     await tx.execute(plan as never);
+  }
+}
+
+/**
+ * The chart's ongoing conditions as the edit form lists them. Unlike the other
+ * lists they are not wiped and rewritten: a condition marked resolved stays as
+ * history, and one added from a visit keeps its ICD-11 code. So: keep the
+ * active ones still listed (updating notes), delete active ones taken off the
+ * list (a slip, not a recovery), add new ones, and bring back a resolved one
+ * listed again under the same name.
+ */
+async function syncConditions(t: typeof orm, patientId: string, listed: ClinicalLists["conditions"]) {
+  const now = instantToDb(new Date());
+  const existing = await t.PatientCondition.select("id", "label", "resolvedAt").where((c) => c.patientId.eq(patientId)).all();
+  const byLabel = new Map(existing.map((c) => [c.label.toLowerCase(), c]));
+  const keep = new Set<string>();
+  for (const c of listed) {
+    const found = byLabel.get(c.label.toLowerCase());
+    if (found) {
+      keep.add(found.id);
+      await t.PatientCondition.where((x) => x.id.eq(found.id)).update({ notes: c.notes, resolvedAt: null, resolvedById: null });
+    } else {
+      await t.PatientCondition.create({ id: newId(), patientId, label: c.label, notes: c.notes, createdAt: now });
+    }
+  }
+  for (const c of existing) {
+    if (!c.resolvedAt && !keep.has(c.id)) await t.PatientCondition.where((x) => x.id.eq(c.id)).delete();
   }
 }
 
@@ -507,7 +535,8 @@ export async function updatePatient(
     // empty set from a form that did not show them.
     if (staff.role !== "SECRETARY") {
       await clearClinicalLists(tx, patientId);
-      await writeClinicalLists(t, patientId, parsed.lists);
+      await writeClinicalLists(t, patientId, { ...parsed.lists, conditions: [] });
+      await syncConditions(t, patientId, parsed.lists.conditions);
     }
 
     // Same reasoning as on registration: the only member of a household made
@@ -738,3 +767,17 @@ export async function startOwnHousehold(formData: FormData) {
   redirect(`${back === `/patients/${patientId}` ? back : `/desk/patients/${patientId}`}?household=new`);
 }
 
+
+/** "Resolved" on the patient page: the condition moves to past conditions, with its date. */
+export async function resolveCondition(formData: FormData) {
+  const doctor = await requireDoctor();
+  const result = await setConditionResolved(doctor, String(formData.get("conditionId") ?? ""), true);
+  if (result.ok) revalidatePath(`/patients/${result.patientId}`);
+}
+
+/** "Reopen" on a past condition: current again. */
+export async function reopenCondition(formData: FormData) {
+  const doctor = await requireDoctor();
+  const result = await setConditionResolved(doctor, String(formData.get("conditionId") ?? ""), false);
+  if (result.ok) revalidatePath(`/patients/${result.patientId}`);
+}

@@ -355,6 +355,12 @@ namespace public {
     label     String
     notes     String?
     createdAt TimestampString(3) @default(now())
+    /// The ICD-11 code, when it was added from a visit's diagnosis.
+    code       String?
+    /// No longer current. Kept, not deleted, so the chart shows it was there.
+    resolvedAt TimestampString(3)?
+    /// The account that marked it resolved.
+    resolvedById String?
     patient   Patient      @relation(fields: [patientId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "PatientCondition_patientId_fkey")
 
     @@index([patientId], map: "PatientCondition_patientId_idx")

@@ -1,0 +1,128 @@
+[
+  {
+    "id": "column.public.PatientCondition.code",
+    "label": "Add column \"code\" to \"PatientCondition\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "code",
+        "table": "PatientCondition"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"code\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "PatientCondition",
+          "code"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"code\"",
+        "sql": "ALTER TABLE \"public\".\"PatientCondition\" ADD COLUMN \"code\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"code\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "PatientCondition",
+          "code"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.PatientCondition.resolvedAt",
+    "label": "Add column \"resolvedAt\" to \"PatientCondition\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "resolvedAt",
+        "table": "PatientCondition"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"resolvedAt\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "PatientCondition",
+          "resolvedAt"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"resolvedAt\"",
+        "sql": "ALTER TABLE \"public\".\"PatientCondition\" ADD COLUMN \"resolvedAt\" timestamp(3)"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"resolvedAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "PatientCondition",
+          "resolvedAt"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.PatientCondition.resolvedById",
+    "label": "Add column \"resolvedById\" to \"PatientCondition\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "resolvedById",
+        "table": "PatientCondition"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"resolvedById\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "PatientCondition",
+          "resolvedById"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"resolvedById\"",
+        "sql": "ALTER TABLE \"public\".\"PatientCondition\" ADD COLUMN \"resolvedById\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"resolvedById\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "PatientCondition",
+          "resolvedById"
+        ]
+      }
+    ]
+  }
+]

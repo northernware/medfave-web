@@ -108,7 +108,7 @@ async function recordsFor(charts: PatientChart[]): Promise<ClinicRecord[]> {
           .first(),
         orm.PatientAllergy.select("label", "reaction", "severity").where((x) => x.patientId.eq(c.id)).all(),
         orm.PatientMedication.select("label", "dosage", "frequency").where((x) => x.patientId.eq(c.id)).all(),
-        orm.PatientCondition.select("label").where((x) => x.patientId.eq(c.id)).all(),
+        orm.PatientCondition.select("label").where((x) => x.patientId.eq(c.id)).where((x) => x.resolvedAt.isNull()).all(),
         // Who has seen them there: the year's visits, newest first.
         orm.Appointment
           .select("scheduledAt", "doctorId")

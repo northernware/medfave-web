@@ -22,9 +22,11 @@ export function ChartForm({
 }) {
   const [state, formAction, pending] = useActionState<ChartFormState, FormData>(changeChart, {});
   const form = useRef<HTMLFormElement>(null);
-  // A successful add starts the form again empty.
+  // A successful add starts the form again empty, and folds its "+ Add" away.
   useEffect(() => {
-    if (state.ok) form.current?.reset();
+    if (!state.ok) return;
+    form.current?.reset();
+    form.current?.closest("details")?.removeAttribute("open");
   }, [state]);
   return (
     <form ref={form} action={formAction} className={className} aria-busy={pending || undefined}>

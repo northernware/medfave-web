@@ -30,6 +30,8 @@ export default async function EditPatientPage({ params }: PageProps<"/patients/[
     .include("medications", (m) =>
       m
         .select("id", "label", "dosage", "frequency", "notes")
+        // Medicines taken now; stopped ones are history and stay out of the form.
+        .where((x) => x.stoppedAt.isNull())
         .orderBy((x) => x.createdAt.asc()),
     )
     .include("alerts", (a) =>

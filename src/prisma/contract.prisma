@@ -379,6 +379,10 @@ namespace public {
     frequency String?
     notes     String?
     createdAt TimestampString(3) @default(now())
+    /// No longer taken. Kept, not deleted, so the chart shows it was.
+    stoppedAt   TimestampString(3)?
+    /// The account that marked it stopped.
+    stoppedById String?
     patient   Patient      @relation(fields: [patientId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "PatientMedication_patientId_fkey")
 
     @@index([patientId], map: "PatientMedication_patientId_idx")

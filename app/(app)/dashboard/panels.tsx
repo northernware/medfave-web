@@ -256,7 +256,7 @@ export function LastVisitDetails({ visit, doctorName }: { visit: LastVisit | nul
 
 /** What the schedule panel needs of a visit. */
 type RailItem = Pick<AppointmentListItem, "id" | "scheduledAt" | "durationMinutes" | "service" | "status"> & {
-  patient: { firstName: string; middleName: string | null; lastName: string };
+  patient: { id?: string; firstName: string; middleName: string | null; lastName: string; household?: { name: string } };
   reason?: string | null;
   /** The patient said "I'll be there" from the app. */
   patientConfirmedAt?: Date | null;
@@ -274,6 +274,27 @@ const STATUS_DOT: Record<AppointmentListItem["status"], string> = {
   NO_SHOW: "bg-danger",
   CANCELLED: "bg-border-strong",
 };
+
+/**
+ * A household's members told apart on its schedule: a few people, so a
+ * colour each reads at a glance (with a legend). Never across households —
+ * a clinic has more of those than colours anyone can tell apart.
+ */
+const MEMBER_COLOURS = ["bg-sky-600", "bg-violet-600", "bg-amber-600", "bg-emerald-600", "bg-indigo-600", "bg-teal-600", "bg-orange-600", "bg-slate-500"];
+export type MemberMark = { name: string; initials: string; colour: string };
+export function memberMarks(members: { id: string; firstName: string; lastName: string }[]): Record<string, MemberMark> {
+  return Object.fromEntries(
+    members.map((m, i) => [m.id, { name: m.firstName, initials: initials(m), colour: MEMBER_COLOURS[i % MEMBER_COLOURS.length] }]),
+  );
+}
+function Mark({ mark }: { mark?: MemberMark }) {
+  if (!mark) return null;
+  return (
+    <span aria-hidden className={`grid size-5 shrink-0 place-items-center rounded-full text-[9px] font-bold text-white ${mark.colour}`}>
+      {mark.initials}
+    </span>
+  );
+}
 
 const HOUR = 160; // px per hour on the timeline: about five hours in view
 /** The shortest card: one line, for a visit of a quarter of an hour or less. */
@@ -294,7 +315,13 @@ export function ScheduleRail({
   canStart = true,
   calendarHref = (key) => `/calendar?day=${key}`,
   openingHours,
+  showHousehold = false,
+  members,
 }: {
+  /** Name each visit's household (the households list, where many families share the day). */
+  showHousehold?: boolean;
+  /** One household's members, each with a mark (its own page); a legend shows above the day. */
+  members?: Record<string, MemberMark>;
   /** The opening hours by weekday (0 = Sunday) that set the timeline's span; left out, 8–5. A day missing is closed. */
   openingHours?: { weekday: number; openMinute: number; closeMinute: number }[];
   /** The full calendar for a day, if this person has one; null hides the icon. */
@@ -422,6 +449,17 @@ export function ScheduleRail({
           </span>
       </div>
 
+      {members && Object.keys(members).length > 0 ? (
+        <ul aria-label="Members" className="flex shrink-0 flex-wrap gap-x-3 gap-y-1.5 px-5 pb-3 text-xs text-ink-muted">
+          {Object.entries(members).map(([id, m]) => (
+            <li key={id} className="flex items-center gap-1.5">
+              <Mark mark={m} />
+              {m.name}
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
       {/* Only the hours scroll; no scrollbar showing. */}
       <div className="min-h-0 flex-1 overflow-y-auto px-5 pt-2 pb-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {closed && todays.length === 0 ? (
@@ -485,6 +523,7 @@ export function ScheduleRail({
                   <>
                     <div className="flex items-center gap-2">
                       <span aria-hidden title={APPOINTMENT_STATUS_LABELS[a.status]} className={`size-1.5 shrink-0 rounded-full ${STATUS_DOT[a.status]}`} />
+                      {members && a.patient.id ? <Mark mark={members[a.patient.id]} /> : null}
                       <Link href={itemHref(a.id)} className="min-w-0 flex-1 truncate text-[13px] leading-5 font-semibold hover:underline">
                         {fullName(a.patient)}
                         {oneLine ? <span className="tabular ml-2 text-[11px] font-normal text-ink-faint">{formatTime(a.scheduledAt)}</span> : null}
@@ -496,6 +535,8 @@ export function ScheduleRail({
                         <span className="tabular text-ink-faint">
                           {formatTime(a.scheduledAt)} – {formatTime(end)}
                         </span>
+                        {/* On a list of households, which family comes first: it's what this page is about. */}
+                        {showHousehold && a.patient.household ? ` · ${a.patient.household.name}` : ""}
                         {" · "}
                         {APPOINTMENT_STATUS_LABELS[a.status]}
                         {a.patientConfirmedAt && (a.status === "PENDING" || a.status === "CONFIRMED") ? " · Coming" : ""}
@@ -519,11 +560,17 @@ export function ScheduleRail({
                       {action}
                     </div>
                     <Link href={itemHref(a.id)} className="min-w-0">
-                      <span className="block truncate text-[13px] leading-5 font-semibold hover:underline">{fullName(a.patient)}</span>
+                      <span className="flex items-center gap-1.5">
+                        {members && a.patient.id ? <Mark mark={members[a.patient.id]} /> : null}
+                        <span className="truncate text-[13px] leading-5 font-semibold hover:underline">{fullName(a.patient)}</span>
+                      </span>
                       {/* What the visit is for (the service); the booking's own words on hover. */}
                       <span title={a.reason ?? undefined} className="block truncate text-[11px] leading-4 text-ink-muted">
                         {SERVICE_LABELS[a.service]}
                       </span>
+                      {showHousehold && a.patient.household ? (
+                        <span className="block truncate text-[11px] leading-4 text-ink-muted">{a.patient.household.name} household</span>
+                      ) : null}
                       <span className="tabular block truncate text-[11px] leading-4 text-ink-faint">
                         {formatTime(a.scheduledAt)} – {formatTime(end)}
                       </span>

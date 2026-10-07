@@ -5,12 +5,14 @@ import { orm } from "@/src/prisma/db";
 import { or } from "@prisma/orm-postgres/orm-client";
 import { buttonClass, Card, EmptyState, PageHeader } from "@/components/ui";
 import { SearchForm } from "@/components/search-form";
+import { loadScheduleRail } from "@/lib/schedule-rail";
+import { ScheduleRail } from "../dashboard/panels";
 
 export const metadata: Metadata = { title: "Households" };
 
 export default async function HouseholdsPage({ searchParams }: PageProps<"/households">) {
   const doctor = await requireDoctor();
-  const { q, view } = await searchParams;
+  const { q, view, day } = await searchParams;
   const query = typeof q === "string" ? q.trim() : "";
   const archived = view === "archived";
 
@@ -33,16 +35,28 @@ export default async function HouseholdsPage({ searchParams }: PageProps<"/house
     );
   }
 
-  const [households, { archivedCount }] = await Promise.all([
+  const [households, { archivedCount }, rail] = await Promise.all([
     householdQuery.all(),
     orm.Household
       .where((h) => h.clinicId.eq(doctor.clinicId))
       .where((h) => h.archivedAt.isNotNull())
       .aggregate((a) => ({ archivedCount: a.count() })),
+    loadScheduleRail(doctor, day),
   ]);
+  // Picking a day in the panel keeps the search and the list being looked at.
+  const dayHref = (key: string) => {
+    const keep = new URLSearchParams();
+    if (query) keep.set("q", query);
+    if (archived) keep.set("view", "archived");
+    if (key !== rail.todayKey) keep.set("day", key);
+    const qs = keep.toString();
+    return `/households${qs ? `?${qs}` : ""}`;
+  };
 
   return (
-    <div className="space-y-3">
+    // The list, with the day's visits beside it (each named by household).
+    <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_340px] xl:items-start">
+    <div className="min-w-0 space-y-3">
       <PageHeader
         title={archived ? "Archived households" : "Households"}
         subtitle="Every patient belongs to one. Each keeps their own record — the grouping links relatives, shared contact details and hereditary risk."
@@ -126,6 +140,10 @@ export default async function HouseholdsPage({ searchParams }: PageProps<"/house
           </ul>
         )}
       </Card>
+    </div>
+      <aside className="h-[640px] xl:sticky xl:top-3 xl:h-[calc(100dvh-1.5rem)]">
+        <ScheduleRail {...rail} keep="" hrefFor={dayHref} showHousehold />
+      </aside>
     </div>
   );
 }

@@ -326,3 +326,15 @@ input[type="time"]::-webkit-date-and-time-value {
 @keyframes slide-in {
   from { transform: translateX(24px); opacity: 0; }
 }
+
+/* Tailwind 4 leaves buttons with the arrow; anything you can press shows the hand. */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  summary,
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    cursor: pointer;
+  }
+}

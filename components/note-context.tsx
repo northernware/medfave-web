@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { sharesCharts } from "@/lib/care";
 import { calendarDateFromDb, formatDate, instantFromDb } from "@/lib/datetime";
 import { orm } from "@/src/prisma/db";
@@ -111,7 +112,10 @@ export async function NoteContext({
       <PatientClipboard
         name={
           <>
-            {fullName(patient)}
+            {/* The way to their chart, now that the note's header doesn't name them. */}
+            <Link href={`/patients/${patientId}`} className="hover:underline">
+              {fullName(patient)}
+            </Link>
             <span className="font-normal text-ink-muted">
               {" · "}
               {SEX_LABELS[patient.sex]} · {ageFrom(calendarDateFromDb(patient.dateOfBirth))}
@@ -241,7 +245,7 @@ function Box({ title, hint, plain, children }: { title: string; hint?: string; p
 export function NoteLayout({ form, context }: { form: ReactNode; context: ReactNode }) {
   return (
     <div className="grid gap-4 lg:grid-cols-[minmax(0,46rem)_minmax(17rem,22rem)] lg:items-start">
-      <aside aria-label="About this patient" className="lg:sticky lg:top-4 lg:order-2 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto">
+      <aside aria-label="About this patient" className="lg:sticky lg:top-4 lg:order-2 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {context}
       </aside>
       <div className="min-w-0 space-y-3 lg:order-1">{form}</div>

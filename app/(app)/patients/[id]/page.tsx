@@ -23,7 +23,7 @@ import {
 } from "@/lib/domain";
 import { AppointmentList } from "@/components/appointment-list";
 import { AlertBanner, AllergyBanner } from "@/components/allergy-banner";
-import { PatientCard } from "@/components/patient-card";
+import { PatientClipboard } from "@/components/patient-clipboard";
 import { DangerZone } from "@/components/danger-zone";
 import { Badge, Card, Detail, EmptyState, PageHeader, SectionTitle, buttonClass } from "@/components/ui";
 
@@ -384,7 +384,7 @@ export default async function PatientPage({
 
         {/* Standing clinical context, kept beside the timeline rather than above it. */}
         <aside className="space-y-3">
-          <PatientCard
+          <PatientClipboard
             number={patient.patientNumber}
             facts={[
               {
@@ -525,7 +525,7 @@ export default async function PatientPage({
           </dl>
         ) : null}
       </div>
-          </PatientCard>
+          </PatientClipboard>
 
       {housemates.length > 0 ? (
         <Card className="p-4">

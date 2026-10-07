@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
  * conditions (`children`). Its edge rises to a clip in the middle. Empty
  * contact fields are left out rather than shown as dashes.
  */
-export function PatientCard({
+export function PatientClipboard({
   number,
   facts,
   contacts,

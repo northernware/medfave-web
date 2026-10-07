@@ -507,12 +507,15 @@ export function ScheduleRail({
             return (
               <div
                 key={a.id}
-                className={`absolute z-[1] flex flex-col overflow-hidden rounded-xl border ${
+                // Hovered (or tabbed into), a squeezed card lifts over its neighbours at full
+                // width and height, every line showing; it keeps its own top, so it reads as the same card.
+                className={`group/card absolute z-[1] flex flex-col overflow-hidden rounded-xl border transition-shadow hover:z-20 hover:left-[76px]! hover:h-auto! hover:min-h-(--h) hover:w-[calc(100%-76px)]! hover:shadow-lg focus-within:z-20 focus-within:left-[76px]! focus-within:h-auto! focus-within:min-h-(--h) focus-within:w-[calc(100%-76px)]! focus-within:shadow-lg ${
                   compact ? "justify-center gap-0.5 px-3 py-1.5" : `gap-1.5 py-3 ${lanes[idx].of > 1 ? "px-3" : "px-4"}`
                 } ${done ? "border-border bg-surface [&>*]:opacity-60" : "border-border-strong bg-surface-muted"}`}
                 style={{
                   top: top(start) + 2,
                   height,
+                  ["--h" as string]: `${height}px`,
                   // Visits that overlap in time sit side by side.
                   left: `calc(76px + (100% - 76px) * ${lanes[idx].lane} / ${lanes[idx].of})`,
                   width: `calc((100% - 76px) / ${lanes[idx].of} - ${lanes[idx].of > 1 ? 4 : 0}px)`,
@@ -524,14 +527,14 @@ export function ScheduleRail({
                     <div className="flex items-center gap-2">
                       <span aria-hidden title={APPOINTMENT_STATUS_LABELS[a.status]} className={`size-1.5 shrink-0 rounded-full ${STATUS_DOT[a.status]}`} />
                       {members && a.patient.id ? <Mark mark={members[a.patient.id]} /> : null}
-                      <Link href={itemHref(a.id)} className="min-w-0 flex-1 truncate text-[13px] leading-5 font-semibold hover:underline">
+                      <Link href={itemHref(a.id)} className="min-w-0 flex-1 truncate group-hover/card:whitespace-normal text-[13px] leading-5 font-semibold hover:underline">
                         {fullName(a.patient)}
-                        {oneLine ? <span className="tabular ml-2 text-[11px] font-normal text-ink-faint">{formatTime(a.scheduledAt)}</span> : null}
+                        {oneLine ? <span className="tabular ml-2 text-[11px] font-normal text-ink-faint group-hover/card:hidden group-focus-within/card:hidden">{formatTime(a.scheduledAt)}</span> : null}
                       </Link>
                       {action}
                     </div>
-                    {oneLine ? null : (
-                      <span title={a.reason ?? undefined} className="block truncate pl-3.5 text-[11px] leading-4 text-ink-muted">
+                    {
+                      <span title={a.reason ?? undefined} className={`${oneLine ? "hidden group-hover/card:block group-focus-within/card:block" : "block"} truncate pl-3.5 text-[11px] leading-4 text-ink-muted group-hover/card:whitespace-normal group-focus-within/card:whitespace-normal`}>
                         <span className="tabular text-ink-faint">
                           {formatTime(a.scheduledAt)} – {formatTime(end)}
                         </span>
@@ -543,7 +546,7 @@ export function ScheduleRail({
                         {" · "}
                         {SERVICE_LABELS[a.service]}
                       </span>
-                    )}
+                    }
                   </>
                 ) : (
                   <>
@@ -562,16 +565,16 @@ export function ScheduleRail({
                     <Link href={itemHref(a.id)} className="min-w-0">
                       <span className="flex items-center gap-1.5">
                         {members && a.patient.id ? <Mark mark={members[a.patient.id]} /> : null}
-                        <span className="truncate text-[13px] leading-5 font-semibold hover:underline">{fullName(a.patient)}</span>
+                        <span className="truncate group-hover/card:whitespace-normal text-[13px] leading-5 font-semibold hover:underline">{fullName(a.patient)}</span>
                       </span>
                       {/* What the visit is for (the service); the booking's own words on hover. */}
-                      <span title={a.reason ?? undefined} className="block truncate text-[11px] leading-4 text-ink-muted">
+                      <span title={a.reason ?? undefined} className="block truncate group-hover/card:whitespace-normal text-[11px] leading-4 text-ink-muted">
                         {SERVICE_LABELS[a.service]}
                       </span>
                       {showHousehold && a.patient.household ? (
-                        <span className="block truncate text-[11px] leading-4 text-ink-muted">{a.patient.household.name} household</span>
+                        <span className="block truncate group-hover/card:whitespace-normal text-[11px] leading-4 text-ink-muted">{a.patient.household.name} household</span>
                       ) : null}
-                      <span className="tabular block truncate text-[11px] leading-4 text-ink-faint">
+                      <span className="tabular block truncate group-hover/card:whitespace-normal text-[11px] leading-4 text-ink-faint">
                         {formatTime(a.scheduledAt)} – {formatTime(end)}
                       </span>
                     </Link>

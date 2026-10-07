@@ -141,7 +141,7 @@ export default async function HouseholdsPage({ searchParams }: PageProps<"/house
         )}
       </Card>
     </div>
-      <aside className="h-[640px] xl:sticky xl:top-3 xl:h-[calc(100dvh-1.5rem)]">
+      <aside className="h-[640px] xl:fixed xl:top-3 xl:right-3 xl:bottom-3 xl:z-10 xl:h-auto xl:w-[340px]">
         <ScheduleRail {...rail} keep="" hrefFor={dayHref} showHousehold />
       </aside>
     </div>

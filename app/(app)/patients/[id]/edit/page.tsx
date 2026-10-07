@@ -6,6 +6,7 @@ import { caresFor } from "@/lib/care";
 import { orm } from "@/src/prisma/db";
 import { calendarDateFromDb } from "@/lib/datetime";
 import { toDateInputValue } from "@/lib/datetime";
+import { CrumbName } from "@/components/crumb-names";
 import { fullName } from "@/lib/domain";
 import { PatientForm } from "@/components/forms/patient-form";
 import { BLANK_ITEM } from "@/components/clinical-picker";
@@ -53,6 +54,7 @@ export default async function EditPatientPage({ params }: PageProps<"/patients/[
 
   return (
     <div className="mx-auto max-w-3xl space-y-3">
+      <CrumbName id={patient.id} name={fullName(patient)} />
       <PageHeader title={`Edit ${fullName(patient)}`} />
       <Card className="p-5 sm:p-6">
         <PatientForm

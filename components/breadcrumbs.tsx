@@ -67,7 +67,8 @@ const isId = (s: string) => /^[0-9a-f-]{16,}$/i.test(s);
 const columnFor = (path: string) =>
   /^\/records\/(new|[^/]+(\/edit)?)$/.test(path) ? "mx-auto max-w-[69rem]" : /\/(new|edit)$/.test(path) ? "mx-auto max-w-3xl" : "";
 
-type Visit = { path: string; url: string; title: string };
+/** A page in the trail; `up` is the page above it (a note's patient), once known. */
+type Visit = { path: string; url: string; title: string; up?: string };
 const KEY = "medfave.trail";
 
 function readTrail(): Visit[] {
@@ -95,10 +96,34 @@ const rawTrail = () => {
   }
 };
 
-/** What a visited page is called: a section by its name, anything else by its title. */
+/**
+ * What a visited page is called, from what we know rather than the tab's
+ * title (which lags a client navigation): a section by its name, a record by
+ * its name (`CrumbName`) or its kind. Undefined for anything else (a form),
+ * which then uses the title saved when it was visited.
+ */
+function labelOf(path: string, named: Record<string, string>) {
+  const parts = path.split("/").filter(Boolean);
+  const last = parts.at(-1) ?? "";
+  const portal = parts[0] === "portal";
+  if (LISTS.has(path)) return (portal ? PORTAL_NAMES[last] : undefined) ?? NAMES[last];
+  if (isId(last)) return named[last];
+  return undefined;
+}
+
+/** A record's kind ("Patient", "Visit note"), when nothing better is known. */
+function kindOf(path: string) {
+  const parts = path.split("/").filter(Boolean);
+  if (!isId(parts.at(-1) ?? "")) return undefined;
+  return (parts[0] === "portal" ? PORTAL_ITEM[parts.at(-2)!] : undefined) ?? ITEM[parts.at(-2)!];
+}
+
+/** The tab's title, for a page `labelOf` can't name. */
 function titleOf(path: string) {
   const parts = path.split("/").filter(Boolean);
   if (LISTS.has(path)) return (parts[0] === "portal" ? PORTAL_NAMES[parts.at(-1)!] : undefined) ?? NAMES[parts.at(-1)!] ?? "Back";
+  // A record is named by \`CrumbName\` or its kind; the tab may still show the last page's title.
+  if (isId(parts.at(-1) ?? "")) return "";
   return document.title.replace(/\s*·\s*Medfave$/, "").trim() || "Back";
 }
 
@@ -129,24 +154,49 @@ export function Breadcrumbs() {
   const from = trail.at(-1)?.path === path ? (trail.at(-2) ?? null) : null;
 
   // Keep a short trail of pages in this tab: arriving where you just were is
-  // going back (drop the page you left); anything else is a step forward.
+  // going back (drop the page you left), and so is going up to the page above
+  // the one you left (a note → its patient); anything else is a step forward.
   useEffect(() => {
     const url = path + window.location.search;
     const trail = readTrail();
     if (trail.at(-2)?.path === path) trail.pop();
-    else if (trail.at(-1)?.path !== path) trail.push({ path, url, title: "" });
+    else if (trail.at(-1)?.up === path) {
+      trail.pop();
+      if (trail.at(-1)?.path !== path) trail.push({ path, url, title: "" });
+    } else if (trail.at(-1)?.path !== path) trail.push({ path, url, title: "" });
     trail[trail.length - 1] = { ...trail[trail.length - 1], url };
     writeTrail(trail);
     // The title arrives with the page's metadata, a moment after it renders.
     const name = window.setTimeout(() => {
       const t = readTrail();
       if (t.at(-1)?.path === path) {
-        t[t.length - 1].title = titleOf(path);
+        t[t.length - 1].title ||= titleOf(path);
         writeTrail(t);
       }
     }, 400);
     return () => window.clearTimeout(name);
   }, [path]);
+
+  // Save this page's name once it's known (a patient's, from `CrumbName`), so it
+  // survives a full page load, when the names learned so far are gone.
+  const known = labelOf(path, named);
+  useEffect(() => {
+    if (!known) return;
+    const t = readTrail();
+    if (t.at(-1)?.path !== path || t.at(-1)?.title === known) return;
+    t[t.length - 1].title = known;
+    writeTrail(t);
+  }, [path, known]);
+
+  // Remember the page above this one, so going up to it later counts as going back.
+  const upHref = (declared ?? parentOf(path, named))?.href;
+  useEffect(() => {
+    if (!upHref) return;
+    const t = readTrail();
+    if (t.at(-1)?.path !== path || t.at(-1)?.up === upHref) return;
+    t[t.length - 1].up = upHref;
+    writeTrail(t);
+  }, [path, upHref]);
 
   const parts = path.split("/").filter(Boolean);
   if (parts.length < 2 || (parts.length === 2 && ["desk", "portal", "manage"].includes(parts[0]) && LISTS.has(path))) {
@@ -154,7 +204,7 @@ export function Breadcrumbs() {
   }
 
   const fallback = declared ?? parentOf(path, named);
-  const label = from?.title || fallback?.label;
+  const label = (from ? labelOf(from.path, named) || from.title || kindOf(from.path) : undefined) || fallback?.label;
   if (!from && !fallback) return null;
 
   const className = "inline-flex items-center gap-1 font-medium text-ink-muted hover:text-ink";

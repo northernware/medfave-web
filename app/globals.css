@@ -68,11 +68,15 @@
   --warn: light-dark(oklch(0.66 0.14 70), oklch(0.78 0.13 80));
   --warn-soft: light-dark(oklch(0.965 0.05 85), oklch(0.33 0.06 75));
   --warn-ink: light-dark(oklch(0.47 0.11 65), oklch(0.87 0.09 85));
-  /* The allergies and medical-alerts boxes: paper pastels with black text on
-     light, bold solid colour with white text on dark. */
+  /* The allergies and medical-alerts boxes: paper pastels with deep ink on
+     light, bold solid colour with pale ink on dark. Each box's ink is tinted
+     to its own colour, never pure black or white, like the rest of our text. */
   --alert-danger: light-dark(oklch(0.92 0.06 22), oklch(0.52 0.19 25));
   --alert-warn: light-dark(oklch(0.94 0.08 88), oklch(0.56 0.13 62));
-  --on-alert: light-dark(oklch(0.18 0.01 25), #ffffff);
+  --on-alert-danger: light-dark(oklch(0.3 0.09 25), oklch(0.97 0.025 25));
+  --on-alert-warn: light-dark(oklch(0.3 0.06 60), oklch(0.98 0.03 85));
+  /* Set per box (allergy-banner.tsx); this is the danger ink by default. */
+  --on-alert: var(--on-alert-danger);
 
   --ok: light-dark(oklch(0.58 0.12 160), oklch(0.72 0.12 160));
   --ok-soft: light-dark(oklch(0.955 0.035 160), oklch(0.3 0.055 160));

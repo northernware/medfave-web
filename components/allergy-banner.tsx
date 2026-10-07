@@ -87,7 +87,7 @@ export function AlertBanner({ alerts, patientId }: { alerts: { id: string; label
   }
   return (
     // Solid, not tinted: an alert has to stand out from everything else on the page.
-    <div className="rounded-md bg-alert-warn px-3.5 py-3 text-on-alert shadow-sm">
+    <div className="rounded-md bg-alert-warn px-3.5 py-3 text-on-alert shadow-sm [--on-alert:var(--on-alert-warn)]">
       <p className="font-display text-sm font-semibold">Medical alerts</p>
       <ul className="mt-1.5 space-y-1">
         {alerts.map((a) => (
@@ -158,7 +158,7 @@ export function AllergyBanner({
   }
 
   return (
-    <div className="rounded-md bg-alert-danger px-3.5 py-3 text-on-alert shadow-sm">
+    <div className="rounded-md bg-alert-danger px-3.5 py-3 text-on-alert shadow-sm [--on-alert:var(--on-alert-danger)]">
       <p className="font-display text-sm font-semibold">Allergies</p>
       <ul className="mt-1.5 space-y-1.5">
         {sortAllergies(allergies).map((a) => (

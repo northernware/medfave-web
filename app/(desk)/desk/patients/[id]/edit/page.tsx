@@ -5,6 +5,7 @@ import { requireStaff } from "@/lib/auth";
 import { clinicDoctors } from "@/lib/clinic";
 import { orm } from "@/src/prisma/db";
 import { calendarDateFromDb, toDateInputValue } from "@/lib/datetime";
+import { CrumbName } from "@/components/crumb-names";
 import { fullName } from "@/lib/domain";
 import { PatientForm } from "@/components/forms/patient-form";
 import { Card, PageHeader } from "@/components/ui";
@@ -56,6 +57,7 @@ export default async function DeskEditPatientPage({
 
   return (
     <div className="mx-auto max-w-3xl space-y-3">
+      <CrumbName id={patient.id} name={fullName(patient)} />
       <PageHeader title="Edit details" subtitle={fullName(patient)} />
       <Card className="p-5 sm:p-6">
         <PatientForm

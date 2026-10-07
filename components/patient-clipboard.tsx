@@ -8,6 +8,7 @@ import type { ReactNode } from "react";
  * contact fields are left out rather than shown as dashes.
  */
 export function PatientClipboard({
+  name,
   number,
   facts,
   contacts,
@@ -16,6 +17,8 @@ export function PatientClipboard({
   /** The sheet: the clinical summary. */
   children: ReactNode;
   number: string | null;
+  /** Who it is, for a page whose header scrolls away while this stays (beside a note). */
+  name?: ReactNode;
   /** Large label/value pairs: born, sex, blood type. */
   facts: { label: string; value: ReactNode }[];
   /** How to reach them, under the facts; null values are skipped. */
@@ -25,6 +28,7 @@ export function PatientClipboard({
   return (
     <section aria-label="Patient details" className="overflow-hidden rounded-2xl border border-border bg-surface-muted">
       <div className="px-5 pt-4 pb-6">
+        {name ? <p className="mb-1 truncate text-sm font-semibold">{name}</p> : null}
         {number ? <p className="nums text-xs font-semibold tracking-wide text-accent-ink">{number}</p> : null}
         <dl className="mt-3 grid grid-cols-[1.4fr_1fr_1fr] gap-x-3">
           {facts.map((f) => (

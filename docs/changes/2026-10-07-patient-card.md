@@ -17,3 +17,7 @@ The sheet now holds what to know before treating: allergies, medical alerts, cur
 ## Follow-up: the clipboard beside a visit note
 
 The note's side column is the same clipboard, so a patient looks the same on both pages. Its top is slim (patient number, blood type, primary contact), since the note's header already names the patient, sex, age and household. The sheet holds allergies, alerts, ongoing conditions and current medicines, all still changeable in place. Reason for visit and Last visit sit below it; on a narrow screen those fold away ("Reason and last visit") while the clipboard stays open.
+
+## Follow-up: the note's clipboard names the patient
+
+Beside a note the clipboard stays in view while the header scrolls away, so it now starts with who it is: "Corazon Dela Cruz · Female · 74 years". A guard against writing on the wrong chart with several notes open. Not on the patient page, where the name is the title right beside it. `PatientClipboard` takes an optional `name`.

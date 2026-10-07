@@ -4,7 +4,7 @@ import { useEffect, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter, useSelectedLayoutSegments } from "next/navigation";
 import { AltArrowLeftIcon } from "@solar-icons/react/linear/alt-arrow-left";
-import { useCrumbNames } from "@/components/crumb-names";
+import { useBackTo, useCrumbNames } from "@/components/crumb-names";
 
 /*
  * The way back, as one link: "‹ Today" back to wherever you came from, named
@@ -121,6 +121,7 @@ export function Breadcrumbs() {
   // The page itself, not a panel opened over it (a note over Today keeps Today's path).
   const path = "/" + useSelectedLayoutSegments().filter((s) => !s.startsWith("(") && !s.startsWith("@")).join("/");
   const named = useCrumbNames();
+  const declared = useBackTo();
   const router = useRouter();
   const raw = useSyncExternalStore(subscribe, rawTrail, () => "[]");
   const trail: Visit[] = JSON.parse(raw);
@@ -152,7 +153,7 @@ export function Breadcrumbs() {
     return null;
   }
 
-  const fallback = parentOf(path, named);
+  const fallback = declared ?? parentOf(path, named);
   const label = from?.title || fallback?.label;
   if (!from && !fallback) return null;
 

@@ -4,6 +4,7 @@ import { calendarDateFromDb } from "@/lib/datetime";
 import { ageFrom, fullName, SEX_LABELS } from "@/lib/domain";
 import type { Sex } from "@/lib/enums";
 import { PageHeader } from "@/components/ui";
+import { BackTo } from "@/components/crumb-names";
 
 type NotePatient = {
   id: string;
@@ -22,6 +23,8 @@ type NotePatient = {
  */
 export function NoteHeader({ title, patient, status }: { title: string; patient: NotePatient; status?: ReactNode }) {
   return (
+    <>
+    <BackTo href={`/patients/${patient.id}`} label={fullName(patient)} />
     <PageHeader
       title={title}
       subtitle={
@@ -35,5 +38,6 @@ export function NoteHeader({ title, patient, status }: { title: string; patient:
         </>
       }
     />
+    </>
   );
 }

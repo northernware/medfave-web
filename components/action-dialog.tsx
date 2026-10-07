@@ -37,7 +37,7 @@ export function ActionDialog({
         onClick={(e) => {
           if (e.target === dialog.current) dialog.current.close();
         }}
-        className="m-auto w-[min(32rem,calc(100vw-2rem))] rounded-xl border border-border bg-surface p-0 text-left text-ink shadow-card backdrop:bg-ink/50 backdrop:backdrop-blur-[2px]"
+        className="m-auto w-[min(32rem,calc(100vw-2rem))] rounded-xl border border-border bg-surface p-0 text-left text-ink shadow-card backdrop:bg-[oklch(0.15_0.03_340/0.55)] backdrop:backdrop-blur-[2px]"
       >
         <form action={action} onClick={(e) => e.stopPropagation()}>
           <div className="space-y-3 px-6 pt-6 pb-4">

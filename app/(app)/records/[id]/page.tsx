@@ -108,32 +108,35 @@ export default async function RecordPage({ params }: PageProps<"/records/[id]">)
     // The same page as writing or amending it: the note, and the patient's clipboard beside it.
     <div className="mx-auto max-w-[69rem] space-y-3">
       <BackTo href={`/patients/${patient.id}`} label={fullName(patient)} />
-      <PageHeader
-        title={record.chiefComplaint || "Untitled draft"}
-        subtitle={
+      <NoteLayout
+        header={
           <>
-            {formatDateTime(visitDate)} · {ageFrom(calendarDateFromDb(patient.dateOfBirth), visitDate)} old at this visit
-            {author ? ` · by ${author.fullName}` : ""}
+            <PageHeader
+              title={record.chiefComplaint || "Untitled draft"}
+              subtitle={
+                <>
+                  {formatDateTime(visitDate)} · {ageFrom(calendarDateFromDb(patient.dateOfBirth), visitDate)} old at this visit
+                  {author ? ` · by ${author.fullName}` : ""}
+                </>
+              }
+              actions={
+                !mine ? null : archived ? (
+                  <form action={restoreMedicalRecord}>
+                    <input type="hidden" name="recordId" value={record.id} />
+                    <button className={buttonClass("primary")}>Restore note</button>
+                  </form>
+                ) : (
+                  <Link
+                    href={`/records/${record.id}/edit`}
+                    className={buttonClass(draft ? "primary" : "secondary")}
+                  >
+                    {draft ? "Continue note" : "Amend note"}
+                  </Link>
+                )
+              }
+            />
           </>
         }
-        actions={
-          !mine ? null : archived ? (
-            <form action={restoreMedicalRecord}>
-              <input type="hidden" name="recordId" value={record.id} />
-              <button className={buttonClass("primary")}>Restore note</button>
-            </form>
-          ) : (
-            <Link
-              href={`/records/${record.id}/edit`}
-              className={buttonClass(draft ? "primary" : "secondary")}
-            >
-              {draft ? "Continue note" : "Amend note"}
-            </Link>
-          )
-        }
-      />
-
-      <NoteLayout
         context={
           <NoteContext
             doctor={doctor}

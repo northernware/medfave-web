@@ -65,7 +65,7 @@ const isId = (s: string) => /^[0-9a-f-]{16,}$/i.test(s);
 
 /** Form and note pages centre their content; the link sits over it, not at the far left. */
 const columnFor = (path: string) =>
-  /^\/records\/(new|[^/]+\/edit)$/.test(path) ? "mx-auto max-w-[69rem]" : /\/(new|edit)$/.test(path) ? "mx-auto max-w-3xl" : "";
+  /^\/records\/(new|[^/]+(\/edit)?)$/.test(path) ? "mx-auto max-w-[69rem]" : /\/(new|edit)$/.test(path) ? "mx-auto max-w-3xl" : "";
 
 type Visit = { path: string; url: string; title: string };
 const KEY = "medfave.trail";

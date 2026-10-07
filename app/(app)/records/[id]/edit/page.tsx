@@ -46,16 +46,20 @@ export default async function EditRecordPage({ params }: PageProps<"/records/[id
 
   return (
     <div className="mx-auto max-w-[69rem] space-y-3">
-      <NoteHeader
-        title={record.status === "DRAFT" ? "Visit note (draft)" : "Amend note"}
-        patient={record.patient}
-        status={
-          record.status === "DRAFT"
-            ? `Draft · last saved ${formatDateTime(instantFromDb(record.updatedAt))}`
-            : "Signed · amending keeps the previous text, with your reason"
-        }
-      />
       <NoteLayout
+        header={
+          <>
+            <NoteHeader
+              title={record.status === "DRAFT" ? "Visit note (draft)" : "Amend note"}
+              patient={record.patient}
+              status={
+                record.status === "DRAFT"
+                  ? `Draft · last saved ${formatDateTime(instantFromDb(record.updatedAt))}`
+                  : "Signed · amending keeps the previous text, with your reason"
+              }
+            />
+          </>
+        }
         context={
           <NoteContext
             doctor={{ id: doctor.id, clinicId: doctor.clinicId }}

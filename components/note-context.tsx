@@ -243,16 +243,22 @@ function Box({ title, hint, plain, children }: { title: string; hint?: string; p
 }
 
 /**
- * The note page's two columns: the form at a comfortable reading width, and
- * the patient's context beside it, staying in view (above it when narrow).
+ * The note page's two columns: the header and form at a comfortable reading
+ * width, and the patient's context beside them, staying in view. The header
+ * heads the left column, so the clipboard starts level with the title. On a
+ * narrow screen: header, then context, then the form.
  */
-export function NoteLayout({ form, context }: { form: ReactNode; context: ReactNode }) {
+export function NoteLayout({ header, form, context }: { header?: ReactNode; form: ReactNode; context: ReactNode }) {
   return (
-    <div className="grid gap-4 lg:grid-cols-[minmax(0,46rem)_minmax(17rem,22rem)] lg:items-start">
-      <aside aria-label="About this patient" className="lg:sticky lg:top-4 lg:order-2 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div className="grid gap-4 lg:grid-cols-[minmax(0,46rem)_minmax(17rem,22rem)] lg:grid-rows-[auto_1fr] lg:items-start">
+      {header ? <div className="min-w-0 space-y-3 lg:col-start-1 lg:row-start-1">{header}</div> : null}
+      <aside
+        aria-label="About this patient"
+        className={`lg:sticky lg:top-4 lg:col-start-2 lg:row-start-1 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${header ? "lg:row-span-2" : ""}`}
+      >
         {context}
       </aside>
-      <div className="min-w-0 space-y-3 lg:order-1">{form}</div>
+      <div className={`min-w-0 space-y-3 lg:col-start-1 ${header ? "lg:row-start-2" : "lg:row-start-1"}`}>{form}</div>
     </div>
   );
 }

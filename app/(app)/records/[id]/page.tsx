@@ -161,6 +161,21 @@ export default async function RecordPage({ params }: PageProps<"/records/[id]">)
         </div>
       ) : null}
 
+      {/* Where the note stands, once: the badge, and who signed it when. */}
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+        <Badge dot tone={RECORD_STATUS_TONE[record.status]}>
+          {RECORD_STATUS_LABELS[record.status]}
+        </Badge>
+        {/* A note with no visit says why it exists. */}
+        {record.noteKind ? <Badge>{NOTE_KIND_LABELS[record.noteKind] ?? record.noteKind}</Badge> : null}
+        {!draft && record.finalizedAt ? (
+          <span className="text-xs text-ink-muted">
+            {formatDateTime(instantFromDb(record.finalizedAt))}
+            {record.finalizedBy ? ` by ${record.finalizedBy.fullName}` : ""}
+          </span>
+        ) : null}
+      </div>
+
       {/* An unfinished note is not the record of the visit yet, and reading it
           as though it were is the mistake worth preventing. */}
       {draft ? (
@@ -171,20 +186,7 @@ export default async function RecordPage({ params }: PageProps<"/records/[id]">)
             finished, and nothing here is signed.
           </p>
         </div>
-      ) : record.finalizedAt ? (
-        <p className="text-xs text-ink-faint">
-          Signed {formatDateTime(instantFromDb(record.finalizedAt))}
-          {record.finalizedBy ? ` by ${record.finalizedBy.fullName}` : ""}.
-        </p>
       ) : null}
-
-      <div className="flex flex-wrap gap-1.5">
-        <Badge dot tone={RECORD_STATUS_TONE[record.status]}>
-          {RECORD_STATUS_LABELS[record.status]}
-        </Badge>
-        {/* A note with no visit says why it exists. */}
-        {record.noteKind ? <Badge>{NOTE_KIND_LABELS[record.noteKind] ?? record.noteKind}</Badge> : null}
-      </div>
 
       {vitals.length > 0 ? (
         <Card>

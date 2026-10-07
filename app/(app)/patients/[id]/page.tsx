@@ -168,6 +168,10 @@ export default async function PatientPage({
   return (
     <div className="space-y-3">
       <CrumbName id={patient.id} name={fullName(patient)} />
+      {/* The header heads the left column, so the clipboard starts level with the name. */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="space-y-6 lg:col-span-2">
+        <div className="space-y-3">
       <PageHeader
         title={fullName(patient)}
         subtitle={
@@ -234,10 +238,8 @@ export default async function PatientPage({
           </p>
         </div>
       ) : null}
+        </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* The timeline is what the doctor reads; it gets the width. */}
-        <div className="space-y-6 lg:col-span-2">
       <section>
         <SectionTitle
           title="Visit history"
@@ -538,17 +540,22 @@ export default async function PatientPage({
         <p className="mt-0.5 text-xs text-ink-muted">
           {shared ? "This clinic shares charts between its doctors." : "Only doctors caring for this patient can open it."}
         </p>
-        <ul className="mt-3 space-y-2.5 text-xs">
-          {accessLog.map((entry, i) => (
-            <li key={i}>
-              <span className="block">
-                {entry.account.fullName}
-                {entry.recordId ? <span className="text-ink-faint"> · a visit note</span> : null}
-              </span>
-              <span className="tabular block text-ink-muted">{formatDateTime(instantFromDb(entry.openedAt))}</span>
-            </li>
+        {/* The last few, one line each; the rest on asking. */}
+        <ul className="mt-3 space-y-1.5 text-xs">
+          {accessLog.slice(0, 3).map((entry, i) => (
+            <AccessLine key={i} entry={entry} />
           ))}
         </ul>
+        {accessLog.length > 3 ? (
+          <details className="group mt-1.5 text-xs">
+            <summary className="list-none text-accent-ink hover:underline group-open:hidden">Show all {accessLog.length}</summary>
+            <ul className="space-y-1.5">
+              {accessLog.slice(3).map((entry, i) => (
+                <AccessLine key={i} entry={entry} />
+              ))}
+            </ul>
+          </details>
+        ) : null}
       </Card>
 
         </aside>
@@ -649,5 +656,18 @@ function DetailsOnly({
         </dl>
       </Card>
     </div>
+  );
+}
+
+/** One opening of the chart, on one line: who, what, when. */
+function AccessLine({ entry }: { entry: { account: { fullName: string }; recordId: string | null; openedAt: string } }) {
+  return (
+    <li className="flex items-baseline justify-between gap-2">
+      <span className="min-w-0 truncate">
+        {entry.account.fullName}
+        {entry.recordId ? <span className="text-ink-faint"> · a note</span> : null}
+      </span>
+      <span className="tabular shrink-0 text-ink-muted">{formatDateTime(instantFromDb(entry.openedAt))}</span>
+    </li>
   );
 }

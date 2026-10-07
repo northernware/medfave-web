@@ -61,6 +61,7 @@ export default async function EditRecordPage({ params }: PageProps<"/records/[id
             doctor={{ id: doctor.id, clinicId: doctor.clinicId }}
             patientId={record.patientId}
             excludeRecordId={record.id}
+            before={instantFromDb(record.visitDate)}
             reason={record.appointment?.reason}
           />
         }

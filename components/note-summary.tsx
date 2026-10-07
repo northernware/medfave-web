@@ -6,22 +6,21 @@ import { calendarDateFromDb, formatCalendarDate, formatDateTime, instantFromDb }
 import { ICD11_CREDIT } from "@/lib/diagnoses";
 import { bloodPressure, bmi, fullName, NOTE_KIND_LABELS, RECORD_STATUS_LABELS, RECORD_STATUS_TONE } from "@/lib/domain";
 import { orm } from "@/src/prisma/db";
-import { AlertBanner, AllergyBanner } from "@/components/allergy-banner";
 import { Badge, Prose, buttonClass } from "@/components/ui";
 
 /**
- * A visit note at a glance, for the side panel: what was found, what was
- * given, what was advised. The same access rule and chart-access log as the
- * note's own page; printing, history, follow-up and amending stay there.
+ * A visit note, whole, for the side panel: everything recorded at the visit,
+ * so it reads here without opening the page. Not the patient's allergies or
+ * alerts: those are the chart's, on the clipboard beside, not the note's.
+ * Amend and print from here; the page keeps the version history. The same
+ * access rule and chart-access log as the note's own page.
  */
 export async function NoteSummary({ id }: { id: string }) {
   const doctor = await requireDoctor();
   const record = await orm.MedicalRecord
     .include("patient", (p) =>
       p
-        .select("id", "firstName", "middleName", "lastName", "allergyStatus")
-        .include("allergies", (a) => a.select("id", "label", "reaction", "severity", "notes"))
-        .include("alerts", (x) => x.select("id", "label", "notes").orderBy((y) => y.label.asc())),
+        .select("id", "firstName", "middleName", "lastName"),
     )
     .include("diagnoses", (d) => d.select("code", "title").orderBy((x) => x.position.asc()))
     .include("prescriptions", (rx) =>
@@ -64,9 +63,6 @@ export async function NoteSummary({ id }: { id: string }) {
           {author ? ` · by ${author.fullName}` : ""}
         </p>
       </div>
-
-      <AllergyBanner status={record.patient.allergyStatus} allergies={record.patient.allergies} />
-      <AlertBanner alerts={record.patient.alerts} />
 
       {record.diagnoses.length > 0 ? (
         <div>
@@ -130,16 +126,21 @@ export async function NoteSummary({ id }: { id: string }) {
         </p>
       ) : null}
 
-      <div className="flex flex-wrap gap-2 border-t border-border pt-4">
-        {/* A plain anchor: a full load leaves the panel behind for the page itself. */}
-        <a href={`/records/${record.id}`} className={buttonClass("secondary")}>
-          Open full note
-        </a>
+      {/* Plain anchors: a full load leaves the panel behind for the page itself. */}
+      <div className="flex flex-wrap items-center gap-2 border-t border-border pt-4">
         {mine && !record.archivedAt ? (
           <a href={`/records/${record.id}/edit`} className={buttonClass(draft ? "primary" : "secondary")}>
             {draft ? "Continue note" : "Amend note"}
           </a>
         ) : null}
+        {mine && record.prescriptions.length > 0 ? (
+          <a href={`/records/${record.id}/prescription`} className={buttonClass("secondary")}>
+            Print prescription
+          </a>
+        ) : null}
+        <a href={`/records/${record.id}`} className="ml-auto text-sm font-medium text-accent-ink hover:underline">
+          History and full page
+        </a>
       </div>
     </div>
   );

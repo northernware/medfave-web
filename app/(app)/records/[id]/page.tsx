@@ -24,11 +24,10 @@ import {
   NOTE_KIND_LABELS,
   RECORD_STATUS_LABELS,
   RECORD_STATUS_TONE,
-  SEX_LABELS,
 } from "@/lib/domain";
 import { changesBetween, parseSnapshot } from "@/lib/record-versions";
-import { AlertBanner, AllergyBanner } from "@/components/allergy-banner";
 import { BackTo } from "@/components/crumb-names";
+import { NoteContext, NoteLayout } from "@/components/note-context";
 import { DangerZone } from "@/components/danger-zone";
 import { Badge, Card, CardHeader, Detail, PageHeader, Prose, buttonClass } from "@/components/ui";
 
@@ -46,9 +45,7 @@ export default async function RecordPage({ params }: PageProps<"/records/[id]">)
   const record = await orm.MedicalRecord
     .include("patient", (p) =>
       p
-        .select("id", "firstName", "middleName", "lastName", "dateOfBirth", "sex", "allergyStatus")
-        .include("allergies", (a) => a.select("id", "label", "reaction", "severity", "notes"))
-        .include("alerts", (x) => x.select("id", "label", "notes").orderBy((y) => y.label.asc()))
+        .select("id", "firstName", "middleName", "lastName", "dateOfBirth", "sex")
         .include("household", (h) => h.select("id", "name")),
     )
     .include("appointment", (a) => a.select("id", "scheduledAt", "reason"))
@@ -108,18 +105,14 @@ export default async function RecordPage({ params }: PageProps<"/records/[id]">)
   ].filter((v) => v.value != null);
 
   return (
-    <div className="space-y-3">
+    // The same page as writing or amending it: the note, and the patient's clipboard beside it.
+    <div className="mx-auto max-w-[69rem] space-y-3">
       <BackTo href={`/patients/${patient.id}`} label={fullName(patient)} />
       <PageHeader
         title={record.chiefComplaint || "Untitled draft"}
         subtitle={
           <>
-            <Link href={`/patients/${patient.id}`} className="text-accent-ink hover:underline">
-              {fullName(patient)}
-            </Link>
-            {" · "}
-            {SEX_LABELS[patient.sex]} · {ageFrom(calendarDateFromDb(patient.dateOfBirth), visitDate)} at visit ·{" "}
-            {formatDateTime(visitDate)}
+            {formatDateTime(visitDate)} · {ageFrom(calendarDateFromDb(patient.dateOfBirth), visitDate)} at the visit
             {author ? ` · by ${author.fullName}` : ""}
           </>
         }
@@ -140,6 +133,18 @@ export default async function RecordPage({ params }: PageProps<"/records/[id]">)
         }
       />
 
+      <NoteLayout
+        context={
+          <NoteContext
+            doctor={doctor}
+            patientId={patient.id}
+            excludeRecordId={record.id}
+            before={instantFromDb(record.visitDate)}
+            reason={record.appointment?.reason}
+          />
+        }
+        form={
+      <div className="space-y-3">
       {archived ? (
         <div className="rounded-lg border border-border bg-surface-muted px-4 py-3 text-sm">
           <p className="font-medium">
@@ -180,9 +185,6 @@ export default async function RecordPage({ params }: PageProps<"/records/[id]">)
         {/* A note with no visit says why it exists. */}
         {record.noteKind ? <Badge>{NOTE_KIND_LABELS[record.noteKind] ?? record.noteKind}</Badge> : null}
       </div>
-
-      <AllergyBanner status={patient.allergyStatus} allergies={patient.allergies} />
-      <AlertBanner alerts={patient.alerts} />
 
       {vitals.length > 0 ? (
         <Card>
@@ -400,6 +402,9 @@ export default async function RecordPage({ params }: PageProps<"/records/[id]">)
           </label>
         </DangerZone>
       )}
+      </div>
+        }
+      />
     </div>
   );
 }

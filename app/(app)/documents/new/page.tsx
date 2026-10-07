@@ -7,7 +7,7 @@ import { DocumentType } from "@/lib/enums";
 import { DocumentForm } from "@/components/forms/document-form";
 import { buttonClass, Card, EmptyState, PageHeader } from "@/components/ui";
 
-export const metadata: Metadata = { title: "Request a document" };
+export const metadata: Metadata = { title: "New document" };
 
 export default async function NewDocumentPage({ searchParams }: PageProps<"/documents/new">) {
   const doctor = await requireDoctor();
@@ -17,7 +17,7 @@ export default async function NewDocumentPage({ searchParams }: PageProps<"/docu
   if (patients.length === 0) {
     return (
       <div className="mx-auto max-w-3xl space-y-6">
-        <PageHeader title="Request a document" />
+        <PageHeader title="New document" />
         <Card>
           <EmptyState
             title="No patients yet"
@@ -39,8 +39,8 @@ export default async function NewDocumentPage({ searchParams }: PageProps<"/docu
   return (
     <div className="mx-auto max-w-3xl space-y-3">
       <PageHeader
-        title="Request a document"
-        subtitle="Recorded as a request first, prepared, then handed over — so the chart says who got what."
+        title="New document"
+        subtitle="Who asked and why, then prepared and handed over — so the chart says who got what."
       />
       <Card className="p-5 sm:p-6">
         <DocumentForm

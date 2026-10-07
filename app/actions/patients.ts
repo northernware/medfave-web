@@ -607,7 +607,7 @@ async function clinicalHistory(clinicId: string, patientId: string) {
   const held = [
     [patient.medicalRecords, "visit note"],
     [patient.appointments, "appointment"],
-    [patient.documentRequests, "records request"],
+    [patient.documentRequests, "document request"],
     [patient.appointmentRequests, "appointment request"],
     [patient.allergies + patient.conditions + patient.medications + patient.alerts, "clinical list entry"],
   ] as const;

@@ -197,7 +197,7 @@ const FEATURES = [
     icon: LetterIcon,
   },
   {
-    title: "Records requests",
+    title: "Documents",
     body: "Certificates, abstracts, insurance forms and record copies, requested by patients and tracked to done.",
     icon: ShieldCheckIcon,
   },

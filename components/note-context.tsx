@@ -1,13 +1,13 @@
 import type { ReactNode } from "react";
 import { sharesCharts } from "@/lib/care";
-import { formatDate, instantFromDb } from "@/lib/datetime";
+import { calendarDateFromDb, formatDate, instantFromDb } from "@/lib/datetime";
 import { orm } from "@/src/prisma/db";
 import { AlertBanner, AllergyBanner } from "@/components/allergy-banner";
 import { AddDisclosure } from "@/components/add-disclosure";
 import { ChartForm } from "@/components/chart-form";
 import { buttonClass } from "@/components/ui";
 import { PatientClipboard } from "@/components/patient-clipboard";
-import { BLOOD_TYPE_LABELS } from "@/lib/domain";
+import { ageFrom, BLOOD_TYPE_LABELS, fullName, SEX_LABELS } from "@/lib/domain";
 
 /**
  * What a doctor checks while writing a note, beside the form: the patient's
@@ -35,6 +35,7 @@ export async function NoteContext({
     orm.Patient
       .select(
         "allergyStatus", "conditionStatus", "medicationStatus", "patientNumber", "bloodType",
+        "firstName", "middleName", "lastName", "sex", "dateOfBirth",
         "emergencyContactName", "emergencyContactRelationship", "emergencyContactNumber",
       )
       .include("allergies", (a) => a.select("id", "label", "reaction", "severity", "notes"))
@@ -108,6 +109,15 @@ export async function NoteContext({
   return (
     <div className="space-y-3">
       <PatientClipboard
+        name={
+          <>
+            {fullName(patient)}
+            <span className="font-normal text-ink-muted">
+              {" · "}
+              {SEX_LABELS[patient.sex]} · {ageFrom(calendarDateFromDb(patient.dateOfBirth))}
+            </span>
+          </>
+        }
         number={patient.patientNumber}
         facts={[{ label: "Blood type", value: BLOOD_TYPE_LABELS[patient.bloodType] }]}
         contacts={[

@@ -405,10 +405,10 @@ export default async function PatientPage({
               { label: "Primary contact", value: patient.emergencyContactName, detail: [patient.emergencyContactRelationship, patient.emergencyContactNumber].filter(Boolean).join(" · ") },
               { label: "Secondary contact", value: patient.emergencyContact2Name, detail: [patient.emergencyContact2Relationship, patient.emergencyContact2Number].filter(Boolean).join(" · ") },
             ]}
-          />
+          >
           <AllergyBanner status={patient.allergyStatus} allergies={patient.allergies} />
           <AlertBanner alerts={patient.alerts} />
-      <Card className="p-4">
+      <div>
         <dl className="grid grid-cols-2 gap-x-4 gap-y-3.5">
           <Detail
             className="col-span-2"
@@ -524,7 +524,8 @@ export default async function PatientPage({
               ))}
           </dl>
         ) : null}
-      </Card>
+      </div>
+          </PatientCard>
 
       {housemates.length > 0 ? (
         <Card className="p-4">

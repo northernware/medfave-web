@@ -14,6 +14,8 @@ import { DangerZone } from "@/components/danger-zone";
 import { caredForIds, sharesCharts } from "@/lib/care";
 import { Badge, buttonClass, Card, CardHeader, Detail, EmptyState, PageHeader, Prose } from "@/components/ui";
 import { DELETE_PHRASES } from "@/lib/confirm-phrase";
+import { loadScheduleRail } from "@/lib/schedule-rail";
+import { memberMarks, ScheduleRail } from "../../dashboard/panels";
 
 /** A household of the clinic: households are the clinic's, like its patients. */
 async function loadHousehold(doctor: { id: string; clinicId: string }, householdId: string) {
@@ -65,7 +67,7 @@ export default async function HouseholdPage({
 }: PageProps<"/households/[id]">) {
   const doctor = await requireDoctor();
   const { id } = await params;
-  const { blocked } = await searchParams;
+  const { blocked, day } = await searchParams;
 
   const household = await loadHousehold(doctor, id);
   if (!household) notFound();
@@ -95,8 +97,13 @@ export default async function HouseholdPage({
       .all()
   ).map(toAppointmentListItem);
 
+  // The household's day with this doctor, each member with a mark of their own.
+  const rail = await loadScheduleRail(doctor, day, household.patients.map((p) => p.id));
+  const marks = memberMarks(members);
+
   return (
-    <div className="space-y-3">
+    <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_340px] xl:items-start">
+    <div className="min-w-0 space-y-3">
       <CrumbName id={household.id} name={`${household.name} household`} />
       <PageHeader
         title={`${household.name} household`}
@@ -309,6 +316,15 @@ export default async function HouseholdPage({
           people in it cannot be deleted.
         </p>
       )}
+    </div>
+      <aside className="h-[640px] xl:sticky xl:top-3 xl:h-[calc(100dvh-1.5rem)]">
+        <ScheduleRail
+          {...rail}
+          keep=""
+          hrefFor={(key) => `/households/${household.id}${key === rail.todayKey ? "" : `?day=${key}`}`}
+          members={marks}
+        />
+      </aside>
     </div>
   );
 }

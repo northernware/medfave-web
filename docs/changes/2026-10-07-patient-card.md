@@ -25,3 +25,8 @@ Beside a note the clipboard stays in view while the header scrolls away, so it n
 ## Follow-up: the note header is just the title
 
 With the patient named on the clipboard, the note header drops its patient line (name · sex · age · household); a draft or amend keeps its status line. The clipboard's name is now the link to the chart. The clipboard column scrolls without a visible scrollbar, like the schedule panel.
+
+## Follow-up: the clipboard starts level with the name; a shorter access list
+
+- The patient page's header (name, household line, Write note · Book · Request document · Edit) now heads the left column, so the clipboard starts level with the name instead of below the buttons.
+- "Who opened this chart" shows the last three openings, one line each (who · when), with "Show all 12" expanding the rest in place. The line on who may open the chart stays.

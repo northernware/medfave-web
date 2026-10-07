@@ -1,5 +1,5 @@
 import { startOwnHousehold } from "@/app/actions/patients";
-import { buttonClass } from "@/components/ui";
+import { ActionDialog } from "@/components/action-dialog";
 import { fullName, RELATIONSHIP_LABELS } from "@/lib/domain";
 import type { Relationship } from "@/lib/enums";
 
@@ -21,28 +21,22 @@ export function StartHousehold({
   // Heading a household is for adults; a child stays in their family's.
   if (others.length === 0 || !adult(patient.dateOfBirth)) return null;
   return (
-    <details className="group">
-      <summary className="cursor-pointer list-none text-sm font-medium text-ink-muted hover:text-ink">
-        Start their own household…
-      </summary>
-      <form action={startOwnHousehold} className="mt-3 space-y-3">
-        <input type="hidden" name="patientId" value={patient.id} />
-        <input type="hidden" name="back" value={back} />
-        <p className="text-sm text-ink-muted">
-          {patient.firstName} becomes head of a new household of their own. Tick who moves with them.
-        </p>
-        <div className="space-y-1.5">
-          {others.map((h) => (
-            <label key={h.id} className="flex items-center gap-2 text-sm">
-              <input type="checkbox" name="memberId" value={h.id} className="accent-[var(--accent)]" />
-              {fullName(h)}
-              <span className="text-ink-faint">· {RELATIONSHIP_LABELS[h.relationship]}</span>
-            </label>
-          ))}
-        </div>
-        <button className={buttonClass("secondary")}>Start household</button>
-      </form>
-    </details>
+    <ActionDialog label="Start their own household…" title="Start their own household" action={startOwnHousehold} submitLabel="Start household">
+      <input type="hidden" name="patientId" value={patient.id} />
+      <input type="hidden" name="back" value={back} />
+      <p className="text-sm text-ink-muted">
+        {patient.firstName} becomes head of a new household of their own. Tick who moves with them.
+      </p>
+      <div className="space-y-1.5">
+        {others.map((h) => (
+          <label key={h.id} className="flex items-center gap-2 text-sm">
+            <input type="checkbox" name="memberId" value={h.id} className="accent-[var(--accent)]" />
+            {fullName(h)}
+            <span className="text-ink-faint">· {RELATIONSHIP_LABELS[h.relationship]}</span>
+          </label>
+        ))}
+      </div>
+    </ActionDialog>
   );
 }
 

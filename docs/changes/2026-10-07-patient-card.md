@@ -30,3 +30,7 @@ With the patient named on the clipboard, the note header drops its patient line 
 
 - The patient page's header (name, household line, Write note · Book · Request document · Edit) now heads the left column, so the clipboard starts level with the name instead of below the buttons.
 - "Who opened this chart" shows the last three openings, one line each (who · when), with "Show all 12" expanding the rest in place. The line on who may open the chart stays.
+
+## Follow-up: "Start their own household" is a quiet action
+
+It was a card of its own in the right column, looking like part of the chart. It's now a quiet text button beside "Archive this chart" at the end of the page (the rare chart actions together), opening a dialog with the housemates to tick. Same on the desk's chart. New `components/action-dialog.tsx`: a quiet button and a dialog around a form, styled like the danger zone without the danger colour.

@@ -529,11 +529,6 @@ export default async function PatientPage({
       </div>
           </PatientClipboard>
 
-      {housemates.length > 0 ? (
-        <Card className="p-4">
-          <StartHousehold patient={patient} others={housemates} back={`/patients/${patient.id}`} />
-        </Card>
-      ) : null}
 
       <Card className="p-4">
         <h2 className="text-sm font-semibold">Who opened this chart</h2>
@@ -562,7 +557,11 @@ export default async function PatientPage({
       </div>
 
       {archived ? null : (
-        <div className="lg:max-w-[calc(66.666%-0.75rem)]">
+        // The rare chart actions, quietly together at the end.
+        <div className="flex flex-wrap items-start justify-end gap-1 lg:max-w-[calc(66.666%-0.75rem)]">
+          <div className="pt-1">
+            <StartHousehold patient={patient} others={housemates} back={`/patients/${patient.id}`} />
+          </div>
           {hasHistory ? (
             <DangerZone
               action={archivePatient}

@@ -23,6 +23,7 @@ import {
 } from "@/lib/domain";
 import { AppointmentList } from "@/components/appointment-list";
 import { AlertBanner, AllergyBanner } from "@/components/allergy-banner";
+import { PatientCard } from "@/components/patient-card";
 import { DangerZone } from "@/components/danger-zone";
 import { Badge, Card, Detail, EmptyState, PageHeader, SectionTitle, buttonClass } from "@/components/ui";
 
@@ -383,50 +384,32 @@ export default async function PatientPage({
 
         {/* Standing clinical context, kept beside the timeline rather than above it. */}
         <aside className="space-y-3">
+          <PatientCard
+            number={patient.patientNumber}
+            facts={[
+              {
+                label: "Born",
+                value: (
+                  <>
+                    {formatCalendarDate(calendarDateFromDb(patient.dateOfBirth))}
+                    <span className="block text-xs font-normal text-ink-muted">{ageFrom(calendarDateFromDb(patient.dateOfBirth))}</span>
+                  </>
+                ),
+              },
+              { label: "Sex", value: SEX_LABELS[patient.sex] },
+              { label: "Blood type", value: BLOOD_TYPE_LABELS[patient.bloodType] },
+            ]}
+            contacts={[
+              { label: "Contact", value: patient.contactNumber ?? patient.household.contactNumber },
+              { label: "Email", value: patient.email },
+              { label: "Primary contact", value: patient.emergencyContactName, detail: [patient.emergencyContactRelationship, patient.emergencyContactNumber].filter(Boolean).join(" · ") },
+              { label: "Secondary contact", value: patient.emergencyContact2Name, detail: [patient.emergencyContact2Relationship, patient.emergencyContact2Number].filter(Boolean).join(" · ") },
+            ]}
+          />
           <AllergyBanner status={patient.allergyStatus} allergies={patient.allergies} />
           <AlertBanner alerts={patient.alerts} />
-      {housemates.length > 0 ? (
-        <Card className="p-4">
-          <StartHousehold patient={patient} others={housemates} back={`/patients/${patient.id}`} />
-        </Card>
-      ) : null}
       <Card className="p-4">
         <dl className="grid grid-cols-2 gap-x-4 gap-y-3.5">
-          <Detail label="Patient number" value={<span className="nums whitespace-nowrap">{patient.patientNumber ?? "—"}</span>} />
-          <Detail label="Date of birth" value={formatCalendarDate(calendarDateFromDb(patient.dateOfBirth))} />
-          <Detail label="Blood type" value={BLOOD_TYPE_LABELS[patient.bloodType]} />
-          <Detail label="Contact" value={patient.contactNumber ?? patient.household.contactNumber} />
-          <Detail label="Email" value={patient.email} />
-          <Detail
-            label="Primary contact"
-            value={
-              patient.emergencyContactName ? (
-                <>
-                  {patient.emergencyContactName}
-                  <span className="mt-0.5 block text-xs text-ink-faint">
-                    {[patient.emergencyContactRelationship, patient.emergencyContactNumber]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </span>
-                </>
-              ) : null
-            }
-          />
-          <Detail
-            label="Secondary contact"
-            value={
-              patient.emergencyContact2Name ? (
-                <>
-                  {patient.emergencyContact2Name}
-                  <span className="mt-0.5 block text-xs text-ink-faint">
-                    {[patient.emergencyContact2Relationship, patient.emergencyContact2Number]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </span>
-                </>
-              ) : null
-            }
-          />
           <Detail
             className="col-span-2"
             label="Current medications"
@@ -472,7 +455,6 @@ export default async function PatientPage({
               }
             />
           ) : null}
-          <Detail label="Visits recorded" value={visits.length} />
           <Detail
             className="col-span-2"
             label="Ongoing conditions"
@@ -543,6 +525,12 @@ export default async function PatientPage({
           </dl>
         ) : null}
       </Card>
+
+      {housemates.length > 0 ? (
+        <Card className="p-4">
+          <StartHousehold patient={patient} others={housemates} back={`/patients/${patient.id}`} />
+        </Card>
+      ) : null}
 
       <Card className="p-4">
         <h2 className="text-sm font-semibold">Who opened this chart</h2>

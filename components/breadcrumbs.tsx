@@ -60,6 +60,10 @@ const PORTAL_ITEM: Record<string, string> = { documents: "Document" };
 
 const isId = (s: string) => /^[0-9a-f-]{16,}$/i.test(s);
 
+/** Form and note pages centre their content; the trail sits over it, not at the far left. */
+const columnFor = (path: string) =>
+  /^\/records\/(new|[^/]+\/edit)$/.test(path) ? "mx-auto max-w-[69rem]" : /\/(new|edit)$/.test(path) ? "mx-auto max-w-3xl" : "";
+
 export function Breadcrumbs() {
   const path = usePathname() ?? "";
   const named = useCrumbNames();
@@ -82,7 +86,7 @@ export function Breadcrumbs() {
   const back = [...crumbs].reverse().find((c) => c.linkable);
 
   return (
-    <nav aria-label="Breadcrumb" className="mb-3 text-sm">
+    <nav aria-label="Breadcrumb" className={`mb-3 text-sm ${columnFor(path)}`}>
       {back ? (
         <Link href={back.href} className="inline-flex items-center gap-1 font-medium text-ink-muted hover:text-ink sm:hidden">
           <AltArrowLeftIcon className="size-4" aria-hidden />

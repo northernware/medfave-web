@@ -484,7 +484,7 @@ export function ScheduleRail({
             const oneLine = height < 60;
             const done = a.status === "COMPLETED" || a.status === "CANCELLED" || a.status === "NO_SHOW";
             const end = new Date(a.scheduledAt.getTime() + a.durationMinutes * 60_000);
-            const action =
+            const actionButton =
               (a.status === "PENDING" || a.status === "CONFIRMED") ? (
                 <form action={setAppointmentStatus}>
                   <input type="hidden" name="appointmentId" value={a.id} />
@@ -504,6 +504,8 @@ export function ScheduleRail({
                   <button className="rounded-full px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap text-ink-muted hover:bg-surface hover:text-ink">Undo check-in</button>
                 </form>
               ) : null;
+            // Above the card's link, which covers the whole card.
+            const action = actionButton ? <div className="relative z-[2]">{actionButton}</div> : null;
             return (
               <div
                 key={a.id}
@@ -527,7 +529,7 @@ export function ScheduleRail({
                     <div className="flex items-center gap-2">
                       <span aria-hidden title={APPOINTMENT_STATUS_LABELS[a.status]} className={`size-1.5 shrink-0 rounded-full ${STATUS_DOT[a.status]}`} />
                       {members && a.patient.id ? <Mark mark={members[a.patient.id]} /> : null}
-                      <Link href={itemHref(a.id)} className="min-w-0 flex-1 truncate group-hover/card:whitespace-normal text-[13px] leading-5 font-semibold hover:underline">
+                      <Link href={itemHref(a.id)} className="min-w-0 flex-1 truncate after:absolute after:inset-0 group-hover/card:whitespace-normal text-[13px] leading-5 font-semibold hover:underline">
                         {fullName(a.patient)}
                         {oneLine ? <span className="tabular ml-2 text-[11px] font-normal text-ink-faint group-hover/card:hidden group-focus-within/card:hidden">{formatTime(a.scheduledAt)}</span> : null}
                       </Link>
@@ -562,7 +564,7 @@ export function ScheduleRail({
                       </span>
                       {action}
                     </div>
-                    <Link href={itemHref(a.id)} className="min-w-0">
+                    <Link href={itemHref(a.id)} className="min-w-0 after:absolute after:inset-0">
                       <span className="flex items-center gap-1.5">
                         {members && a.patient.id ? <Mark mark={members[a.patient.id]} /> : null}
                         <span className="truncate group-hover/card:whitespace-normal text-[13px] leading-5 font-semibold hover:underline">{fullName(a.patient)}</span>

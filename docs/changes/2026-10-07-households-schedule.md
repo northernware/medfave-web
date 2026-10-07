@@ -10,3 +10,7 @@ Code: `lib/schedule-rail.ts` (`loadScheduleRail(doctor, day, patientIds?)`), `Sc
 ## Follow-up: squeezed cards open on hover
 
 Hovering a schedule card (or tabbing into it) lifts it over its neighbours, full width and as tall as it needs, with every line unwrapped. A one-line card shows its hidden second line (time, household, status, service). It keeps its own top, so it reads as the same card. On Today and the households pages alike.
+
+## Follow-up: the whole card opens the visit
+
+A schedule card is one link now, to the visit (the name's link stretched over the card), so the pointer shows anywhere on it. Check in, Start and Undo check-in sit above the link and still work on their own.

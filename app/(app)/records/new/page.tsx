@@ -96,9 +96,12 @@ export default async function NewRecordPage({ searchParams }: PageProps<"/record
 
   return (
     <div className="mx-auto max-w-[69rem] space-y-3">
-      <NoteHeader title="New visit note" patient={patient} />
-
       <NoteLayout
+        header={
+          <>
+            <NoteHeader title="New visit note" patient={patient} />
+          </>
+        }
         context={
           <NoteContext
             doctor={{ id: doctor.id, clinicId: doctor.clinicId }}

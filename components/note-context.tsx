@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { sharesCharts } from "@/lib/care";
-import { calendarDateFromDb, formatDate, instantFromDb } from "@/lib/datetime";
+import { calendarDateFromDb, formatDate, instantFromDb, instantToDb } from "@/lib/datetime";
 import { orm } from "@/src/prisma/db";
 import { AlertBanner, AllergyBanner } from "@/components/allergy-banner";
 import { AddDisclosure } from "@/components/add-disclosure";
@@ -22,8 +22,11 @@ export async function NoteContext({
   doctor,
   patientId,
   excludeRecordId,
+  before,
   reason,
 }: {
+  /** An existing note's visit: "last visit" is the one before it, not the latest. */
+  before?: Date;
   doctor: { id: string; clinicId: string };
   patientId: string;
   /** The note being written, so "last visit" means the one before it. */
@@ -56,6 +59,7 @@ export async function NoteContext({
       .where((r) => r.status.neq("DRAFT"))
       .where((r) => r.archivedAt.isNull())
       .where((r) => (excludeRecordId ? r.id.neq(excludeRecordId) : r.id.isNotNull()))
+      .where((r) => (before ? r.visitDate.lt(instantToDb(before)) : r.id.isNotNull()))
       .where((r) => (shared ? r.id.isNotNull() : r.doctorId.eq(doctor.id)))
       .orderBy((r) => r.visitDate.desc())
       .first(),

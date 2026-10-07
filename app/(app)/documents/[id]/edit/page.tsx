@@ -28,12 +28,12 @@ export default async function EditDocumentPage({ params }: PageProps<"/documents
   const { patients, visits } = await documentFormData(doctor.id);
 
   return (
-    <div className="space-y-3">
+    <div className="mx-auto max-w-3xl space-y-3">
       <PageHeader
         title={`Edit ${DOCUMENT_TYPE_LABELS[request.type].toLowerCase()}`}
         subtitle={fullName(request.patient)}
       />
-      <Card className="max-w-3xl p-5 sm:p-6">
+      <Card className="p-5 sm:p-6">
         <DocumentForm
           action={updateDocumentRequest.bind(null, request.id)}
           patients={patients}

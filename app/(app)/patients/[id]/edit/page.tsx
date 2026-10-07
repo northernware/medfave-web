@@ -52,9 +52,9 @@ export default async function EditPatientPage({ params }: PageProps<"/patients/[
   const action = updatePatient.bind(null, patient.id);
 
   return (
-    <div className="space-y-3">
+    <div className="mx-auto max-w-3xl space-y-3">
       <PageHeader title={`Edit ${fullName(patient)}`} />
-      <Card className="max-w-3xl p-5 sm:p-6">
+      <Card className="p-5 sm:p-6">
         <PatientForm
           action={action}
           households={households}

@@ -37,12 +37,12 @@ export default async function NewDocumentPage({ searchParams }: PageProps<"/docu
     typeof patientId === "string" && patients.some((p) => p.id === patientId) ? patientId : "";
 
   return (
-    <div className="space-y-3">
+    <div className="mx-auto max-w-3xl space-y-3">
       <PageHeader
         title="Request a document"
         subtitle="Recorded as a request first, prepared, then handed over — so the chart says who got what."
       />
-      <Card className="max-w-3xl p-5 sm:p-6">
+      <Card className="p-5 sm:p-6">
         <DocumentForm
           action={createDocumentRequest}
           patients={patients}

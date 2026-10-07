@@ -13,3 +13,7 @@ Code: `components/patient-clipboard.tsx`.
 ## Follow-up: the clinical summary is the clipboard's sheet
 
 The sheet now holds what to know before treating: allergies, medical alerts, current and past medicines, ongoing and past conditions, and the conditions' notes (one card instead of three). The contacts moved up into the top half, under born, sex and blood type, two to a row. `PatientClipboard` takes the sheet as `children`.
+
+## Follow-up: the clipboard beside a visit note
+
+The note's side column is the same clipboard, so a patient looks the same on both pages. Its top is slim (patient number, blood type, primary contact), since the note's header already names the patient, sex, age and household. The sheet holds allergies, alerts, ongoing conditions and current medicines, all still changeable in place. Reason for visit and Last visit sit below it; on a narrow screen those fold away ("Reason and last visit") while the clipboard stays open.

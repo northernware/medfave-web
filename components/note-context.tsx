@@ -6,12 +6,16 @@ import { AlertBanner, AllergyBanner } from "@/components/allergy-banner";
 import { AddDisclosure } from "@/components/add-disclosure";
 import { ChartForm } from "@/components/chart-form";
 import { buttonClass } from "@/components/ui";
+import { PatientClipboard } from "@/components/patient-clipboard";
+import { BLOOD_TYPE_LABELS } from "@/lib/domain";
 
 /**
- * What a doctor checks while writing a note, beside the form: allergies and
- * alerts, the conditions and medicines on the chart, and the last visit's
- * diagnoses, medicines and advice. On a wide screen it stays in view while the
- * form scrolls; on a narrow one it sits above the form.
+ * What a doctor checks while writing a note, beside the form: the patient's
+ * clipboard, as on their page (a slim top, since the note's header already
+ * names them; the sheet with allergies, alerts, conditions and medicines, all
+ * changeable in place), then why they came and the last visit. On a wide
+ * screen it stays in view while the form scrolls; on a narrow one it sits
+ * above the form, the visit history folded away.
  */
 export async function NoteContext({
   doctor,
@@ -29,7 +33,10 @@ export async function NoteContext({
   const shared = await sharesCharts(doctor.clinicId);
   const [patient, last] = await Promise.all([
     orm.Patient
-      .select("allergyStatus", "conditionStatus", "medicationStatus")
+      .select(
+        "allergyStatus", "conditionStatus", "medicationStatus", "patientNumber", "bloodType",
+        "emergencyContactName", "emergencyContactRelationship", "emergencyContactNumber",
+      )
       .include("allergies", (a) => a.select("id", "label", "reaction", "severity", "notes"))
       .include("alerts", (x) => x.select("id", "label", "notes").orderBy((y) => y.label.asc()))
       .include("conditions", (c) => c.select("id", "label").where((y) => y.resolvedAt.isNull()).orderBy((y) => y.label.asc()))
@@ -64,73 +71,6 @@ export async function NoteContext({
           <p>{reason}</p>
         </Box>
       ) : null}
-
-      <Box title="Ongoing conditions" hint="On the chart">
-        {patient.conditions.length ? (
-          <ul className="space-y-0.5">
-            {patient.conditions.map((c) => (
-              <li key={c.id} className="flex items-baseline justify-between gap-2">
-                <span>{c.label}</span>
-                <ChartForm
-                  patientId={patientId}
-                  action="condition.resolve"
-                  id={c.id}
-                  confirm={`Mark ${c.label} resolved? It moves to past conditions; you can reopen it.`}
-                >
-                  <button className="text-xs text-ink-muted hover:text-ink hover:underline" aria-label={`Mark ${c.label} resolved`}>
-                    Resolve
-                  </button>
-                </ChartForm>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-ink-muted">{listOr(patient.conditionStatus, "None known")}</p>
-        )}
-        <Add label="Add condition">
-          <ChartForm patientId={patientId} action="condition.add" className="grid gap-1.5">
-            <input name="label" required placeholder="Condition (e.g. Hypertension)" className={input} />
-            <button className={saveButton}>Save condition</button>
-          </ChartForm>
-        </Add>
-      </Box>
-
-      <Box title="Current medicines">
-        {patient.medications.length ? (
-          <ul className="space-y-0.5">
-            {patient.medications.map((m) => (
-              <li key={m.id} className="flex items-baseline justify-between gap-2">
-                <span>
-                  {[m.label, m.dosage].filter(Boolean).join(" ")}
-                  {m.frequency ? <span className="text-ink-muted"> · {m.frequency}</span> : null}
-                </span>
-                <ChartForm
-                  patientId={patientId}
-                  action="medication.stop"
-                  id={m.id}
-                  confirm={`Stop ${m.label}? It moves to past medicines; you can restart it.`}
-                >
-                  <button className="text-xs text-ink-muted hover:text-ink hover:underline" aria-label={`${m.label}: no longer taken`}>
-                    Stop
-                  </button>
-                </ChartForm>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-ink-muted">{listOr(patient.medicationStatus, "None")}</p>
-        )}
-        <Add label="Add medicine">
-          <ChartForm patientId={patientId} action="medication.add" className="grid gap-1.5">
-            <input name="label" required placeholder="Medicine (e.g. Amlodipine)" className={input} />
-            <div className="flex gap-1.5">
-              <input name="dosage" placeholder="Dose (5 mg)" className={input} />
-              <input name="frequency" placeholder="How often" className={input} />
-            </div>
-            <button className={saveButton}>Save medicine</button>
-          </ChartForm>
-        </Add>
-      </Box>
 
       <Box title={last ? `Last visit · ${formatDate(instantFromDb(last.visitDate))}` : "Last visit"}>
         {last ? (
@@ -167,14 +107,92 @@ export async function NoteContext({
 
   return (
     <div className="space-y-3">
-      {/* Changed in place: what the doctor learns at the visit goes straight on the chart. */}
-      <AllergyBanner status={patient.allergyStatus} allergies={patient.allergies} patientId={patientId} />
-      <AlertBanner alerts={patient.alerts} patientId={patientId} />
+      <PatientClipboard
+        number={patient.patientNumber}
+        facts={[{ label: "Blood type", value: BLOOD_TYPE_LABELS[patient.bloodType] }]}
+        contacts={[
+          {
+            label: "Primary contact",
+            value: patient.emergencyContactName,
+            detail: [patient.emergencyContactRelationship, patient.emergencyContactNumber].filter(Boolean).join(" · "),
+          },
+        ]}
+      >
+        {/* Changed in place: what the doctor learns at the visit goes straight on the chart. */}
+        <AllergyBanner status={patient.allergyStatus} allergies={patient.allergies} patientId={patientId} />
+        <AlertBanner alerts={patient.alerts} patientId={patientId} />
+      <Box plain title="Ongoing conditions">
+          {patient.conditions.length ? (
+            <ul className="space-y-0.5">
+              {patient.conditions.map((c) => (
+                <li key={c.id} className="flex items-baseline justify-between gap-2">
+                  <span>{c.label}</span>
+                  <ChartForm
+                    patientId={patientId}
+                    action="condition.resolve"
+                    id={c.id}
+                    confirm={`Mark ${c.label} resolved? It moves to past conditions; you can reopen it.`}
+                  >
+                    <button className="text-xs text-ink-muted hover:text-ink hover:underline" aria-label={`Mark ${c.label} resolved`}>
+                      Resolve
+                    </button>
+                  </ChartForm>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-ink-muted">{listOr(patient.conditionStatus, "None known")}</p>
+          )}
+          <Add label="Add condition">
+            <ChartForm patientId={patientId} action="condition.add" className="grid gap-1.5">
+              <input name="label" required placeholder="Condition (e.g. Hypertension)" className={input} />
+              <button className={saveButton}>Save condition</button>
+            </ChartForm>
+          </Add>
+        </Box>
 
-      {/* Safety first everywhere; the rest beside the form when wide, folded away above it when narrow. */}
+        <Box plain title="Current medicines">
+          {patient.medications.length ? (
+            <ul className="space-y-0.5">
+              {patient.medications.map((m) => (
+                <li key={m.id} className="flex items-baseline justify-between gap-2">
+                  <span>
+                    {[m.label, m.dosage].filter(Boolean).join(" ")}
+                    {m.frequency ? <span className="text-ink-muted"> · {m.frequency}</span> : null}
+                  </span>
+                  <ChartForm
+                    patientId={patientId}
+                    action="medication.stop"
+                    id={m.id}
+                    confirm={`Stop ${m.label}? It moves to past medicines; you can restart it.`}
+                  >
+                    <button className="text-xs text-ink-muted hover:text-ink hover:underline" aria-label={`${m.label}: no longer taken`}>
+                      Stop
+                    </button>
+                  </ChartForm>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-ink-muted">{listOr(patient.medicationStatus, "None")}</p>
+          )}
+          <Add label="Add medicine">
+            <ChartForm patientId={patientId} action="medication.add" className="grid gap-1.5">
+              <input name="label" required placeholder="Medicine (e.g. Amlodipine)" className={input} />
+              <div className="flex gap-1.5">
+                <input name="dosage" placeholder="Dose (5 mg)" className={input} />
+                <input name="frequency" placeholder="How often" className={input} />
+              </div>
+              <button className={saveButton}>Save medicine</button>
+            </ChartForm>
+          </Add>
+        </Box>
+      </PatientClipboard>
+
+      {/* The visit and its history beside the form when wide, folded away above it when narrow. */}
       <div className="hidden space-y-3 lg:block">{more}</div>
       <details className="group rounded-md border border-border bg-surface lg:hidden">
-        <summary className="cursor-pointer px-3.5 py-2.5 text-sm font-semibold">More about this patient</summary>
+        <summary className="cursor-pointer px-3.5 py-2.5 text-sm font-semibold">{reason ? "Reason and last visit" : "Last visit"}</summary>
         <div className="space-y-3 px-3.5 pb-3.5">{more}</div>
       </details>
     </div>
@@ -193,9 +211,10 @@ function Add({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-function Box({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
+/** A titled box; `plain` on the clipboard's sheet, which is the box already. */
+function Box({ title, hint, plain, children }: { title: string; hint?: string; plain?: boolean; children: ReactNode }) {
   return (
-    <section className="rounded-md border border-border bg-surface px-3.5 py-3 text-sm">
+    <section className={plain ? "text-sm" : "rounded-md border border-border bg-surface px-3.5 py-3 text-sm"}>
       <h2 className="mb-1.5 font-display text-sm font-semibold">
         {title}
         {hint ? <span className="ml-1.5 text-xs font-normal text-ink-faint">{hint}</span> : null}

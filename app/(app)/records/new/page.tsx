@@ -95,7 +95,7 @@ export default async function NewRecordPage({ searchParams }: PageProps<"/record
     .all();
 
   return (
-    <div className="space-y-3">
+    <div className="mx-auto max-w-[69rem] space-y-3">
       <NoteHeader title="New visit note" patient={patient} />
 
       <NoteLayout

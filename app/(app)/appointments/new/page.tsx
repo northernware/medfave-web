@@ -66,9 +66,9 @@ export default async function NewAppointmentPage({ searchParams }: PageProps<"/a
   const walkIn = source === "WALK_IN";
 
   return (
-    <div className="space-y-3">
+    <div className="mx-auto max-w-3xl space-y-3">
       <PageHeader title="Book appointment" />
-      <Card className="max-w-3xl p-5 sm:p-6">
+      <Card className="p-5 sm:p-6">
         <AppointmentForm
           action={createAppointment}
           patients={patients}

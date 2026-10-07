@@ -45,7 +45,7 @@ export default async function EditRecordPage({ params }: PageProps<"/records/[id
     .all();
 
   return (
-    <div className="space-y-3">
+    <div className="mx-auto max-w-[69rem] space-y-3">
       <NoteHeader
         title={record.status === "DRAFT" ? "Visit note (draft)" : "Amend note"}
         patient={record.patient}

@@ -10,9 +10,9 @@ export default async function NewHouseholdPage() {
   await requireDoctor();
 
   return (
-    <div className="space-y-3">
+    <div className="mx-auto max-w-3xl space-y-3">
       <PageHeader title="New household" subtitle="A shared address and history. Members are added next, each with their own record." />
-      <Card className="max-w-3xl p-5 sm:p-6">
+      <Card className="p-5 sm:p-6">
         <HouseholdForm action={createHousehold} submitLabel="Create household" cancelHref="/households" />
       </Card>
     </div>

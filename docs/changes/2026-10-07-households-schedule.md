@@ -14,3 +14,7 @@ Hovering a schedule card (or tabbing into it) lifts it over its neighbours, full
 ## Follow-up: the whole card opens the visit
 
 A schedule card is one link now, to the visit (the name's link stretched over the card), so the pointer shows anywhere on it. Check in, Start and Undo check-in sit above the link and still work on their own.
+
+## Follow-up: pinned like Today
+
+On wide screens the households pages' schedule panel is pinned to the window's right edge, top to bottom, exactly like Today's: level with the sidebar, whatever sits above the page title (the back link). It no longer starts lower on a household's page or runs past the bottom of the window.

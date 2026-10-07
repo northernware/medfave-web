@@ -9,3 +9,7 @@ The column used to open with a two-column grid of every detail, dashes for anyth
 Our own colours (`surface-muted` top, `surface` sheet); no QR code yet. That waits for the desk being able to scan a patient in.
 
 Code: `components/patient-card.tsx`.
+
+## Follow-up: the clinical summary is the clipboard's sheet
+
+The sheet now holds what to know before treating: allergies, medical alerts, current and past medicines, ongoing and past conditions, and the conditions' notes (one card instead of three). The contacts moved up into the top half, under born, sex and blood type, two to a row. `PatientCard` takes the sheet as `children`.

@@ -53,7 +53,7 @@ export default async function DeskNewAppointmentPage({
 
   if (doctors.length === 0) {
     return (
-      <div className="space-y-6">
+      <div className="mx-auto max-w-3xl space-y-6">
         <PageHeader title="Book appointment" />
         <Card>
           <EmptyState
@@ -67,9 +67,9 @@ export default async function DeskNewAppointmentPage({
 
   if (!doctorId) {
     return (
-      <div className="space-y-6">
+      <div className="mx-auto max-w-3xl space-y-6">
         <PageHeader title={source === "WALK_IN" ? "Register walk-in" : "Book appointment"} subtitle="Choose the doctor first." />
-        <Card className="max-w-3xl p-5 sm:p-6">{picker}</Card>
+        <Card className="p-5 sm:p-6">{picker}</Card>
       </div>
     );
   }
@@ -80,7 +80,7 @@ export default async function DeskNewAppointmentPage({
 
   if (patients.length === 0) {
     return (
-      <div className="space-y-6">
+      <div className="mx-auto max-w-3xl space-y-6">
         <PageHeader title="Book appointment" />
         <Card>
           <EmptyState
@@ -101,7 +101,7 @@ export default async function DeskNewAppointmentPage({
   const preselected = typeof patientId === "string" && patients.some((p) => p.id === patientId);
 
   return (
-    <div className="space-y-3">
+    <div className="mx-auto max-w-3xl space-y-3">
       <PageHeader title={walkIn ? "Register walk-in" : "Book appointment"} />
       <Card className="space-y-6 p-5 sm:p-6">
         {picker}

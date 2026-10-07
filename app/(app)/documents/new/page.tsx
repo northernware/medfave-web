@@ -16,7 +16,7 @@ export default async function NewDocumentPage({ searchParams }: PageProps<"/docu
 
   if (patients.length === 0) {
     return (
-      <div className="space-y-6">
+      <div className="mx-auto max-w-3xl space-y-6">
         <PageHeader title="Request a document" />
         <Card>
           <EmptyState

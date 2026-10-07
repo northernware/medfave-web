@@ -112,7 +112,7 @@ export default async function RecordPage({ params }: PageProps<"/records/[id]">)
         title={record.chiefComplaint || "Untitled draft"}
         subtitle={
           <>
-            {formatDateTime(visitDate)} · {ageFrom(calendarDateFromDb(patient.dateOfBirth), visitDate)} at the visit
+            {formatDateTime(visitDate)} · {ageFrom(calendarDateFromDb(patient.dateOfBirth), visitDate)} old at this visit
             {author ? ` · by ${author.fullName}` : ""}
           </>
         }

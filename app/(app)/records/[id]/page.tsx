@@ -28,6 +28,7 @@ import {
 } from "@/lib/domain";
 import { changesBetween, parseSnapshot } from "@/lib/record-versions";
 import { AlertBanner, AllergyBanner } from "@/components/allergy-banner";
+import { BackTo } from "@/components/crumb-names";
 import { DangerZone } from "@/components/danger-zone";
 import { Badge, Card, CardHeader, Detail, PageHeader, Prose, buttonClass } from "@/components/ui";
 
@@ -108,6 +109,7 @@ export default async function RecordPage({ params }: PageProps<"/records/[id]">)
 
   return (
     <div className="space-y-3">
+      <BackTo href={`/patients/${patient.id}`} label={fullName(patient)} />
       <PageHeader
         title={record.chiefComplaint || "Untitled draft"}
         subtitle={

@@ -21,3 +21,7 @@ The note's side column is the same clipboard, so a patient looks the same on bot
 ## Follow-up: the note's clipboard names the patient
 
 Beside a note the clipboard stays in view while the header scrolls away, so it now starts with who it is: "Corazon Dela Cruz · Female · 74 years". A guard against writing on the wrong chart with several notes open. Not on the patient page, where the name is the title right beside it. `PatientClipboard` takes an optional `name`.
+
+## Follow-up: the note header is just the title
+
+With the patient named on the clipboard, the note header drops its patient line (name · sex · age · household); a draft or amend keeps its status line. The clipboard's name is now the link to the chart. The clipboard column scrolls without a visible scrollbar, like the schedule panel.

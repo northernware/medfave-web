@@ -22,7 +22,7 @@ const NAMES: Record<string, string> = {
   appointments: "Appointments",
   patients: "Patients",
   households: "Households",
-  documents: "Records requests",
+  documents: "Documents",
   records: "Visit notes",
   desk: "Today",
   requests: "Requests",

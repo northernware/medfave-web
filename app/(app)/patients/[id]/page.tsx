@@ -194,7 +194,7 @@ export default async function PatientPage({
               {/* A certificate or an abstract is often wanted precisely after a
                   chart has been set aside, so this stays available. */}
               <Link href={`/documents/new?patientId=${patient.id}`} className={buttonClass("secondary")}>
-                Request document
+                New document
               </Link>
             </>
           ) : (
@@ -206,7 +206,7 @@ export default async function PatientPage({
               Book
             </Link>
             <Link href={`/documents/new?patientId=${patient.id}`} className={buttonClass("secondary")}>
-              Request document
+              New document
             </Link>
             <Link href={`/patients/${patient.id}/edit`} className={buttonClass("secondary")}>
               Edit

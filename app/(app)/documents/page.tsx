@@ -13,7 +13,7 @@ import type { DocumentRequestStatus } from "@/lib/enums";
 import { Pager } from "@/components/pager";
 import { Badge, buttonClass, Card, EmptyState, PageHeader } from "@/components/ui";
 
-export const metadata: Metadata = { title: "Records requests" };
+export const metadata: Metadata = { title: "Documents" };
 
 const VIEWS = [
   { key: "open", label: "Open" },
@@ -61,11 +61,11 @@ export default async function DocumentsPage({ searchParams }: PageProps<"/docume
   return (
     <div className="space-y-3">
       <PageHeader
-        title="Records requests"
+        title="Documents"
         subtitle="Certificates, abstracts and copies asked for from the chart."
         actions={
           <Link href="/documents/new" className={buttonClass("primary")}>
-            Request a document
+            New document
           </Link>
         }
       />
@@ -99,7 +99,7 @@ export default async function DocumentsPage({ searchParams }: PageProps<"/docume
             }
             action={
               <Link href="/documents/new" className={buttonClass("primary")}>
-                Request a document
+                New document
               </Link>
             }
           />

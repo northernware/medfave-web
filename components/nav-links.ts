@@ -31,7 +31,7 @@ export const DOCTOR_LINKS: readonly NavLink[] = [
   { href: "/appointments", label: "Appointments", icon: "appointments", group: "Practice" },
   { href: "/patients", label: "Patients", icon: "patients", group: "Patients" },
   { href: "/households", label: "Households", icon: "households", group: "Patients" },
-  { href: "/documents", label: "Records requests", icon: "documents", group: "Patients" },
+  { href: "/documents", label: "Documents", icon: "documents", group: "Patients" },
   { href: "/feedback", label: "Patient feedback", icon: "feedback", group: "Patients" },
   { href: "/manage/schedule", label: "My hours", icon: "hours", group: "Clinic" },
   { href: "/manage", label: "Clinic settings", icon: "settings", group: "Clinic" },

@@ -24,7 +24,7 @@ export function VisitMoves({
 }) {
   const steps = moves.filter((m) => m !== "CANCELLED");
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex w-full flex-wrap items-center gap-2">
       {steps.map((next, i) => (
         <form key={next} action={setAppointmentStatus}>
           <input type="hidden" name="appointmentId" value={appointmentId} />

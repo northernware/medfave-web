@@ -130,15 +130,16 @@ export const STATUS_TRANSITIONS: Record<AppointmentStatus, AppointmentStatus[]> 
  * no-show grace). After that it would only be marked missed again, so there
  * is nothing to restore.
  *
- * Checking in and starting happen on the visit's day only, and nobody is a
- * no-show before their time has come (`begun`: the visit's time has passed).
+ * Checking in works on any day (someone who turns up early, with the slot
+ * free, is seen then), but nobody is a no-show before their time has come
+ * (`begun`: the visit's time has passed).
  */
 export function movesFrom(status: AppointmentStatus, onItsDay: boolean, stillDue: boolean, begun = true): AppointmentStatus[] {
   const moves = status === "NO_SHOW" && onItsDay ? ["CHECKED_IN", "CONFIRMED"] as AppointmentStatus[] : STATUS_TRANSITIONS[status];
   return moves.filter(
     (to) =>
       !(to === "CONFIRMED" && (status === "NO_SHOW" || status === "CANCELLED") && !stillDue) &&
-      !((to === "CHECKED_IN" || to === "IN_CONSULTATION") && !onItsDay) &&
+      !(to === "CHECKED_IN" && status === "NO_SHOW" && !onItsDay) &&
       !(to === "NO_SHOW" && !begun),
   );
 }

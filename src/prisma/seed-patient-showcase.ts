@@ -19,6 +19,10 @@ devOnly("db:seed-patient-showcase");
  *  - a visit with a move he asked for ("Move requested")
  *  - a request the clinic declined, with a note ("From the clinic: …")
  *  - a carer who sees his records (Profile → people who see my records)
+ *  - his family (My family): he looks after his children's charts and his
+ *    mother's (Corazon), as a clinic-made link would — each with its entry
+ *    on his family list. Lia comes from db:seed-doctor-showcase; whoever is
+ *    missing is skipped, so run this after it.
  *  - Dr. Ana Reyes in his faves ("Your doctors" on Home)
  *
  * Every row it makes has an id from `seedId(MARK.patient, …)` (./seed-ids.ts),
@@ -45,7 +49,7 @@ async function main() {
   const account = await orm.Account.select("id").where((a) => a.email.eq(PATIENT_EMAIL)).first();
   if (!account) throw new Error(`No ${PATIENT_EMAIL}: run npm run db:seed first.`);
   const chart = await orm.Patient
-    .select("id", "clinicId")
+    .select("id", "clinicId", "householdId")
     .where((p) => p.accountId.eq(account.id))
     .first();
   if (!chart) throw new Error("The demo patient has no chart.");
@@ -57,6 +61,7 @@ async function main() {
   await orm.Appointment.where((a) => or(a.id.like(`${MARK.patient}-%`), a.id.like("showcase-%"))).deleteAndCount();
   await orm.DocumentRequest.where((d) => or(d.id.like(`${MARK.patient}-%`), d.id.like("showcase-%"))).deleteAndCount();
   await orm.CareLink.where((c) => or(c.id.like(`${MARK.patient}-%`), c.id.like("showcase-%"))).deleteAndCount();
+  await orm.FamilyMember.where((f) => f.id.like(`${MARK.patient}-%`)).deleteAndCount();
   await orm.Fave.where((f) => or(f.id.like(`${MARK.patient}-%`), f.id.like("showcase-%"))).deleteAndCount();
 
   const now = instantToDb(new Date());
@@ -191,11 +196,50 @@ async function main() {
     createdAt: now,
   });
 
+  // His family: the household's children, and his mother, whose charts he looks
+  // after. Each link joins an entry on his family list, as a real one does.
+  const household = await orm.Patient
+    .select("id", "firstName", "middleName", "lastName", "dateOfBirth", "sex", "relationship")
+    .where((p) => p.householdId.eq(chart.householdId))
+    .where((p) => p.id.neq(chart.id))
+    .where((p) => p.archivedAt.isNull())
+    .all();
+  const toRamon = { CHILD: "CHILD", GRANDPARENT: "PARENT" } as const;
+  let family = 0;
+  for (const member of household) {
+    const relationship = toRamon[member.relationship as keyof typeof toRamon];
+    if (!relationship) continue;
+    const entry = id(`family-${member.id}`);
+    await orm.FamilyMember.create({
+      id: entry,
+      accountId: account.id,
+      firstName: member.firstName,
+      middleName: member.middleName,
+      lastName: member.lastName,
+      dateOfBirth: member.dateOfBirth,
+      sex: member.sex,
+      relationship,
+      createdAt: now,
+      updatedAt: now,
+    });
+    await orm.CareLink.create({
+      id: id(`care-${member.id}`),
+      clinicId: chart.clinicId,
+      patientId: member.id,
+      accountId: account.id,
+      grantedById: doctor.accountId,
+      caregiverName: "Ramon Dela Cruz",
+      familyMemberId: entry,
+      createdAt: now,
+    });
+    family++;
+  }
+
   // Dr. Reyes in his faves, unless he faved her already.
   const faved = await orm.Fave.select("id").where((f) => f.accountId.eq(account.id)).where((f) => f.doctorId.eq(doctor.id)).first();
   if (!faved) await orm.Fave.create({ id: id("fave"), accountId: account.id, doctorId: doctor.id, createdAt: now });
 
-  console.log("Showcase data added for", PATIENT_EMAIL, "· carer login", CARER_EMAIL, "/", PASSWORD);
+  console.log("Showcase data added for", PATIENT_EMAIL, `· ${family} family members · carer login`, CARER_EMAIL, "/", PASSWORD);
 }
 
 main().then(

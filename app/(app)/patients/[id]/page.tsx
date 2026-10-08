@@ -23,7 +23,7 @@ import {
 } from "@/lib/domain";
 import { AppointmentList } from "@/components/appointment-list";
 import { AlertBanner, AllergyBanner } from "@/components/allergy-banner";
-import { PatientClipboard } from "@/components/patient-clipboard";
+import { CLIPBOARD_COLUMN, PatientClipboard } from "@/components/patient-clipboard";
 import { DangerZone } from "@/components/danger-zone";
 import { Badge, Card, Detail, EmptyState, PageHeader, SectionTitle, buttonClass } from "@/components/ui";
 
@@ -382,10 +382,52 @@ export default async function PatientPage({
         </Card>
       </section>
 
+        {archived ? null : (
+          // The rare chart actions, quietly together at the end.
+          <div className="flex flex-wrap items-start justify-end gap-1">
+            <div className="pt-1">
+              <StartHousehold patient={patient} others={housemates} back={`/patients/${patient.id}`} />
+            </div>
+            {hasHistory ? (
+              <DangerZone
+                action={archivePatient}
+                fieldName="patientId"
+                fieldValue={patient.id}
+                variant="secondary"
+                summary="Archive this chart"
+                warning={`Takes ${fullName(patient)} out of the working lists. Every note, its history, prescriptions and issued documents are kept, and restoring brings it all back. Upcoming appointments and pending requests have to be dealt with first.`}
+                confirmLabel="Archive chart"
+              >
+                <label className="block">
+                  <span className="mb-1.5 block text-sm font-medium">Reason</span>
+                  <input
+                    name="archiveReason"
+                    required
+                    maxLength={300}
+                    placeholder="Moved away, deceased, duplicate of another chart…"
+                    className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-faint"
+                  />
+                </label>
+              </DangerZone>
+            ) : (
+              // Nothing clinical is attached, so this is the registered-by-mistake
+              // case and deleting destroys nothing but the registration.
+              <DangerZone
+                action={deletePatient}
+                fieldName="patientId"
+                fieldValue={patient.id}
+                summary="Delete this registration"
+                warning={`${fullName(patient)} has no visits, appointments, requests or clinical lists, so deleting removes only the registration. Once anything is recorded, a chart can be archived but not deleted.`}
+                confirmLabel="Delete registration"
+                confirmPhrase={DELETE_PHRASES.registration}
+              />
+            )}
+          </div>
+        )}
         </div>
 
         {/* Standing clinical context, kept beside the timeline rather than above it. */}
-        <aside className="space-y-3">
+        <aside className={`space-y-3 ${CLIPBOARD_COLUMN}`}>
           <PatientClipboard
             number={patient.patientNumber}
             facts={[
@@ -556,48 +598,6 @@ export default async function PatientPage({
         </aside>
       </div>
 
-      {archived ? null : (
-        // The rare chart actions, quietly together at the end.
-        <div className="flex flex-wrap items-start justify-end gap-1 lg:max-w-[calc(66.666%-0.75rem)]">
-          <div className="pt-1">
-            <StartHousehold patient={patient} others={housemates} back={`/patients/${patient.id}`} />
-          </div>
-          {hasHistory ? (
-            <DangerZone
-              action={archivePatient}
-              fieldName="patientId"
-              fieldValue={patient.id}
-              variant="secondary"
-              summary="Archive this chart"
-              warning={`Takes ${fullName(patient)} out of the working lists. Every note, its history, prescriptions and issued documents are kept, and restoring brings it all back. Upcoming appointments and pending requests have to be dealt with first.`}
-              confirmLabel="Archive chart"
-            >
-              <label className="block">
-                <span className="mb-1.5 block text-sm font-medium">Reason</span>
-                <input
-                  name="archiveReason"
-                  required
-                  maxLength={300}
-                  placeholder="Moved away, deceased, duplicate of another chart…"
-                  className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-faint"
-                />
-              </label>
-            </DangerZone>
-          ) : (
-            // Nothing clinical is attached, so this is the registered-by-mistake
-            // case and deleting destroys nothing but the registration.
-            <DangerZone
-              action={deletePatient}
-              fieldName="patientId"
-              fieldValue={patient.id}
-              summary="Delete this registration"
-              warning={`${fullName(patient)} has no visits, appointments, requests or clinical lists, so deleting removes only the registration. Once anything is recorded, a chart can be archived but not deleted.`}
-              confirmLabel="Delete registration"
-              confirmPhrase={DELETE_PHRASES.registration}
-            />
-          )}
-        </div>
-      )}
     </div>
   );
 }

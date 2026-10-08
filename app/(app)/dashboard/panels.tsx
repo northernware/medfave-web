@@ -9,6 +9,9 @@ import { APPOINTMENT_STATUS_LABELS, fullName, SERVICE_LABELS } from "@/lib/domai
 import type { AppointmentListItem } from "@/components/appointment-list";
 import { addDays, minuteOfDay, weekdayOf } from "@/lib/scheduling";
 import { buttonClass, EmptyState } from "@/components/ui";
+import { AlertBanner, AllergyBanner, type AllergyEntry } from "@/components/allergy-banner";
+import { PatientClipboard } from "@/components/patient-clipboard";
+import type { ClinicalListStatus } from "@/lib/enums";
 
 /*
  * The doctor's Today, laid out like the reference design: stat tiles, the
@@ -161,7 +164,17 @@ export function PatientsList({
 }
 
 export type LastVisit = {
-  patient: { id: string; firstName: string; middleName: string | null; lastName: string; sexLabel: string; age: string; patientNumber: string | null };
+  patient: {
+    id: string;
+    firstName: string;
+    middleName: string | null;
+    lastName: string;
+    sexLabel: string;
+    age: string;
+    patientNumber: string | null;
+    bloodType: string;
+    allergyStatus: ClinicalListStatus;
+  };
   record: {
     id: string;
     visitDate: Date;
@@ -173,7 +186,8 @@ export type LastVisit = {
     prescriptions: { drugName: string; dosage: string; frequency: string }[];
     diagnoses: { code: string; title: string }[];
   } | null;
-  allergies: string[];
+  allergies: AllergyEntry[];
+  alerts: { id: string; label: string; notes: string | null }[];
 };
 
 /** The selected patient's most recent visit with this doctor. */
@@ -189,60 +203,66 @@ export function LastVisitDetails({ visit, doctorName }: { visit: LastVisit | nul
   const { patient, record } = visit;
   const row = (label: string, value: React.ReactNode) =>
     value ? (
-      <div className="grid gap-1 sm:grid-cols-[140px_1fr] sm:gap-4">
-        <dt className="text-sm text-ink-muted">{label}</dt>
-        <dd className="text-sm leading-6 font-medium whitespace-pre-line">{value}</dd>
+      <div>
+        <dt className="text-xs text-ink-faint">{label}</dt>
+        <dd className="text-sm leading-6 whitespace-pre-line">{value}</dd>
       </div>
     ) : null;
+  // The patient's clipboard, as on their page and beside a note: who, then
+  // what to watch for, then their last visit with this doctor.
   return (
-    <section className={`${PANEL} p-5`}>
-      <h2 className="font-display text-lg font-semibold">Last visit details</h2>
-      <div className="mt-4 flex flex-wrap items-baseline justify-between gap-2">
-        <div>
-          <Link href={`/patients/${patient.id}`} className="font-display text-lg font-semibold hover:underline">
+    <PatientClipboard
+      name={
+        <>
+          <Link href={`/patients/${patient.id}`} className="hover:underline">
             {fullName(patient)}
           </Link>
-          <p className="text-sm text-ink-muted">
-            {patient.sexLabel}, {patient.age}
-          </p>
-        </div>
-        {patient.patientNumber ? <span className="tabular text-sm text-ink-faint">{patient.patientNumber}</span> : null}
-      </div>
-      {/* The colour rule: allergies in the red box, as on every other page. */}
-      {visit.allergies.length > 0 ? (
-        <p className="mt-3 rounded-md bg-alert-danger px-3 py-2 text-sm text-on-alert">
-          <span className="font-semibold">Allergies</span> · {visit.allergies.join(", ")}
-        </p>
-      ) : null}
-      {record ? (
-        <>
-          <p className="mt-3 font-medium">{record.chiefComplaint}</p>
-          <dl className="mt-5 space-y-4">
-            {row("Last checked", `${doctorName} on ${formatCalendarDate(record.visitDate)}`)}
-            {row(
-              "Diagnoses",
-              record.diagnoses.length > 0 ? record.diagnoses.map((d) => `${d.code} ${d.title}`).join("\n") : null,
-            )}
-            {/* Older notes only: these fields are no longer written. */}
-            {row("Assessment", record.assessment)}
-            {row("Plan", record.treatmentPlan)}
-            {row(
-              "Prescription",
-              record.prescriptions.length > 0
-                ? record.prescriptions.map((p) => `${p.drugName} ${p.dosage} — ${p.frequency}`).join("\n")
-                : null,
-            )}
-            {row("Follow-up", record.followUpDate ? formatCalendarDate(record.followUpDate) : null)}
-            {row("Advice and notes", record.notes)}
-          </dl>
-          <Link href={`/records/${record.id}`} className={`${buttonClass("secondary")} mt-5`}>
-            Open the note
-          </Link>
+          <span className="font-normal text-ink-muted">
+            {" · "}
+            {patient.sexLabel} · {patient.age}
+          </span>
         </>
-      ) : (
-        <p className="mt-5 text-sm text-ink-muted">No visit notes with you yet.</p>
-      )}
-    </section>
+      }
+      number={patient.patientNumber}
+      facts={[{ label: "Blood type", value: patient.bloodType }]}
+      contacts={[]}
+    >
+      <AllergyBanner status={patient.allergyStatus} allergies={visit.allergies} />
+      <AlertBanner alerts={visit.alerts} />
+      <section className="text-sm">
+        <h2 className="mb-1.5 font-display text-sm font-semibold">
+          {record ? `Last visit · ${formatCalendarDate(record.visitDate)}` : "Last visit"}
+        </h2>
+        {record ? (
+          <>
+            <p className="font-medium">{record.chiefComplaint}</p>
+            <dl className="mt-3 space-y-3">
+              {row(
+                "Diagnoses",
+                record.diagnoses.length > 0 ? record.diagnoses.map((d) => `${d.code} ${d.title}`).join("\n") : null,
+              )}
+              {/* Older notes only: these fields are no longer written. */}
+              {row("Assessment", record.assessment)}
+              {row("Plan", record.treatmentPlan)}
+              {row(
+                "Prescription",
+                record.prescriptions.length > 0
+                  ? record.prescriptions.map((p) => `${p.drugName} ${p.dosage} — ${p.frequency}`).join("\n")
+                  : null,
+              )}
+              {row("Follow-up", record.followUpDate ? formatCalendarDate(record.followUpDate) : null)}
+              {row("Advice and notes", record.notes)}
+              {row("Seen by", doctorName)}
+            </dl>
+            <Link href={`/records/${record.id}`} className={`${buttonClass("secondary")} mt-4`}>
+              Open the note
+            </Link>
+          </>
+        ) : (
+          <p className="text-ink-muted">No visit notes with you yet.</p>
+        )}
+      </section>
+    </PatientClipboard>
   );
 }
 

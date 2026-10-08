@@ -15,8 +15,11 @@ export function VisitMoves({
   appointmentId,
   status,
   moves,
+  start,
   children,
 }: {
+  /** The doctor's Start: begins the consultation and opens its note (as on Today). */
+  start?: (formData: FormData) => Promise<void>;
   appointmentId: string;
   status: AppointmentStatus;
   moves: AppointmentStatus[];
@@ -26,7 +29,7 @@ export function VisitMoves({
   return (
     <div className="flex w-full flex-wrap items-center gap-2">
       {steps.map((next, i) => (
-        <form key={next} action={setAppointmentStatus}>
+        <form key={next} action={next === "IN_CONSULTATION" && start ? start : setAppointmentStatus}>
           <input type="hidden" name="appointmentId" value={appointmentId} />
           <input type="hidden" name="status" value={next} />
           <button className={buttonClass(i === 0 ? "primary" : "secondary")}>{statusActionLabel(status, next)}</button>

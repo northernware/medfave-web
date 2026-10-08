@@ -25,6 +25,7 @@ import {
 } from "@/lib/domain";
 import { movesFor } from "@/lib/booking";
 import { NoteContext } from "@/components/note-context";
+import { CLIPBOARD_COLUMN } from "@/components/patient-clipboard";
 import { DELETE_PHRASES } from "@/lib/confirm-phrase";
 import { DangerZone } from "@/components/danger-zone";
 import { Badge, buttonClass, Card, CardHeader, Detail, PageHeader, Prose } from "@/components/ui";
@@ -333,7 +334,7 @@ export default async function AppointmentPage({
             confirmPhrase={DELETE_PHRASES.appointment}
           />
         </div>
-        <div className="space-y-3">
+        <div className={`space-y-3 ${CLIPBOARD_COLUMN}`}>
           {/* What to know before the visit: the patient's clipboard, as beside a note. */}
           <NoteContext doctor={doctor} patientId={patient.id} />
           <Card>

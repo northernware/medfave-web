@@ -1,6 +1,15 @@
 import type { ReactNode } from "react";
 
 /**
+ * The column a clipboard sits in, on wide screens: its top level with the
+ * sidebar and the schedule panel (lifted over the back link's line above the
+ * page), then staying in view as the page scrolls, scrolling within itself if
+ * it's taller than the window.
+ */
+export const CLIPBOARD_COLUMN =
+  "lg:sticky lg:top-3 lg:-mt-[35px] lg:max-h-[calc(100dvh-1.5rem)] lg:self-start lg:overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
+
+/**
  * The patient on a clipboard. The top is who they are (number, birth, sex,
  * blood type in large type, then how to reach them); clipped below it, a
  * sheet with what to know before treating them: allergies, alerts, medicines,
@@ -26,7 +35,7 @@ export function PatientClipboard({
 }) {
   const shown = contacts.filter((c) => c.value);
   return (
-    <section aria-label="Patient details" className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface-muted">
+    <section aria-label="Patient details" className="flex flex-col overflow-hidden rounded-xl border border-border bg-surface-muted">
       <div className="px-5 pt-4 pb-6">
         {name ? <p className="mb-1 truncate text-sm font-semibold">{name}</p> : null}
         {number ? <p className="nums text-xs font-semibold tracking-wide text-accent-ink">{number}</p> : null}
@@ -53,7 +62,7 @@ export function PatientClipboard({
         ) : null}
       </div>
 
-      <div className="relative flex-1 rounded-t-2xl bg-surface px-5 pt-5 pb-4">
+      <div className="relative flex-1 rounded-t-xl bg-surface px-5 pt-5 pb-4">
           {/* The clip: a tab rising from the sheet's edge, curved into it at both shoulders. */}
           <span aria-hidden className="absolute -top-3 left-1/2 h-3.5 w-20 -translate-x-1/2 rounded-t-lg bg-surface">
             <span className="absolute top-1.5 left-1/2 h-1 w-7 -translate-x-1/2 rounded-full bg-border-strong" />

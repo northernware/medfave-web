@@ -7,7 +7,7 @@ import { AlertBanner, AllergyBanner } from "@/components/allergy-banner";
 import { AddDisclosure } from "@/components/add-disclosure";
 import { ChartForm } from "@/components/chart-form";
 import { buttonClass } from "@/components/ui";
-import { PatientClipboard } from "@/components/patient-clipboard";
+import { CLIPBOARD_COLUMN, PatientClipboard } from "@/components/patient-clipboard";
 import { ageFrom, BLOOD_TYPE_LABELS, fullName, SEX_LABELS } from "@/lib/domain";
 
 /**
@@ -254,7 +254,7 @@ export function NoteLayout({ header, form, context }: { header?: ReactNode; form
       {header ? <div className="min-w-0 space-y-3 lg:col-start-1 lg:row-start-1">{header}</div> : null}
       <aside
         aria-label="About this patient"
-        className={`lg:sticky lg:top-4 lg:col-start-2 lg:row-start-1 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${header ? "lg:row-span-2" : ""}`}
+        className={`lg:col-start-2 lg:row-start-1 ${CLIPBOARD_COLUMN} ${header ? "lg:row-span-2" : ""}`}
       >
         {context}
       </aside>

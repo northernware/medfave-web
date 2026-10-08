@@ -115,13 +115,13 @@ export function RailSkeleton({ weekStrip = true }: { weekStrip?: boolean }) {
 export function ClipboardSkeleton({ boxes = 3 }: { boxes?: number }) {
   return (
     // Stretched (Today), the sheet fills the card, as on the real one.
-    <div className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface-muted">
+    <div className="flex flex-col overflow-hidden rounded-xl border border-border bg-surface-muted">
       <div className="space-y-2.5 px-5 pt-4 pb-6">
         <div className={`${pulse} h-4 w-44 bg-surface`} />
         <div className={`${pulse} h-3 w-28 bg-surface`} />
         <div className={`${pulse} mt-3 h-6 w-16 bg-surface`} />
       </div>
-      <div className="relative flex-1 space-y-3 rounded-t-2xl bg-surface px-5 pt-5 pb-4">
+      <div className="relative flex-1 space-y-3 rounded-t-xl bg-surface px-5 pt-5 pb-4">
         <span aria-hidden className="absolute -top-3 left-1/2 h-3.5 w-20 -translate-x-1/2 rounded-t-lg bg-surface" />
         {Array.from({ length: boxes }, (_, i) => (
           <div key={i} className={`${pulse} h-16 w-full`} />

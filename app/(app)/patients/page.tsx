@@ -3,9 +3,9 @@ import Link from "next/link";
 import { requireDoctor } from "@/lib/auth";
 import { caredForIds, idsOrNone } from "@/lib/care";
 import { orm } from "@/src/prisma/db";
-import { calendarDateFromDb } from "@/lib/datetime";
+import { calendarDateFromDb, formatDate, instantFromDb } from "@/lib/datetime";
 import { or } from "@prisma/orm-postgres/orm-client";
-import { ageFrom, fullName, RELATIONSHIP_LABELS, SEX_LABELS } from "@/lib/domain";
+import { ACTIVE_STATUSES, ageFrom, fullName, RELATIONSHIP_LABELS, SEX_LABELS } from "@/lib/domain";
 import { Badge, buttonClass, Card, EmptyState, PageHeader } from "@/components/ui";
 import { SearchForm } from "@/components/search-form";
 
@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: "Patients" };
 
 export default async function PatientsPage({ searchParams }: PageProps<"/patients">) {
   const doctor = await requireDoctor();
-  const { q, view, who } = await searchParams;
+  const { q, view, who, sort } = await searchParams;
   // "Mine" are the patients this doctor cares for; "everyone" is the whole
   // clinic, whose details every doctor there may see (lib/care.ts).
   const everyone = who === "all";
@@ -56,7 +56,45 @@ export default async function PatientsPage({ searchParams }: PageProps<"/patient
     );
   }
 
-  const patients = await patientQuery.all();
+  const listed = await patientQuery.all();
+
+  // Last seen and next visit with this doctor, from their visits: what answers
+  // "who haven't I seen in a while" and "who's coming".
+  const now = new Date();
+  const visits = await orm.Appointment
+    .select("patientId", "scheduledAt", "status")
+    .where((a) => a.doctorId.eq(doctor.id))
+    .where((a) => a.patientId.in(idsOrNone(listed.map((p) => p.id))))
+    .where((a) => a.status.in(["COMPLETED", ...ACTIVE_STATUSES]))
+    .all();
+  const lastSeen = new Map<string, Date>();
+  const nextVisit = new Map<string, Date>();
+  for (const v of visits) {
+    const at = instantFromDb(v.scheduledAt);
+    if (v.status === "COMPLETED") {
+      if (!lastSeen.has(v.patientId) || at > lastSeen.get(v.patientId)!) lastSeen.set(v.patientId, at);
+    } else if (at >= now && (!nextVisit.has(v.patientId) || at < nextVisit.get(v.patientId)!)) {
+      nextVisit.set(v.patientId, at);
+    }
+  }
+  const order = sort === "last" || sort === "next" ? sort : "name";
+  const patients =
+    order === "name"
+      ? listed
+      : [...listed].sort((a, b) => {
+          // Last seen: longest ago first, never seen at the top. Next visit: soonest first, none last.
+          if (order === "last") return (lastSeen.get(a.id)?.getTime() ?? 0) - (lastSeen.get(b.id)?.getTime() ?? 0);
+          return (nextVisit.get(a.id)?.getTime() ?? Infinity) - (nextVisit.get(b.id)?.getTime() ?? Infinity);
+        });
+  const sortHref = (to: string) => {
+    const keep = new URLSearchParams();
+    if (query) keep.set("q", query);
+    if (everyone) keep.set("who", "all");
+    if (archived) keep.set("view", "archived");
+    if (to !== "name") keep.set("sort", to);
+    const qs = keep.toString();
+    return `/patients${qs ? `?${qs}` : ""}`;
+  };
 
   const [{ householdCount }, { archivedCount }] = await Promise.all([
     orm.Household
@@ -128,6 +166,26 @@ export default async function PatientsPage({ searchParams }: PageProps<"/patient
         ) : null}
       </div>
 
+      {patients.length > 1 ? (
+        <div className="flex items-center gap-1 text-sm" role="group" aria-label="Sort">
+          <span className="mr-1 text-ink-faint">Sort by</span>
+          {[
+            ["name", "Name"],
+            ["last", "Last seen"],
+            ["next", "Next visit"],
+          ].map(([key, label]) => (
+            <Link
+              key={key}
+              href={sortHref(key)}
+              aria-current={order === key ? "true" : undefined}
+              className={`rounded-full px-3 py-1 ${order === key ? "bg-accent-tint font-semibold text-accent-ink" : "text-ink-muted hover:text-ink"}`}
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
+      ) : null}
+
       <Card>
         {patients.length === 0 ? (
           <EmptyState
@@ -178,8 +236,12 @@ export default async function PatientsPage({ searchParams }: PageProps<"/patient
                       {patient.archivedAt && patient.archiveReason ? ` · ${patient.archiveReason}` : ""}
                     </span>
                   </span>
-                  <span className="tabular shrink-0 text-xs text-ink-muted">
+                  <span className="tabular shrink-0 text-right text-xs text-ink-muted">
                     {SEX_LABELS[patient.sex]} · {ageFrom(calendarDateFromDb(patient.dateOfBirth))}
+                    <span className="mt-0.5 block text-ink-faint">
+                      {lastSeen.has(patient.id) ? `Seen ${formatDate(lastSeen.get(patient.id)!)}` : "Not seen yet"}
+                      {nextVisit.has(patient.id) ? ` · Next ${formatDate(nextVisit.get(patient.id)!)}` : ""}
+                    </span>
                   </span>
                 </Link>
               </li>

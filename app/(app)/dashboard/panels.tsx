@@ -329,7 +329,10 @@ export function ScheduleRail({
   openingHours,
   showHousehold = false,
   members,
+  weekStrip = true,
 }: {
+  /** The month and week strip at the top; off where the page has its own day picker (Calendar). */
+  weekStrip?: boolean;
   /** Name each visit's household (the households list, where many families share the day). */
   showHousehold?: boolean;
   /** One household's members, each with a mark (its own page); a legend shows above the day. */
@@ -406,6 +409,7 @@ export function ScheduleRail({
 
   return (
     <section className={`${PANEL} flex h-full flex-col overflow-hidden`}>
+      {weekStrip ? (
       <div className="shrink-0 border-b border-border p-5">
         <div className="flex items-center justify-between gap-2">
           <h2 className="font-display text-lg font-semibold">{monthLabel}</h2>
@@ -439,6 +443,7 @@ export function ScheduleRail({
           })}
         </div>
       </div>
+      ) : null}
 
       <div className="flex shrink-0 items-center justify-between px-5 pt-5 pb-3">
           <h3 className="font-semibold">

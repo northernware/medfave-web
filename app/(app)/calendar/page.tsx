@@ -230,6 +230,8 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
             now={now}
             keep=""
             hrefFor={(key) => `/calendar?month=${key.slice(0, 7)}&day=${key}`}
+            // The month grid beside it is the day picker here.
+            weekStrip={false}
           />
         </div>
       </div>

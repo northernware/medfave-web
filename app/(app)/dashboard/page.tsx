@@ -370,7 +370,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
               </Card>
           ) : null}
 
-          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,24rem)]">
             <PatientsList
               upcoming={upcoming}
               moreFor={Object.fromEntries(moreFor)}

@@ -6,13 +6,14 @@ import { giveCareAccess, issuePatientActivation, revokeCareLink, revokePatientAc
 import { isAdult as isAdultDob } from "@/lib/households";
 import { StartHousehold } from "@/components/start-household";
 import { requireStaff } from "@/lib/auth";
+import { PatientClipboard } from "@/components/patient-clipboard";
 import { orm } from "@/src/prisma/db";
 import { calendarDateFromDb, formatCalendarDate, formatDateTime, instantFromDb } from "@/lib/datetime";
 import { ageFrom, fullName, RELATIONSHIP_LABELS, REMINDER_LABELS, SEX_LABELS } from "@/lib/domain";
 import { AppointmentList } from "@/components/appointment-list";
 import { ShareCode } from "@/components/share-code";
 import { activationLink, qrSvg } from "@/lib/activation-link";
-import { Badge, buttonClass, Card, CardHeader, Detail, SectionTitle } from "@/components/ui";
+import { Badge, buttonClass, Card, CardHeader, SectionTitle } from "@/components/ui";
 import { TextInput } from "@/components/form";
 
 export const metadata: Metadata = { title: "Patient" };
@@ -207,65 +208,67 @@ export default async function DeskPatientPage({
   return (
     <div className="space-y-3">
       <CrumbName id={patient.id} name={fullName(patient)} />
-      <header className="flex flex-wrap items-center gap-4">
-        <span
-          aria-hidden="true"
-          className="grid size-14 shrink-0 place-items-center rounded-full bg-accent-soft font-display text-lg font-semibold text-accent-ink"
-        >
-          {`${patient.firstName[0] ?? ""}${patient.lastName[0] ?? ""}`.toUpperCase()}
-        </span>
-        <div className="min-w-0 flex-1">
-          <h1 className="font-display text-[26px] leading-8 font-semibold tracking-[-0.015em] sm:text-[30px] sm:leading-9">
-            {fullName(patient)}
-          </h1>
-          <p className="mt-0.5 text-sm text-ink-muted">
-            {SEX_LABELS[patient.sex]} · {ageFrom(calendarDateFromDb(patient.dateOfBirth))} · {patient.household.name}{" "}
-            household
-            {patient.patientNumber ? <span className="tabular"> · {patient.patientNumber}</span> : null}
-          </p>
-        </div>
-        {patient.archivedAt ? null : (
-          <div className="flex w-full gap-2 sm:w-auto">
-            <Link
-              href={`/desk/appointments/new?patientId=${patient.id}`}
-              className={buttonClass("primary", "flex-1 sm:flex-none")}
-            >
-              Book a visit
-            </Link>
-            <Link
-              href={`/desk/patients/${patient.id}/edit`}
-              className={buttonClass("secondary", "flex-1 sm:flex-none")}
-            >
-              Edit details
-            </Link>
-          </div>
-        )}
-      </header>
-
-      {patient.archivedAt ? (
-        <div className="rounded-lg border border-border bg-surface-muted px-4 py-3 text-sm">
-          <p className="font-medium">This chart is archived.</p>
-          <p className="mt-0.5 text-ink-muted">
-            It cannot be booked or edited until the clinician restores it.
-          </p>
-        </div>
-      ) : null}
-
-      {/* Handed over in person, once. This is the only way a login ever reaches
-          a chart, so it is issued to somebody the desk has identified. */}
-      {code && typeof code === "string" ? (
-        <ActivationHandover
-          code={code}
-          pin={typeof pin === "string" && /^\d{6}$/.test(pin) ? pin : undefined}
-          patientName={fullName(patient)}
-          clinicName={staff.clinicName}
-          mail={typeof mail === "string" ? mail : undefined}
-          caregiver={forWho === "caregiver" ? (typeof to === "string" ? to : "") : undefined}
-        />
-      ) : null}
-
+      {/* The header heads the left column, so the clipboard starts level with the name. */}
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
         <section className="min-w-0">
+          <div className="mb-3 space-y-3">
+          <header className="flex flex-wrap items-center gap-4">
+            <span
+              aria-hidden="true"
+              className="grid size-14 shrink-0 place-items-center rounded-full bg-accent-soft font-display text-lg font-semibold text-accent-ink"
+            >
+              {`${patient.firstName[0] ?? ""}${patient.lastName[0] ?? ""}`.toUpperCase()}
+            </span>
+            <div className="min-w-0 flex-1">
+              <h1 className="font-display text-[26px] leading-8 font-semibold tracking-[-0.015em] sm:text-[30px] sm:leading-9">
+                {fullName(patient)}
+              </h1>
+              <p className="mt-0.5 text-sm text-ink-muted">
+                {SEX_LABELS[patient.sex]} · {ageFrom(calendarDateFromDb(patient.dateOfBirth))} · {patient.household.name}{" "}
+                household
+                {patient.patientNumber ? <span className="tabular"> · {patient.patientNumber}</span> : null}
+              </p>
+            </div>
+            {patient.archivedAt ? null : (
+              <div className="flex w-full gap-2 sm:w-auto">
+                <Link
+                  href={`/desk/appointments/new?patientId=${patient.id}`}
+                  className={buttonClass("primary", "flex-1 sm:flex-none")}
+                >
+                  Book a visit
+                </Link>
+                <Link
+                  href={`/desk/patients/${patient.id}/edit`}
+                  className={buttonClass("secondary", "flex-1 sm:flex-none")}
+                >
+                  Edit details
+                </Link>
+              </div>
+            )}
+          </header>
+
+          {patient.archivedAt ? (
+            <div className="rounded-lg border border-border bg-surface-muted px-4 py-3 text-sm">
+              <p className="font-medium">This chart is archived.</p>
+              <p className="mt-0.5 text-ink-muted">
+                It cannot be booked or edited until the clinician restores it.
+              </p>
+            </div>
+          ) : null}
+
+          {/* Handed over in person, once. This is the only way a login ever reaches
+              a chart, so it is issued to somebody the desk has identified. */}
+          {code && typeof code === "string" ? (
+            <ActivationHandover
+              code={code}
+              pin={typeof pin === "string" && /^\d{6}$/.test(pin) ? pin : undefined}
+              patientName={fullName(patient)}
+              clinicName={staff.clinicName}
+              mail={typeof mail === "string" ? mail : undefined}
+              caregiver={forWho === "caregiver" ? (typeof to === "string" ? to : "") : undefined}
+            />
+          ) : null}
+          </div>
           <SectionTitle title="Visits" />
           <Card className="overflow-hidden">
             <AppointmentList
@@ -278,6 +281,54 @@ export default async function DeskPatientPage({
         </section>
 
         <div className="space-y-3">
+        {/* Who they are and how to reach them, on the clipboard the doctor's pages
+            use. Nothing clinical: the desk's sheet is contacts only. */}
+        <PatientClipboard
+          number={patient.patientNumber}
+          facts={[
+            {
+              label: "Born",
+              value: (
+                <>
+                  {formatCalendarDate(calendarDateFromDb(patient.dateOfBirth))}
+                  <span className="block text-xs font-normal text-ink-muted">{ageFrom(calendarDateFromDb(patient.dateOfBirth))}</span>
+                </>
+              ),
+            },
+            { label: "Sex", value: SEX_LABELS[patient.sex] },
+          ]}
+          contacts={[]}
+        >
+          <dl className="space-y-3">
+            {[
+              { label: "Mobile", value: patient.contactNumber },
+              { label: "Email", value: patient.email },
+              { label: "Reminders", value: REMINDER_LABELS[patient.reminderPreference] },
+              { label: "Household address", value: patient.household.address },
+              { label: "Household number", value: patient.household.contactNumber },
+              {
+                label: "Primary contact",
+                value: patient.emergencyContactName,
+                detail: [patient.emergencyContactRelationship, patient.emergencyContactNumber].filter(Boolean).join(" · "),
+              },
+              {
+                label: "Secondary contact",
+                value: patient.emergencyContact2Name,
+                detail: [patient.emergencyContact2Relationship, patient.emergencyContact2Number].filter(Boolean).join(" · "),
+              },
+            ]
+              .filter((c) => c.value)
+              .map((c) => (
+                <div key={c.label} className="min-w-0">
+                  <dt className="text-xs text-ink-faint">{c.label}</dt>
+                  <dd className="text-sm leading-6">
+                    {c.value}
+                    {"detail" in c && c.detail ? <span className="block text-xs text-ink-faint">{c.detail}</span> : null}
+                  </dd>
+                </div>
+              ))}
+          </dl>
+        </PatientClipboard>
         <Card>
           <CardHeader title="Medfave account" subtitle="Lets them see their visits and ask for times." />
           <div className="flex flex-wrap items-center gap-3 px-5 py-4">
@@ -401,38 +452,6 @@ export default async function DeskPatientPage({
           </div>
         </Card>
 
-        <Card>
-          <CardHeader title="Contact details" />
-          <dl className="grid gap-4 px-5 py-4 sm:grid-cols-2 lg:grid-cols-1">
-            <Detail label="Date of birth" value={formatCalendarDate(calendarDateFromDb(patient.dateOfBirth))} />
-            <Detail label="Relationship" value={RELATIONSHIP_LABELS[patient.relationship]} />
-            <Detail label="Mobile" value={patient.contactNumber} />
-            <Detail label="Email" value={patient.email} />
-            {/* The patient's own standing choice, set from their portal. New
-                bookings take it as their default. */}
-            <Detail label="Reminders" value={REMINDER_LABELS[patient.reminderPreference]} />
-            <Detail label="Household address" value={patient.household.address} />
-            <Detail label="Household number" value={patient.household.contactNumber} />
-            <Detail label="Primary contact" value={patient.emergencyContactName} />
-            <Detail
-              label="Primary contact number"
-              value={
-                patient.emergencyContactNumber
-                  ? `${patient.emergencyContactNumber}${patient.emergencyContactRelationship ? ` (${patient.emergencyContactRelationship})` : ""}`
-                  : null
-              }
-            />
-            <Detail label="Secondary contact" value={patient.emergencyContact2Name} />
-            <Detail
-              label="Secondary contact number"
-              value={
-                patient.emergencyContact2Number
-                  ? `${patient.emergencyContact2Number}${patient.emergencyContact2Relationship ? ` (${patient.emergencyContact2Relationship})` : ""}`
-                  : null
-              }
-            />
-          </dl>
-        </Card>
 
         </div>
       </div>

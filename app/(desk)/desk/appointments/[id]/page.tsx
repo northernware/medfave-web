@@ -113,22 +113,19 @@ export default async function DeskAppointmentPage({
             <CardHeader title="The visit" />
             <dl className="grid gap-4 px-5 py-4 sm:grid-cols-2">
               <Detail label="Service" value={SERVICE_LABELS[appointment.service]} />
-              <Detail label="Reason" value={appointment.reason} />
+              {appointment.reason ? <Detail label="Reason" value={appointment.reason} /> : null}
               <Detail label="Type" value={APPOINTMENT_TYPE_LABELS[appointment.visitType]} />
               <Detail label="Priority" value={VISIT_PRIORITY_LABELS[appointment.priority]} />
-              <Detail label="Room" value={appointment.room} />
+              {/* Only what's known: no rows of dashes. */}
+              {appointment.room ? <Detail label="Room" value={appointment.room} /> : null}
               <Detail label="Booked as" value={BOOKING_SOURCE_LABELS[appointment.source]} />
               {/* The desk books, so the desk is who needs to know whether anything
                   goes out the day before. */}
               <Detail label="Reminder" value={REMINDER_LABELS[appointment.reminderPreference]} />
-              <Detail
-                label="Arrived"
-                value={appointment.arrivedAt ? formatTime(instantFromDb(appointment.arrivedAt)) : null}
-              />
-              <Detail
-                label="Contact"
-                value={patient.contactNumber ?? patient.household.contactNumber}
-              />
+              {appointment.arrivedAt ? <Detail label="Arrived" value={formatTime(instantFromDb(appointment.arrivedAt))} /> : null}
+              {patient.contactNumber ?? patient.household.contactNumber ? (
+                <Detail label="Contact" value={patient.contactNumber ?? patient.household.contactNumber} />
+              ) : null}
             </dl>
             {/* Scheduling notes are for the desk; internal notes are not shown
                 here, and neither is anything clinical. */}

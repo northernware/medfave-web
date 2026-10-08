@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { CrumbName } from "@/components/crumb-names";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { deleteAppointment, setAppointmentStatus } from "@/app/actions/appointments";
+import { deleteAppointment, setAppointmentStatus, startConsultation } from "@/app/actions/appointments";
 import { requireDoctor } from "@/lib/auth";
 import { visitHistory } from "@/lib/visit-history";
 import { VisitHistory } from "@/components/visit-history";
@@ -299,7 +299,7 @@ export default async function AppointmentPage({
 
             <div className="mt-5 flex flex-wrap gap-2 border-t border-border pt-4">
               {/* Only the moves that exist from here; the expected one leads, Cancel sits apart. */}
-              <VisitMoves appointmentId={appointment.id} status={appointment.status} moves={movesFor(appointment)}>
+              <VisitMoves appointmentId={appointment.id} status={appointment.status} moves={movesFor(appointment)} start={startConsultation}>
                 <Link href={`/appointments/${appointment.id}/edit`} className={buttonClass("ghost")}>
                   Reschedule
                 </Link>

@@ -38,9 +38,10 @@ function brief(value: string, max = 110) {
   return value.length > max ? `${value.slice(0, max).trimEnd()}…` : value;
 }
 
-export default async function RecordPage({ params }: PageProps<"/records/[id]">) {
+export default async function RecordPage({ params, searchParams }: PageProps<"/records/[id]">) {
   const doctor = await requireDoctor();
   const { id } = await params;
+  const { signed } = await searchParams;
 
   const record = await orm.MedicalRecord
     .include("patient", (p) =>
@@ -161,6 +162,23 @@ export default async function RecordPage({ params }: PageProps<"/records/[id]">)
             It is out of the patient&rsquo;s chart but nothing has been destroyed — restore it to
             put it back.
           </p>
+        </div>
+      ) : null}
+
+      {/* Just signed, with a follow-up asked for and not booked: the next step,
+          while the patient is still in the room. */}
+      {signed && mine && record.followUpDate && needsAction(followUp.state) ? (
+        <div className="flex flex-wrap items-center gap-3 rounded-lg border border-accent/40 bg-accent-soft px-4 py-3 text-sm">
+          <p className="min-w-0 flex-1">
+            <span className="font-semibold">Signed.</span> You asked to see them again on{" "}
+            {formatCalendarDate(calendarDateFromDb(record.followUpDate))}.
+          </p>
+          <Link
+            href={`/appointments/new?patientId=${patient.id}&service=FOLLOW_UP_CHECKUP&date=${toDateInputValue(calendarDateFromDb(record.followUpDate))}&followUpFor=${record.id}`}
+            className={buttonClass("primary")}
+          >
+            Book the follow-up
+          </Link>
         </div>
       ) : null}
 

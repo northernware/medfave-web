@@ -300,6 +300,15 @@ export default async function AppointmentPage({
             <div className="mt-5 flex flex-wrap gap-2 border-t border-border pt-4">
               {/* Only the moves that exist from here; the expected one leads, Cancel sits apart. */}
               <VisitMoves appointmentId={appointment.id} status={appointment.status} moves={movesFor(appointment)} start={startConsultation}>
+                {/* "See you in two weeks": a new visit for the same patient and service. */}
+                {appointment.status === "COMPLETED" || appointment.status === "NO_SHOW" || appointment.status === "CANCELLED" ? (
+                  <Link
+                    href={`/appointments/new?patientId=${patient.id}&service=${appointment.service}&after=${appointment.id}`}
+                    className={buttonClass(movesFor(appointment).length === 0 ? "primary" : "secondary")}
+                  >
+                    Book again
+                  </Link>
+                ) : null}
                 <Link href={`/appointments/${appointment.id}/edit`} className={buttonClass("ghost")}>
                   Reschedule
                 </Link>

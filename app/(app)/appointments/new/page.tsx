@@ -37,7 +37,7 @@ function usableDate(
 
 export default async function NewAppointmentPage({ searchParams }: PageProps<"/appointments/new">) {
   const doctor = await requireDoctor();
-  const { patientId, date, service, followUpFor, source } = await searchParams;
+  const { patientId, date, service, followUpFor, source, after } = await searchParams;
   const { patients, busyByDay, followUps, schedule, window, walkInWindow, now } = await bookingFormData(doctor.id);
 
   if (patients.length === 0) {
@@ -98,7 +98,8 @@ export default async function NewAppointmentPage({ searchParams }: PageProps<"/a
             source:
               source === "WALK_IN" ? BookingSource.WALK_IN : BookingSource.STAFF,
             reminderPreference: ReminderPreference.NONE,
-            previousAppointmentId: "",
+            // "Book again" from a visit links the new one to it ("Follows on from").
+            previousAppointmentId: typeof after === "string" ? after : "",
             room: "",
             notes: "",
             internalNotes: "",

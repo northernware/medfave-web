@@ -609,8 +609,9 @@ export async function changeAppointmentStatus(
 
 /** What may be done with a visit now: `movesFrom`, with its day and whether its time is still to come. */
 export function movesFor(a: { status: AppointmentStatus; scheduledAt: string }, now = new Date()) {
-  const stillDue = instantFromDb(a.scheduledAt).getTime() + NO_SHOW_GRACE_MINUTES * 60_000 > now.getTime();
-  return movesFrom(a.status, isClinicToday(a.scheduledAt, now), stillDue);
+  const at = instantFromDb(a.scheduledAt).getTime();
+  const stillDue = at + NO_SHOW_GRACE_MINUTES * 60_000 > now.getTime();
+  return movesFrom(a.status, isClinicToday(a.scheduledAt, now), stillDue, at <= now.getTime());
 }
 
 /** Whether a stored visit time falls on today, by the clinic's clock. */

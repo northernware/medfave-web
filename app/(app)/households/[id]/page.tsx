@@ -220,7 +220,7 @@ export default async function HouseholdPage({
                     <span className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                       <span className="truncate font-medium">{fullName(patient)}</span>
                       {!mine.has(patient.id) ? null : patient.allergies.length > 0 ? (
-                        <Badge tone={patient.allergies.some((a) => a.severity === "SEVERE") ? "danger" : "warn"}>
+                        <Badge tone="danger">
                           {patient.allergies.length} {patient.allergies.length === 1 ? "allergy" : "allergies"}
                         </Badge>
                       ) : patient.allergyStatus === "UNKNOWN" ? (

@@ -86,8 +86,8 @@ export function PatientsList({
   return (
     <section className={`${PANEL} flex flex-col p-5`}>
       <div className="mb-4 flex items-baseline justify-between gap-2">
-        <h2 className="font-display text-lg font-semibold">Patients list</h2>
-        <span className="text-xs text-ink-faint">By next visit</span>
+        <h2 className="font-display text-lg font-semibold">Upcoming visits</h2>
+        <span className="text-xs text-ink-faint">Soonest first</span>
       </div>
       {upcoming.length === 0 && recent.length === 0 ? (
         <EmptyState title="Nobody yet" description="Upcoming visits appear here." />
@@ -171,6 +171,7 @@ export type LastVisit = {
     notes: string | null;
     followUpDate: Date | null;
     prescriptions: { drugName: string; dosage: string; frequency: string }[];
+    diagnoses: { code: string; title: string }[];
   } | null;
   allergies: string[];
 };
@@ -207,31 +208,22 @@ export function LastVisitDetails({ visit, doctorName }: { visit: LastVisit | nul
         </div>
         {patient.patientNumber ? <span className="tabular text-sm text-ink-faint">{patient.patientNumber}</span> : null}
       </div>
+      {/* The colour rule: allergies in the red box, as on every other page. */}
       {visit.allergies.length > 0 ? (
-        <div className="mt-3 flex flex-wrap gap-1.5">
-          {visit.allergies.map((a) => (
-            <span key={a} className="rounded-full bg-danger-tint px-2.5 py-1 text-xs font-semibold text-danger-ink">
-              Allergy: {a}
-            </span>
-          ))}
-        </div>
+        <p className="mt-3 rounded-md bg-alert-danger px-3 py-2 text-sm text-on-alert">
+          <span className="font-semibold">Allergies</span> · {visit.allergies.join(", ")}
+        </p>
       ) : null}
       {record ? (
         <>
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            {record.chiefComplaint
-              .split(/,|;| and /)
-              .map((s) => s.trim())
-              .filter(Boolean)
-              .slice(0, 4)
-              .map((c) => (
-                <span key={c} className="rounded-full bg-surface-muted px-2.5 py-1 text-xs font-medium">
-                  {c}
-                </span>
-              ))}
-          </div>
+          <p className="mt-3 font-medium">{record.chiefComplaint}</p>
           <dl className="mt-5 space-y-4">
             {row("Last checked", `${doctorName} on ${formatCalendarDate(record.visitDate)}`)}
+            {row(
+              "Diagnoses",
+              record.diagnoses.length > 0 ? record.diagnoses.map((d) => `${d.code} ${d.title}`).join("\n") : null,
+            )}
+            {/* Older notes only: these fields are no longer written. */}
             {row("Assessment", record.assessment)}
             {row("Plan", record.treatmentPlan)}
             {row(

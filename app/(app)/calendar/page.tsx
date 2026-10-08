@@ -197,7 +197,10 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
                             <span className="tabular shrink-0 font-medium">
                               {formatTimeCompact(a.scheduledAt)}
                             </span>
-                            <span className="truncate text-ink-muted">{a.patient.lastName}</span>
+                            {/* The person, not the family: a household's members share a surname. */}
+                            <span title={`${a.patient.firstName} ${a.patient.lastName}`} className="truncate text-ink-muted">
+                              {a.patient.firstName} {a.patient.lastName.charAt(0)}.
+                            </span>
                           </span>
                         ))}
                         {items.length > 5 ? (

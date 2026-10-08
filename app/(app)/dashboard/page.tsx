@@ -240,6 +240,17 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
   // The timeline spans the clinic's hours; a clinic that hasn't set them, the doctor's own week.
   const clinicWeek = await loadClinicHours(doctor.clinicId);
   const railWeek = clinicWeek.length > 0 ? clinicWeek : (await loadSchedule(doctor.id)).hours;
+  // What the day's count is made of: what's left, then what happened.
+  const count = (status: string) => todays.filter((a) => a.status === status).length;
+  const todayHint =
+    [
+      remaining > 0 ? `${remaining} to come` : null,
+      count("COMPLETED") > 0 ? `${count("COMPLETED")} seen` : null,
+      count("NO_SHOW") > 0 ? `${count("NO_SHOW")} no-show` : null,
+      count("CANCELLED") > 0 ? `${count("CANCELLED")} cancelled` : null,
+    ]
+      .filter(Boolean)
+      .join(" · ") || "Nothing booked";
   const me = await orm.Account.select("firstName").where((a) => a.id.eq(doctor.accountId)).first();
 
   return (
@@ -270,7 +281,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
             }
           />
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-            <StatCard value={todays.length} label="Today" hint={remaining > 0 ? `${remaining} still to come` : "Nothing left today"} />
+            <StatCard value={todays.length} label="Today" hint={todayHint} />
             <StatCard
               value={waiting.length}
               label="Waiting"
@@ -532,6 +543,7 @@ async function loadLastVisit(patientId: string, doctorId: string): Promise<LastV
     orm.MedicalRecord
       .select("id", "visitDate", "chiefComplaint", "assessment", "treatmentPlan", "notes", "followUpDate")
       .include("prescriptions", (rx) => rx.select("drugName", "dosage", "frequency"))
+      .include("diagnoses", (d) => d.select("code", "title").orderBy((x) => x.position.asc()))
       .where((r) => r.patientId.eq(patientId))
       // Notes are their author's: only this doctor's own show here.
       .where((r) => r.doctorId.eq(doctorId))
@@ -558,6 +570,7 @@ async function loadLastVisit(patientId: string, doctorId: string): Promise<LastV
           chiefComplaint: record.chiefComplaint,
           assessment: record.assessment,
           treatmentPlan: record.treatmentPlan,
+          diagnoses: record.diagnoses,
           notes: record.notes,
           followUpDate: record.followUpDate ? calendarDateFromDb(record.followUpDate) : null,
           prescriptions: record.prescriptions,

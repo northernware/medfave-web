@@ -24,7 +24,8 @@ export async function GET(request: Request, ctx: RouteContext<"/api/v1/doctor/pa
   const patient = await orm.Patient
     .select(
       "id", "firstName", "middleName", "lastName", "patientNumber", "dateOfBirth", "sex", "contactNumber", "email",
-      "archivedAt", "allergyStatus", "medicationStatus", "conditionStatus",
+      "archivedAt", "allergyStatus", "medicationStatus", "conditionStatus", "bloodType",
+      "emergencyContactName", "emergencyContactRelationship", "emergencyContactNumber",
     )
     .include("household", (h) => h.select("id", "name"))
     .where((p) => p.id.eq(id))
@@ -111,6 +112,15 @@ export async function GET(request: Request, ctx: RouteContext<"/api/v1/doctor/pa
         canStartOwn: !patient.archivedAt && housemates.length > 0 && isAdult(String(patient.dateOfBirth)),
       },
       archived: patient.archivedAt !== null,
+      /** The clipboard's top: blood type and who to call. */
+      bloodType: patient.bloodType,
+      primaryContact: patient.emergencyContactName
+        ? {
+            name: patient.emergencyContactName,
+            relationship: patient.emergencyContactRelationship,
+            number: patient.emergencyContactNumber,
+          }
+        : null,
     },
     /** Whether this doctor cares for them: may read the chart and visits. */
     caresFor: cares,

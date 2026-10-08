@@ -38,7 +38,8 @@ export async function saveMedicalRecord(_prev: FormState, formData: FormData): P
   revalidateRecord(outcome.recordId, outcome.patientId);
   // A finished note is read; an unfinished one is carried on with.
   redirect(
-    intent === "finish" ? `/records/${outcome.recordId}` : `/records/${outcome.recordId}/edit`,
+    // "signed" lets the page offer what comes next (booking a follow-up).
+    intent === "finish" ? `/records/${outcome.recordId}?signed=1` : `/records/${outcome.recordId}/edit`,
   );
 }
 

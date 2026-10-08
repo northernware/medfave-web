@@ -75,20 +75,26 @@ export function SearchSkeleton() {
   return <div className={`${pulse} h-9 w-full max-w-sm`} />;
 }
 
-/** The day's schedule panel pinned on the right, as on Today and Calendar. */
-export function RailSkeleton() {
+/** The day's schedule panel pinned on the right, as on Today, Calendar and the households pages. */
+export function RailSkeleton({ weekStrip = true }: { weekStrip?: boolean }) {
   return (
-    <div className="xl:fixed xl:top-3 xl:right-3 xl:bottom-3 xl:z-10 xl:w-[340px]">
+    <div className="h-[640px] xl:fixed xl:top-3 xl:right-3 xl:bottom-3 xl:z-10 xl:h-auto xl:w-[340px]">
       <div className={`${card} flex h-full flex-col gap-4 p-4`}>
-        <div className="flex items-center justify-between">
-          <div className={`${pulse} h-5 w-32`} />
-          <div className={`${pulse} size-8 rounded-full`} />
-        </div>
-        <div className="flex justify-between gap-1">
-          {Array.from({ length: 7 }, (_, i) => (
-            <div key={i} className={`${pulse} h-12 w-9 rounded-lg`} />
-          ))}
-        </div>
+        {weekStrip ? (
+          <>
+            <div className="flex items-center justify-between">
+              <div className={`${pulse} h-5 w-32`} />
+              <div className={`${pulse} size-8 rounded-full`} />
+            </div>
+            <div className="flex justify-between gap-1">
+              {Array.from({ length: 7 }, (_, i) => (
+                <div key={i} className={`${pulse} h-12 w-9 rounded-lg`} />
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className={`${pulse} h-5 w-24`} />
+        )}
         <div className="flex-1 space-y-6 pt-2">
           {Array.from({ length: 5 }, (_, i) => (
             <div key={i} className="flex gap-3">
@@ -98,6 +104,43 @@ export function RailSkeleton() {
           ))}
         </div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * The patient clipboard (components/patient-clipboard.tsx): a tinted top with
+ * who they are, then the sheet, its clip in the middle, with a few boxes.
+ */
+export function ClipboardSkeleton({ boxes = 3 }: { boxes?: number }) {
+  return (
+    // Stretched (Today), the sheet fills the card, as on the real one.
+    <div className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface-muted">
+      <div className="space-y-2.5 px-5 pt-4 pb-6">
+        <div className={`${pulse} h-4 w-44 bg-surface`} />
+        <div className={`${pulse} h-3 w-28 bg-surface`} />
+        <div className={`${pulse} mt-3 h-6 w-16 bg-surface`} />
+      </div>
+      <div className="relative flex-1 space-y-3 rounded-t-2xl bg-surface px-5 pt-5 pb-4">
+        <span aria-hidden className="absolute -top-3 left-1/2 h-3.5 w-20 -translate-x-1/2 rounded-t-lg bg-surface" />
+        {Array.from({ length: boxes }, (_, i) => (
+          <div key={i} className={`${pulse} h-16 w-full`} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** A form's card: a few labelled fields, two to a row where the form has them. */
+function FormCardSkeleton({ fields = 6 }: { fields?: number }) {
+  return (
+    <div className={`${card} grid gap-5 p-5 sm:grid-cols-2 sm:p-6`}>
+      {Array.from({ length: fields }, (_, i) => (
+        <div key={i} className={`space-y-2 ${i % 3 === 2 ? "sm:col-span-2" : ""}`}>
+          <div className={`${pulse} h-4 w-28`} />
+          <div className={`${pulse} h-11 w-full rounded-lg`} />
+        </div>
+      ))}
     </div>
   );
 }
@@ -129,9 +172,9 @@ export function TodaySkeleton() {
         <div className="min-w-0 space-y-3">
           <HeaderSkeleton />
           <StatsSkeleton />
-          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,24rem)]">
             <ListSkeleton rows={5} />
-            <ListSkeleton rows={5} avatar={false} />
+            <ClipboardSkeleton />
           </div>
         </div>
       </div>
@@ -161,7 +204,107 @@ export function CalendarPageSkeleton() {
           <CalendarSkeleton />
         </div>
       </div>
+      <RailSkeleton weekStrip={false} />
+    </Busy>
+  );
+}
+
+/** A list with the schedule panel beside it (the households list). */
+export function ListWithRailSkeleton() {
+  return (
+    <Busy>
+      <div className="grid grid-cols-1 gap-3 xl:pr-[352px]">
+        <div className="min-w-0 space-y-3">
+          <HeaderSkeleton action />
+          <SearchSkeleton />
+          <ListSkeleton rows={6} title={false} avatar={false} />
+        </div>
+      </div>
       <RailSkeleton />
+    </Busy>
+  );
+}
+
+/** A household: its details and members, the schedule panel beside. */
+export function HouseholdSkeleton() {
+  return (
+    <Busy>
+      <div className="grid grid-cols-1 gap-3 xl:pr-[352px]">
+        <div className="min-w-0 space-y-3">
+          <HeaderSkeleton action />
+          <div className={`${card} space-y-3 p-5`}>
+            <div className={`${pulse} h-4 w-2/3`} />
+            <div className={`${pulse} h-4 w-1/2`} />
+          </div>
+          <ListSkeleton rows={5} avatar={false} />
+        </div>
+      </div>
+      <RailSkeleton />
+    </Busy>
+  );
+}
+
+/** The patient page: header and history on the left, the clipboard on the right. */
+export function PatientSkeleton() {
+  return (
+    <Busy>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="space-y-6 lg:col-span-2">
+          <HeaderSkeleton action />
+          <ListSkeleton rows={3} avatar={false} />
+          <ListSkeleton rows={4} avatar={false} />
+        </div>
+        <div className="lg:self-start">
+          <ClipboardSkeleton boxes={4} />
+        </div>
+      </div>
+    </Busy>
+  );
+}
+
+/** A visit: header and its details on the left, the clipboard on the right. */
+export function VisitSkeleton() {
+  return (
+    <Busy>
+      <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
+        <div className="min-w-0 space-y-3">
+          <HeaderSkeleton action />
+          <div className={`${card} space-y-4 p-5`}>
+            <div className={`${pulse} h-5 w-40`} />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className={`${pulse} h-10`} />
+              <div className={`${pulse} h-10`} />
+            </div>
+            <div className={`${pulse} h-10 w-56 rounded-full`} />
+          </div>
+        </div>
+        <ClipboardSkeleton />
+      </div>
+    </Busy>
+  );
+}
+
+/** A visit note, read or written: header and the note at reading width, the clipboard beside, centred. */
+export function NoteSkeleton() {
+  return (
+    <Busy className="mx-auto max-w-[69rem]">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,46rem)_minmax(17rem,22rem)] lg:items-start">
+        <div className="min-w-0 space-y-3">
+          <HeaderSkeleton />
+          <FormCardSkeleton fields={7} />
+        </div>
+        <ClipboardSkeleton />
+      </div>
+    </Busy>
+  );
+}
+
+/** A form page: header and card, centred like the clinic settings pages. */
+export function FormSkeleton() {
+  return (
+    <Busy className="mx-auto max-w-3xl space-y-3">
+      <HeaderSkeleton />
+      <FormCardSkeleton />
     </Busy>
   );
 }

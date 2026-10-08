@@ -28,6 +28,7 @@ import {
   QUEUE_STATUSES,
   SERVICE_LABELS,
   SEX_LABELS,
+  BLOOD_TYPE_LABELS,
   ageFrom,
 } from "@/lib/domain";
 import { appointmentListQuery, loadClinicHours, loadSchedule, toAppointmentListItem } from "@/lib/queries";
@@ -539,7 +540,11 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
 /** A patient's most recent visit note by this doctor, with what's needed beside the patients list. */
 async function loadLastVisit(patientId: string, doctorId: string): Promise<LastVisit | null> {
   const [patient, record, allergies] = await Promise.all([
-    orm.Patient.select("id", "firstName", "middleName", "lastName", "sex", "dateOfBirth", "patientNumber").where((p) => p.id.eq(patientId)).first(),
+    orm.Patient
+      .select("id", "firstName", "middleName", "lastName", "sex", "dateOfBirth", "patientNumber", "bloodType", "allergyStatus")
+      .include("alerts", (x) => x.select("id", "label", "notes").orderBy((y) => y.label.asc()))
+      .where((p) => p.id.eq(patientId))
+      .first(),
     orm.MedicalRecord
       .select("id", "visitDate", "chiefComplaint", "assessment", "treatmentPlan", "notes", "followUpDate")
       .include("prescriptions", (rx) => rx.select("drugName", "dosage", "frequency"))
@@ -550,7 +555,7 @@ async function loadLastVisit(patientId: string, doctorId: string): Promise<LastV
       .where((r) => r.archivedAt.isNull())
       .orderBy((r) => r.visitDate.desc())
       .first(),
-    orm.PatientAllergy.select("label").where((a) => a.patientId.eq(patientId)).all(),
+    orm.PatientAllergy.select("id", "label", "reaction", "severity", "notes").where((a) => a.patientId.eq(patientId)).all(),
   ]);
   if (!patient) return null;
   return {
@@ -562,6 +567,8 @@ async function loadLastVisit(patientId: string, doctorId: string): Promise<LastV
       sexLabel: SEX_LABELS[patient.sex],
       age: ageFrom(calendarDateFromDb(patient.dateOfBirth)),
       patientNumber: patient.patientNumber,
+      bloodType: BLOOD_TYPE_LABELS[patient.bloodType],
+      allergyStatus: patient.allergyStatus,
     },
     record: record
       ? {
@@ -576,6 +583,7 @@ async function loadLastVisit(patientId: string, doctorId: string): Promise<LastV
           prescriptions: record.prescriptions,
         }
       : null,
-    allergies: allergies.map((a) => a.label),
+    allergies,
+    alerts: patient.alerts,
   };
 }

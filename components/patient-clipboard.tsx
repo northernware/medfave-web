@@ -26,7 +26,7 @@ export function PatientClipboard({
 }) {
   const shown = contacts.filter((c) => c.value);
   return (
-    <section aria-label="Patient details" className="overflow-hidden rounded-2xl border border-border bg-surface-muted">
+    <section aria-label="Patient details" className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface-muted">
       <div className="px-5 pt-4 pb-6">
         {name ? <p className="mb-1 truncate text-sm font-semibold">{name}</p> : null}
         {number ? <p className="nums text-xs font-semibold tracking-wide text-accent-ink">{number}</p> : null}
@@ -53,7 +53,7 @@ export function PatientClipboard({
         ) : null}
       </div>
 
-      <div className="relative rounded-t-2xl bg-surface px-5 pt-5 pb-4">
+      <div className="relative flex-1 rounded-t-2xl bg-surface px-5 pt-5 pb-4">
           {/* The clip: a tab rising from the sheet's edge, curved into it at both shoulders. */}
           <span aria-hidden className="absolute -top-3 left-1/2 h-3.5 w-20 -translate-x-1/2 rounded-t-lg bg-surface">
             <span className="absolute top-1.5 left-1/2 h-1 w-7 -translate-x-1/2 rounded-full bg-border-strong" />

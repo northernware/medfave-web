@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { CrumbName } from "@/components/crumb-names";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { setAppointmentStatus } from "@/app/actions/appointments";
 import { requireStaff } from "@/lib/auth";
+import { VisitMoves } from "@/components/visit-moves";
 import { visitHistory } from "@/lib/visit-history";
 import { VisitHistory } from "@/components/visit-history";
 import { orm } from "@/src/prisma/db";
@@ -17,7 +17,6 @@ import {
   fullName,
   REMINDER_LABELS,
   SERVICE_LABELS,
-  statusActionLabel,
   VISIT_PRIORITY_LABELS,
 } from "@/lib/domain";
 import { movesFor } from "@/lib/booking";
@@ -144,16 +143,8 @@ export default async function DeskAppointmentPage({
           {moves.length > 0 ? (
             <Card>
               <CardHeader title="Move it along" />
-              <div className="flex flex-wrap gap-2 px-5 py-4">
-                {moves.map((next, i) => (
-                  <form key={next} action={setAppointmentStatus}>
-                    <input type="hidden" name="appointmentId" value={appointment.id} />
-                    <input type="hidden" name="status" value={next} />
-                    <button className={buttonClass(i === 0 ? "primary" : "secondary")}>
-                      {statusActionLabel(appointment.status, next)}
-                    </button>
-                  </form>
-                ))}
+              <div className="px-5 py-4">
+                <VisitMoves appointmentId={appointment.id} status={appointment.status} moves={moves} />
               </div>
             </Card>
           ) : null}

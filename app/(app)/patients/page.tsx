@@ -166,7 +166,7 @@ export default async function PatientsPage({ searchParams }: PageProps<"/patient
                       {!mine.has(patient.id) ? (
                         <Badge tone="neutral">Not yet your patient</Badge>
                       ) : patient.allergies.length > 0 ? (
-                        <Badge tone={patient.allergies.some((a) => a.severity === "SEVERE") ? "danger" : "warn"}>
+                        <Badge tone="danger">
                           {patient.allergies.length} {patient.allergies.length === 1 ? "allergy" : "allergies"}
                         </Badge>
                       ) : patient.allergyStatus === "UNKNOWN" ? (

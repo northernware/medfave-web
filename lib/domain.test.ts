@@ -22,4 +22,11 @@ describe("movesFrom", () => {
   it("lets a checked-in visit be undone, started, cancelled or missed", () => {
     expect(movesFrom("CHECKED_IN", true, true)).toEqual(["IN_CONSULTATION", "CONFIRMED", "CANCELLED", "NO_SHOW"]);
   });
+
+  it("offers no check-in or start away from the visit's day, and no no-show before its time", () => {
+    expect(movesFrom("CONFIRMED", false, true, false)).not.toContain("CHECKED_IN");
+    expect(movesFrom("CONFIRMED", false, true, false)).not.toContain("NO_SHOW");
+    expect(movesFrom("CONFIRMED", true, true, true)).toContain("NO_SHOW");
+    expect(movesFrom("CONFIRMED", true, true, false)).toContain("CHECKED_IN");
+  });
 });

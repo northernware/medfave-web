@@ -2,12 +2,13 @@ import type { ReactNode } from "react";
 
 /**
  * The column a clipboard sits in, on wide screens: its top level with the
- * sidebar and the schedule panel (lifted over the back link's line above the
- * page), then staying in view as the page scrolls, scrolling within itself if
- * it's taller than the window.
+ * page's title, under the back link (it belongs to the page, not the app's
+ * frame; centred pages never put it at the window's edge), then staying in
+ * view as the page scrolls, scrolling within itself if it's taller than the
+ * window.
  */
 export const CLIPBOARD_COLUMN =
-  "lg:sticky lg:top-3 lg:-mt-[35px] lg:max-h-[calc(100dvh-1.5rem)] lg:self-start lg:overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
+  "lg:sticky lg:top-3 lg:max-h-[calc(100dvh-1.5rem)] lg:self-start lg:overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
 
 /**
  * The patient on a clipboard. The top is who they are (number, birth, sex,

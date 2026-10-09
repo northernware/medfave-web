@@ -1,7 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { EXAM_SYSTEMS, isNormalFinding, parseExam, serializeExam, type ExamFindings } from "@/lib/exam";
+import {
+  EXAM_GRIDS,
+  EXAM_SYSTEMS,
+  gridToText,
+  isNormalFinding,
+  normalGrid,
+  parseExam,
+  serializeExam,
+  textToGrid,
+  type ExamFindings,
+} from "@/lib/exam";
 
 const box = "w-full rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-faint";
 
@@ -80,7 +90,8 @@ export function ExamField({ name, defaultValue, onEdit }: { name: string; defaul
                     </button>
                     <button
                       type="button"
-                      onClick={() => set(s.key, "")}
+                      // A grid starts at normal: change only what's different.
+                      onClick={() => set(s.key, EXAM_GRIDS[s.key] ? s.normal : "")}
                       className="rounded-full px-3 py-1 text-xs font-semibold text-ink-muted hover:bg-surface-muted hover:text-ink"
                     >
                       Findings
@@ -88,7 +99,9 @@ export function ExamField({ name, defaultValue, onEdit }: { name: string; defaul
                   </>
                 )}
               </div>
-              {examined ? (
+              {examined && EXAM_GRIDS[s.key] && textToGrid(s.key, text) ? (
+                <GridEditor systemKey={s.key} text={text} onChange={(t) => set(s.key, t)} />
+              ) : examined ? (
                 <textarea
                   aria-label={`${s.label} findings`}
                   rows={3}
@@ -108,6 +121,65 @@ export function ExamField({ name, defaultValue, onEdit }: { name: string; defaul
           More systems ({hidden}): skin, neck, lymph nodes, breasts, genitalia, rectal, extremities, pulses, musculoskeletal, neurologic, reflexes
         </button>
       ) : null}
+    </div>
+  );
+}
+
+/** Right/left values per site (pulses, reflexes), and a note. Written back as the system's line. */
+function GridEditor({ systemKey, text, onChange }: { systemKey: string; text: string; onChange: (text: string) => void }) {
+  const grid = EXAM_GRIDS[systemKey];
+  const { values, note } = textToGrid(systemKey, text) ?? { values: normalGrid(systemKey), note: "" };
+  const put = (site: string, side: 0 | 1, value: string) => {
+    const pair: [string, string] = [...(values[site] ?? ["", ""])] as [string, string];
+    pair[side] = value;
+    onChange(gridToText(systemKey, { ...values, [site]: pair }, note));
+  };
+  const select = "rounded-md border border-border-strong bg-surface px-2 py-1 text-sm";
+  return (
+    <div className="space-y-2">
+      <table className="text-sm">
+        <thead>
+          <tr className="text-xs text-ink-faint">
+            <th className="pr-4 text-left font-normal" />
+            <th className="px-1 font-normal">Right</th>
+            <th className="px-1 font-normal">Left</th>
+          </tr>
+        </thead>
+        <tbody>
+          {grid.sites.map((site) => (
+            <tr key={site.name}>
+              <td className="py-0.5 pr-4">{site.name}</td>
+              {([0, 1] as const).map((side) => {
+                const value = values[site.name]?.[side] ?? "";
+                return (
+                  <td key={side} className="px-1 py-0.5">
+                    <select
+                      aria-label={`${site.name}, ${side === 0 ? "right" : "left"}`}
+                      value={value}
+                      onChange={(e) => put(site.name, side, e.target.value)}
+                      className={`${select} ${value && value !== site.normal ? "font-semibold text-warn-ink" : ""}`}
+                    >
+                      <option value="">—</option>
+                      {site.scale.map((g) => (
+                        <option key={g} value={g}>
+                          {g}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <input
+        aria-label={`${systemKey} note`}
+        placeholder="Note (optional)"
+        defaultValue={note}
+        onChange={(e) => onChange(gridToText(systemKey, values, e.target.value))}
+        className="w-full rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-faint"
+      />
     </div>
   );
 }

@@ -10,6 +10,57 @@
  * doctor can edit. Pure, no imports: shared by the form and the pages.
  */
 
+/**
+ * Systems recorded as a right/left grid rather than prose: pulses (0–4+) and
+ * reflexes (0–4+, plantar ↓ flexor / ↑ extensor). Written on their line as
+ * "Radial 2+/2+; Femoral 2+/2+" (right/left), then " — " and any note.
+ */
+export type ExamGrid = { sites: { name: string; scale: string[]; normal: string }[] };
+const GRADES = ["0", "1+", "2+", "3+", "4+"];
+export const EXAM_GRIDS: Record<string, ExamGrid> = {
+  pulses: {
+    sites: ["Radial", "Femoral", "Popliteal", "Dorsalis pedis", "Posterior tibial"].map((name) => ({ name, scale: GRADES, normal: "2+" })),
+  },
+  reflexes: {
+    sites: [
+      ...["Biceps", "Triceps", "Brachioradialis", "Patellar", "Achilles"].map((name) => ({ name, scale: GRADES, normal: "2+" })),
+      { name: "Plantar", scale: ["↓", "↑", "—"], normal: "↓" },
+    ],
+  },
+};
+
+/** A grid's values by site, [right, left]. */
+export type GridValues = Record<string, [string, string]>;
+
+export function gridToText(key: string, values: GridValues, note = "") {
+  const grid = EXAM_GRIDS[key];
+  const cells = grid.sites
+    .filter((s) => values[s.name]?.[0] || values[s.name]?.[1])
+    .map((s) => `${s.name} ${values[s.name][0] || "—"}/${values[s.name][1] || "—"}`)
+    .join("; ");
+  return [cells, note.trim()].filter(Boolean).join(" — ");
+}
+
+/** A grid line read back; null if it isn't one (typed as prose). */
+export function textToGrid(key: string, text: string): { values: GridValues; note: string } | null {
+  const grid = EXAM_GRIDS[key];
+  if (!grid) return null;
+  const [cells, ...rest] = text.split(" — ");
+  const values: GridValues = {};
+  for (const cell of cells.split(";").map((c) => c.trim()).filter(Boolean)) {
+    const site = grid.sites.find((s) => cell.startsWith(`${s.name} `));
+    const m = site && cell.slice(site.name.length + 1).match(/^(\S+)\/(\S+)$/);
+    if (!site || !m) return null;
+    values[site.name] = [m[1] === "—" ? "" : m[1], m[2] === "—" ? "" : m[2]];
+  }
+  return { values, note: rest.join(" — ") };
+}
+
+/** Every site at its normal, both sides. */
+export function normalGrid(key: string): GridValues {
+  return Object.fromEntries(EXAM_GRIDS[key].sites.map((s) => [s.name, [s.normal, s.normal]]));
+}
+
 export type ExamSystem = {
   key: string;
   label: string;
@@ -53,23 +104,17 @@ export const EXAM_SYSTEMS: ExamSystem[] = [
   { key: "genitalia", label: "Genitalia", normal: "External genitalia without lesions." },
   { key: "rectal", label: "Rectal", normal: "No external lesions. Normal sphincter tone. No masses." },
   { key: "extremities", label: "Extremities", normal: "Warm, no edema. Calves supple, non-tender." },
-  {
-    key: "pulses",
-    label: "Peripheral pulses",
-    normal: "Radial, femoral, popliteal, dorsalis pedis and posterior tibial 2+ and equal bilaterally.",
-  },
+  { key: "pulses", label: "Peripheral pulses", normal: "" },
   { key: "msk", label: "Musculoskeletal", normal: "No joint deformity or swelling. Full range of motion." },
   {
     key: "neuro",
     label: "Neurologic",
     normal: "Alert and oriented to person, place and time. Cranial nerves II–XII intact. Strength 5/5 throughout. Sensation intact. Gait steady.",
   },
-  {
-    key: "reflexes",
-    label: "Reflexes",
-    normal: "Biceps, triceps, brachioradialis, patellar and Achilles 2+ and symmetric. Plantar responses flexor.",
-  },
+  { key: "reflexes", label: "Reflexes", normal: "" },
 ];
+// A grid system's normal is its grid at normal.
+for (const s of EXAM_SYSTEMS) if (EXAM_GRIDS[s.key]) s.normal = gridToText(s.key, normalGrid(s.key));
 
 const BY_LABEL = new Map(EXAM_SYSTEMS.map((s) => [s.label.toLowerCase(), s]));
 

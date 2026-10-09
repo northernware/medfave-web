@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { EXAM_SYSTEMS, isNormalFinding, parseExam, serializeExam } from "@/lib/exam";
+import { EXAM_SYSTEMS, gridToText, isNormalFinding, normalGrid, parseExam, serializeExam, textToGrid } from "@/lib/exam";
 
 describe("exam by system", () => {
   it("writes one line per examined system, in order, and reads it back", () => {
@@ -22,5 +22,18 @@ describe("exam by system", () => {
     const cardio = EXAM_SYSTEMS.find((s) => s.key === "cardio")!;
     expect(isNormalFinding("cardio", cardio.normal)).toBe(true);
     expect(isNormalFinding("cardio", "Grade 2/6 systolic murmur.")).toBe(false);
+  });
+
+  it("writes pulses and reflexes as a right/left grid and reads them back", () => {
+    const values = { ...normalGrid("pulses"), "Dorsalis pedis": ["1+", "2+"] as [string, string] };
+    const text = gridToText("pulses", values, "Trace ankle edema");
+    expect(text).toContain("Dorsalis pedis 1+/2+");
+    expect(textToGrid("pulses", text)).toEqual({ values, note: "Trace ankle edema" });
+    expect(isNormalFinding("reflexes", gridToText("reflexes", normalGrid("reflexes")))).toBe(true);
+    expect(EXAM_SYSTEMS.find((s) => s.key === "reflexes")!.normal).toContain("Plantar ↓/↓");
+  });
+
+  it("treats a pulses line typed as prose as prose", () => {
+    expect(textToGrid("pulses", "Weak pulses in both feet")).toBeNull();
   });
 });

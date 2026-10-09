@@ -1,4 +1,4 @@
-import { EXAM_GRIDS, EXAM_SYSTEMS, isNormalFinding, parseExam, textToGrid } from "@/lib/exam";
+import { EXAM_GRIDS, EXAM_PARTS, EXAM_SYSTEMS, isNormalFinding, parseExam, textToGrid, textToParts } from "@/lib/exam";
 import { Prose } from "@/components/ui";
 
 /**
@@ -21,7 +21,13 @@ export function ExamView({ text }: { text: string | null }) {
             <div key={s.key} className="grid gap-x-3 sm:grid-cols-[9rem_1fr]">
               <dt className="text-sm font-medium">{s.label}</dt>
               <dd className={`text-sm leading-6 text-pretty ${normal ? "text-ink-muted" : "text-ink"}`}>
-                {EXAM_GRIDS[s.key] && textToGrid(s.key, findings[s.key]) ? <Grid systemKey={s.key} text={findings[s.key]} /> : findings[s.key]}
+                {EXAM_GRIDS[s.key] && textToGrid(s.key, findings[s.key]) ? (
+                  <Grid systemKey={s.key} text={findings[s.key]} />
+                ) : EXAM_PARTS[s.key] && textToParts(s.key, findings[s.key]) ? (
+                  <Parts systemKey={s.key} text={findings[s.key]} />
+                ) : (
+                  findings[s.key]
+                )}
               </dd>
             </div>
           );
@@ -60,5 +66,22 @@ function Grid({ systemKey, text }: { systemKey: string; text: string }) {
       </table>
       {note ? <p>{note}</p> : null}
     </>
+  );
+}
+
+/** HEENT or neurologic by part; what isn't the part's normal in full ink. */
+function Parts({ systemKey, text }: { systemKey: string; text: string }) {
+  const values = textToParts(systemKey, text)!;
+  return (
+    <dl className="space-y-0.5">
+      {EXAM_PARTS[systemKey]
+        .filter((p) => values[p.name])
+        .map((p) => (
+          <div key={p.name} className={values[p.name] === p.normal ? "text-ink-muted" : "text-ink"}>
+            <dt className="inline font-medium">{p.name}: </dt>
+            <dd className="inline">{values[p.name]}</dd>
+          </div>
+        ))}
+    </dl>
   );
 }

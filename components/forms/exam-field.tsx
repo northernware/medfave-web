@@ -3,13 +3,17 @@
 import { useState } from "react";
 import {
   EXAM_GRIDS,
+  EXAM_PARTS,
   EXAM_SYSTEMS,
   gridToText,
   isNormalFinding,
   normalGrid,
+  normalParts,
   parseExam,
+  partsToText,
   serializeExam,
   textToGrid,
+  textToParts,
   type ExamFindings,
 } from "@/lib/exam";
 
@@ -90,8 +94,8 @@ export function ExamField({ name, defaultValue, onEdit }: { name: string; defaul
                     </button>
                     <button
                       type="button"
-                      // A grid starts at normal: change only what's different.
-                      onClick={() => set(s.key, EXAM_GRIDS[s.key] ? s.normal : "")}
+                      // A grid or a system in parts starts at normal: change only what's different.
+                      onClick={() => set(s.key, EXAM_GRIDS[s.key] || EXAM_PARTS[s.key] ? s.normal : "")}
                       className="rounded-full px-3 py-1 text-xs font-semibold text-ink-muted hover:bg-surface-muted hover:text-ink"
                     >
                       Findings
@@ -101,16 +105,10 @@ export function ExamField({ name, defaultValue, onEdit }: { name: string; defaul
               </div>
               {examined && EXAM_GRIDS[s.key] && textToGrid(s.key, text) ? (
                 <GridEditor systemKey={s.key} text={text} onChange={(t) => set(s.key, t)} />
+              ) : examined && EXAM_PARTS[s.key] && textToParts(s.key, text) ? (
+                <PartsEditor systemKey={s.key} text={text} onChange={(t) => set(s.key, t)} />
               ) : examined ? (
-                <textarea
-                  aria-label={`${s.label} findings`}
-                  rows={3}
-                  autoFocus={text === ""}
-                  className={box}
-                  value={text}
-                  placeholder={`What you found on ${s.label.toLowerCase()} examination`}
-                  onChange={(e) => set(s.key, e.target.value)}
-                />
+                <Finding label={s.label} value={text} normal={s.normal} onChange={(t) => set(s.key, t)} />
               ) : null}
             </li>
           );
@@ -180,6 +178,102 @@ function GridEditor({ systemKey, text, onChange }: { systemKey: string; text: st
         onChange={(e) => onChange(gridToText(systemKey, values, e.target.value))}
         className="w-full rounded-lg border border-border-strong bg-surface px-3 py-2 text-sm text-ink placeholder:text-ink-faint"
       />
+    </div>
+  );
+}
+
+/**
+ * One finding: the untouched normal as a quiet line (tap it to change it), so
+ * a list of normals stays short; anything else, or once tapped, a text box.
+ */
+function Finding({ label, value, normal, onChange }: { label: string; value: string; normal: string; onChange: (text: string) => void }) {
+  const [editing, setEditing] = useState(false);
+  if (value === normal && !editing) {
+    return (
+      <button
+        type="button"
+        onClick={() => setEditing(true)}
+        title="Change"
+        className="block w-full rounded-md px-1 py-0.5 text-left text-sm text-ink-muted hover:bg-surface-muted hover:text-ink"
+      >
+        {value}
+      </button>
+    );
+  }
+  return (
+    <textarea
+      aria-label={`${label} findings`}
+      rows={3}
+      autoFocus={editing || value === ""}
+      className={box}
+      value={value}
+      placeholder={`What you found on ${label.toLowerCase()} examination`}
+      onChange={(e) => onChange(e.target.value)}
+    />
+  );
+}
+
+/**
+ * A system examined in parts (HEENT, neurologic): each part normal, with
+ * findings, or not examined, and "All normal" for the common case. Written
+ * back as the system's line, "Head: … Eyes: …".
+ */
+function PartsEditor({ systemKey, text, onChange }: { systemKey: string; text: string; onChange: (text: string) => void }) {
+  // Held here, not re-read from the line: a part just opened for findings is
+  // empty, and an empty part isn't written, so re-reading would drop it.
+  const [values, setValues] = useState(() => textToParts(systemKey, text) ?? {});
+  const put = (part: string, value: string | undefined) => {
+    const next = { ...values };
+    if (value === undefined) delete next[part];
+    else next[part] = value;
+    setValues(next);
+    onChange(partsToText(systemKey, next));
+  };
+  const chip = "rounded-full px-2.5 py-0.5 text-xs font-semibold";
+  return (
+    <div className="space-y-1.5">
+      <ul className="space-y-2 border-l-2 border-border pl-3">
+        {EXAM_PARTS[systemKey].map((part) => {
+          const value = values[part.name];
+          return (
+            <li key={part.name} className="space-y-1">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className={`min-w-0 flex-1 text-sm ${value !== undefined && value !== part.normal ? "font-semibold text-warn-ink" : ""}`}>
+                  {part.name}
+                </span>
+                {value === undefined ? (
+                  <>
+                    <button type="button" onClick={() => put(part.name, part.normal)} className={`${chip} border border-border-strong hover:border-accent hover:text-accent-ink`}>
+                      Normal
+                    </button>
+                    <button type="button" onClick={() => put(part.name, "")} className={`${chip} text-ink-muted hover:bg-surface-muted hover:text-ink`}>
+                      Findings
+                    </button>
+                  </>
+                ) : (
+                  <button type="button" onClick={() => put(part.name, undefined)} className="rounded-full px-2 py-0.5 text-xs text-ink-faint hover:text-ink">
+                    Not examined
+                  </button>
+                )}
+              </div>
+              {value !== undefined ? <Finding label={part.name} value={value} normal={part.normal} onChange={(t) => put(part.name, t)} /> : null}
+            </li>
+          );
+        })}
+      </ul>
+      {EXAM_PARTS[systemKey].some((p) => values[p.name] === undefined) ? (
+        <button
+          type="button"
+          onClick={() => {
+            const next = { ...normalParts(systemKey), ...Object.fromEntries(Object.entries(values).filter(([, v]) => v)) };
+            setValues(next);
+            onChange(partsToText(systemKey, next));
+          }}
+          className="text-xs font-semibold text-accent-ink hover:underline"
+        >
+          Rest normal
+        </button>
+      ) : null}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { EXAM_SYSTEMS, gridToText, isNormalFinding, normalGrid, parseExam, serializeExam, textToGrid } from "@/lib/exam";
+import { EXAM_SYSTEMS, gridToText, isNormalFinding, normalGrid, normalParts, parseExam, partsToText, serializeExam, textToGrid, textToParts } from "@/lib/exam";
 
 describe("exam by system", () => {
   it("writes one line per examined system, in order, and reads it back", () => {
@@ -35,5 +35,19 @@ describe("exam by system", () => {
 
   it("treats a pulses line typed as prose as prose", () => {
     expect(textToGrid("pulses", "Weak pulses in both feet")).toBeNull();
+  });
+
+  it("writes HEENT in parts and reads them back, through the whole exam", () => {
+    const parts = { ...normalParts("heent"), Ears: "Cerumen obscures right TM." };
+    const line = partsToText("heent", parts);
+    expect(line).toContain("Ears: Cerumen obscures right TM. Nose:");
+    expect(textToParts("heent", line)).toEqual(parts);
+    const exam = parseExam(serializeExam({ heent: line }))!;
+    expect(textToParts("heent", exam.heent)).toEqual(parts);
+    expect(isNormalFinding("heent", partsToText("heent", normalParts("heent")))).toBe(true);
+  });
+
+  it("keeps an older HEENT written as prose as prose", () => {
+    expect(textToParts("heent", "Normocephalic. PERRL.")).toBeNull();
   });
 });

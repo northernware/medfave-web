@@ -61,6 +61,59 @@ export function normalGrid(key: string): GridValues {
   return Object.fromEntries(EXAM_GRIDS[key].sites.map((s) => [s.name, [s.normal, s.normal]]));
 }
 
+/**
+ * Systems examined in parts, each with its own normal: HEENT and neurologic,
+ * as the doctor's sample writes them. On the system's line as "Head: …
+ * Eyes: …", parts not examined left out.
+ */
+export const EXAM_PARTS: Record<string, { name: string; normal: string }[]> = {
+  heent: [
+    { name: "Head", normal: "Normocephalic, atraumatic." },
+    { name: "Eyes", normal: "Pupils equal, round, reactive to light. Conjunctivae pink, sclerae anicteric." },
+    { name: "Ears", normal: "Canals clear, tympanic membranes intact." },
+    { name: "Nose", normal: "Mucosa pink, septum midline." },
+    { name: "Mouth and throat", normal: "Oral mucosa moist; pharynx without exudates." },
+  ],
+  neuro: [
+    { name: "Mental status", normal: "Alert and oriented to person, place and time." },
+    { name: "Cranial nerves", normal: "II–XII intact." },
+    { name: "Motor and strength", normal: "Normal bulk and tone. Strength 5/5 throughout." },
+    { name: "Cerebellar", normal: "Point-to-point movements intact. Gait steady." },
+    { name: "Sensory", normal: "Light touch, pinprick and position sense intact." },
+  ],
+};
+
+/** A parts system's findings by part name; parts not examined absent. */
+export type PartValues = Record<string, string>;
+
+export function partsToText(key: string, values: PartValues) {
+  return EXAM_PARTS[key]
+    .filter((p) => values[p.name]?.trim())
+    .map((p) => `${p.name}: ${values[p.name].trim().replace(/\s*\n+\s*/g, " ")}`)
+    .join(" ");
+}
+
+/** A parts system's line read back by part; null if it isn't written in parts. */
+export function textToParts(key: string, text: string): PartValues | null {
+  const parts = EXAM_PARTS[key];
+  if (!parts || !text.trim()) return parts ? {} : null;
+  const names = parts.map((p) => p.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+  const found = [...text.matchAll(new RegExp(`(?:^|\\s)(${names}): `, "g"))];
+  if (!found.length || text.slice(0, found[0].index).trim()) return null;
+  const values: PartValues = {};
+  found.forEach((m, i) => {
+    const start = m.index! + m[0].length;
+    const end = i + 1 < found.length ? found[i + 1].index! : text.length;
+    values[m[1]] = text.slice(start, end).trim();
+  });
+  return values;
+}
+
+/** Every part at its normal. */
+export function normalParts(key: string): PartValues {
+  return Object.fromEntries(EXAM_PARTS[key].map((p) => [p.name, p.normal]));
+}
+
 export type ExamSystem = {
   key: string;
   label: string;
@@ -77,8 +130,7 @@ export const EXAM_SYSTEMS: ExamSystem[] = [
     key: "heent",
     label: "HEENT",
     common: true,
-    normal:
-      "Normocephalic, atraumatic. Pupils equal, round, reactive to light. Conjunctivae pink, sclerae anicteric. Ear canals clear, tympanic membranes intact. Nasal mucosa pink. Oral mucosa moist; pharynx without exudates.",
+    normal: "",
   },
   { key: "neck", label: "Neck", normal: "Supple. Trachea midline. Thyroid not enlarged." },
   { key: "nodes", label: "Lymph nodes", normal: "No cervical, axillary or inguinal lymphadenopathy." },
@@ -109,12 +161,14 @@ export const EXAM_SYSTEMS: ExamSystem[] = [
   {
     key: "neuro",
     label: "Neurologic",
-    normal: "Alert and oriented to person, place and time. Cranial nerves II–XII intact. Strength 5/5 throughout. Sensation intact. Gait steady.",
+    normal: "",
   },
   { key: "reflexes", label: "Reflexes", normal: "" },
 ];
 // A grid system's normal is its grid at normal.
 for (const s of EXAM_SYSTEMS) if (EXAM_GRIDS[s.key]) s.normal = gridToText(s.key, normalGrid(s.key));
+// A parts system's normal is every part at normal.
+for (const s of EXAM_SYSTEMS) if (EXAM_PARTS[s.key]) s.normal = partsToText(s.key, normalParts(s.key));
 
 const BY_LABEL = new Map(EXAM_SYSTEMS.map((s) => [s.label.toLowerCase(), s]));
 

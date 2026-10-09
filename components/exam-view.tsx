@@ -1,0 +1,30 @@
+import { EXAM_SYSTEMS, isNormalFinding, parseExam } from "@/lib/exam";
+import { Prose } from "@/components/ui";
+
+/**
+ * A note's physical examination as written: by system (lib/exam.ts), each a
+ * label and its finding, the ones that aren't the standard normal in full
+ * ink and the normal ones quieter, so what was found stands out. An older
+ * free-text exam reads as it was.
+ */
+export function ExamView({ text }: { text: string | null }) {
+  if (!text?.trim()) return null;
+  const findings = parseExam(text);
+  if (!findings) return <Prose label="Physical examination" text={text} />;
+  return (
+    <div>
+      <h3 className="text-sm font-semibold text-ink-muted">Physical examination</h3>
+      <dl className="mt-1.5 space-y-1.5">
+        {EXAM_SYSTEMS.filter((s) => findings[s.key]).map((s) => {
+          const normal = isNormalFinding(s.key, findings[s.key]);
+          return (
+            <div key={s.key} className="grid gap-x-3 sm:grid-cols-[9rem_1fr]">
+              <dt className="text-sm font-medium">{s.label}</dt>
+              <dd className={`text-sm leading-6 text-pretty ${normal ? "text-ink-muted" : "text-ink"}`}>{findings[s.key]}</dd>
+            </div>
+          );
+        })}
+      </dl>
+    </div>
+  );
+}

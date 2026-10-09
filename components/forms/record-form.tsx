@@ -9,6 +9,7 @@ import { NOTE_KIND_LABELS } from "@/lib/domain";
 import { BLANK_PRESCRIPTION, type PrescriptionRow, type RecordDefaults } from "@/lib/form-defaults";
 import { searchDiagnoses, type AutosaveResult } from "@/app/actions/records";
 import { DiagnosisPicker, type ChartCondition } from "@/components/forms/diagnosis-picker";
+import { ExamField } from "@/components/forms/exam-field";
 import { EMPTY_FORM_STATE, type FormState } from "@/lib/validation";
 
 /**
@@ -238,13 +239,14 @@ export function RecordForm({
             label="Physical examination"
             htmlFor="physicalExamination"
             error={err?.physicalExamination}
-            hint="Findings on examination — the vitals below are recorded separately."
+            hint="By system: Normal fills in the standard finding, which you can change. The vitals below are recorded separately."
           >
-            <TextArea
-              id="physicalExamination"
+            <ExamField
               name="physicalExamination"
-              rows={4}
               defaultValue={defaults.physicalExamination}
+              onEdit={() => {
+                unsaved.current = true;
+              }}
             />
           </Field>
         )}

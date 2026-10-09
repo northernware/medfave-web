@@ -7,6 +7,7 @@ import { ICD11_CREDIT } from "@/lib/diagnoses";
 import { bloodPressure, bmi, fullName, NOTE_KIND_LABELS, RECORD_STATUS_LABELS, RECORD_STATUS_TONE } from "@/lib/domain";
 import { orm } from "@/src/prisma/db";
 import { Badge, Prose, buttonClass } from "@/components/ui";
+import { ExamView } from "@/components/exam-view";
 
 /**
  * A visit note, whole, for the side panel: everything recorded at the visit,
@@ -96,7 +97,7 @@ export async function NoteSummary({ id }: { id: string }) {
       ) : null}
 
       <Prose label="History of present illness" text={record.historyOfPresentIllness} />
-      <Prose label="Physical examination" text={record.physicalExamination} />
+      <ExamView text={record.physicalExamination} />
       <Prose label="Assessment" text={record.assessment} />
       <Prose label="Treatment plan" text={record.treatmentPlan} />
 

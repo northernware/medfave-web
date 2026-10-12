@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ScrollStart } from "@/components/scroll-start";
 import { AltArrowLeftIcon } from "@solar-icons/react/linear/alt-arrow-left";
 import { AltArrowRightIcon } from "@solar-icons/react/linear/alt-arrow-right";
 import { Fragment } from "react";
@@ -483,6 +484,10 @@ export function ScheduleRail({
           <p className="py-10 text-center text-sm text-ink-muted">Closed this day.</p>
         ) : (
         <div className="relative" style={{ height: (hours.length - 1) * HOUR + 8 }}>
+          {/* Opens at the first visit (or now, today, if none), not at opening time. */}
+          {starts.length || selected === todayKey ? (
+            <ScrollStart top={Math.max(0, top(starts.length ? Math.min(...starts) : nowMinute) - 24)} />
+          ) : null}
           {/* The time column: one vertical line through every hour, the labels sitting on it. */}
           <span aria-hidden className="absolute top-0 bottom-0 left-8 w-px -translate-x-1/2 bg-border-strong" />
           {hours.map((h) => (

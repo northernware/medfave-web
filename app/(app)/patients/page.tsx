@@ -3,7 +3,7 @@ import Link from "next/link";
 import { requireDoctor } from "@/lib/auth";
 import { caredForIds, idsOrNone } from "@/lib/care";
 import { orm } from "@/src/prisma/db";
-import { calendarDateFromDb, formatDate, instantFromDb } from "@/lib/datetime";
+import { calendarDateFromDb, formatShortDate, instantFromDb } from "@/lib/datetime";
 import { or } from "@prisma/orm-postgres/orm-client";
 import { ACTIVE_STATUSES, ageFrom, fullName, RELATIONSHIP_LABELS, SEX_LABELS } from "@/lib/domain";
 import { Badge, buttonClass, Card, EmptyState, PageHeader } from "@/components/ui";
@@ -239,8 +239,8 @@ export default async function PatientsPage({ searchParams }: PageProps<"/patient
                   <span className="tabular shrink-0 text-right text-xs text-ink-muted">
                     {SEX_LABELS[patient.sex]} · {ageFrom(calendarDateFromDb(patient.dateOfBirth))}
                     <span className="mt-0.5 block text-ink-faint">
-                      {lastSeen.has(patient.id) ? `Seen ${formatDate(lastSeen.get(patient.id)!)}` : "Not seen yet"}
-                      {nextVisit.has(patient.id) ? ` · Next ${formatDate(nextVisit.get(patient.id)!)}` : ""}
+                      {lastSeen.has(patient.id) ? `Seen ${formatShortDate(lastSeen.get(patient.id)!)}` : "Not seen yet"}
+                      {nextVisit.has(patient.id) ? ` · Next ${formatShortDate(nextVisit.get(patient.id)!)}` : ""}
                     </span>
                   </span>
                 </Link>

@@ -135,6 +135,17 @@ export function formatDate(at: Date) {
   return new Intl.DateTimeFormat(LOCALE, { timeZone: CLINIC_TIME_ZONE, ...LONG_DATE }).format(at);
 }
 
+/** "Sep 30", with the year only when it isn't this year — for dates in a list. */
+export function formatShortDate(at: Date, now = new Date()) {
+  const year = (d: Date) => new Intl.DateTimeFormat(LOCALE, { timeZone: CLINIC_TIME_ZONE, year: "numeric" }).format(d);
+  return new Intl.DateTimeFormat(LOCALE, {
+    timeZone: CLINIC_TIME_ZONE,
+    month: "short",
+    day: "numeric",
+    ...(year(at) === year(now) ? {} : { year: "numeric" }),
+  }).format(at);
+}
+
 /** "Wednesday, 2 September 2026" — for day headings. */
 export function formatDayHeading(at: Date) {
   return new Intl.DateTimeFormat(LOCALE, {

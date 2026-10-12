@@ -265,10 +265,11 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
             title={greetingFor(doctor.fullName, true, now, me?.firstName)}
             subtitle={formatDayHeading(now)}
             actions={
-              <>
+              // On a phone: the walk-in across, the other two side by side under it.
+              <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto">
                 <Link
                   href="/appointments/new?source=WALK_IN"
-                  className={buttonClass("primary")}
+                  className={`${buttonClass("primary")} col-span-2`}
                 >
                   Register walk-in
                 </Link>
@@ -278,7 +279,7 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
                 <Link href="/patients/new" className={buttonClass("secondary")}>
                   Add patient
                 </Link>
-              </>
+              </div>
             }
           />
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">

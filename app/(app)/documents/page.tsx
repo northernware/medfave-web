@@ -97,11 +97,6 @@ export default async function DocumentsPage({ searchParams }: PageProps<"/docume
                 ? "Documents handed over will be listed here, with who received them."
                 : "When somebody asks for a certificate, an abstract or copies of a chart, record it here."
             }
-            action={
-              <Link href="/documents/new" className={buttonClass("primary")}>
-                New document
-              </Link>
-            }
           />
         ) : (
           <ul className="divide-y divide-border">

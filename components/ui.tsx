@@ -150,7 +150,7 @@ export function PageHeader({
         <h1 className="text-[32px] leading-10 font-semibold tracking-[-0.015em] text-balance">{title}</h1>
         {subtitle ? <p className="mt-1 text-[15px] leading-6 text-ink-muted">{subtitle}</p> : null}
       </div>
-      {actions ? <div className="flex flex-wrap gap-2 sm:shrink-0">{actions}</div> : null}
+      {actions ? <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:shrink-0">{actions}</div> : null}
     </header>
   );
 }

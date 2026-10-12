@@ -55,10 +55,26 @@ export function ExamField({ name, defaultValue, onEdit }: { name: string; defaul
   };
   const systems = EXAM_SYSTEMS.filter((s) => showAll || s.common || findings[s.key] !== undefined);
   const hidden = EXAM_SYSTEMS.length - systems.length;
+  // The routine visit in one click: each common system not yet examined at its normal.
+  const commonLeft = EXAM_SYSTEMS.filter((s) => s.common && findings[s.key] === undefined);
 
   return (
     <div className="space-y-2">
       <input type="hidden" name={name} value={serializeExam(findings)} />
+      {commonLeft.length > 0 ? (
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => {
+              setFindings((f) => ({ ...f, ...Object.fromEntries(commonLeft.map((s) => [s.key, s.normal])) }));
+              onEdit();
+            }}
+            className="rounded-full border border-border-strong px-3 py-1 text-xs font-semibold hover:border-accent hover:text-accent-ink"
+          >
+            Common systems normal
+          </button>
+        </div>
+      ) : null}
       <ul className="divide-y divide-border rounded-lg border border-border">
         {systems.map((s) => {
           const text = findings[s.key];
@@ -116,7 +132,7 @@ export function ExamField({ name, defaultValue, onEdit }: { name: string; defaul
       </ul>
       {hidden > 0 ? (
         <button type="button" onClick={() => setShowAll(true)} className="text-sm font-medium text-accent-ink hover:underline">
-          More systems ({hidden}): skin, neck, lymph nodes, breasts, genitalia, rectal, extremities, pulses, musculoskeletal, neurologic, reflexes
+          More systems ({hidden})
         </button>
       ) : null}
     </div>

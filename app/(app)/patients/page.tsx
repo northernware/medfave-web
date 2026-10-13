@@ -126,7 +126,8 @@ export default async function PatientsPage({ searchParams }: PageProps<"/patient
       />
 
       <div className="flex flex-wrap items-center gap-3">
-        <div className="min-w-0 flex-1">
+        {/* On a phone the search takes the row; the toggle wraps under it. */}
+        <div className="min-w-0 basis-full sm:basis-auto sm:flex-1">
           <SearchForm
             action="/patients"
             placeholder="Search by name, number or household"

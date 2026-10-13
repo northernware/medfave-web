@@ -74,10 +74,11 @@ export default async function AppointmentsPage({ searchParams }: PageProps<"/app
         subtitle="Grouped by day, in clinic time."
         actions={
           <>
-            <Link href="/appointments/new?source=WALK_IN" className={buttonClass("secondary")}>
+            {/* Walk-in leads, as on Today. */}
+            <Link href="/appointments/new?source=WALK_IN" className={buttonClass("primary")}>
               Register walk-in
             </Link>
-            <Link href="/appointments/new" className={buttonClass("primary")}>
+            <Link href="/appointments/new" className={buttonClass("secondary")}>
               Book appointment
             </Link>
           </>

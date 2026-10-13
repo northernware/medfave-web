@@ -195,11 +195,14 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
                           >
                             <span className={`size-1.5 shrink-0 rounded-full ${DOT_TONE[a.status]}`} />
                             <span className="tabular shrink-0 font-medium">
-                              {formatTimeCompact(a.scheduledAt)}
+                              {/* "10a" on the hour: the cell is narrow. */}
+                              {formatTimeCompact(a.scheduledAt).replace(":00", "")}
                             </span>
                             {/* The person, not the family: a household's members share a surname. */}
+                            {/* Initials where the cell is too narrow for "Ramon D." */}
                             <span title={`${a.patient.firstName} ${a.patient.lastName}`} className="truncate text-ink-muted">
-                              {a.patient.firstName} {a.patient.lastName.charAt(0)}.
+                              <span className="min-[1440px]:hidden">{a.patient.firstName.charAt(0)}{a.patient.lastName.charAt(0)}</span>
+                              <span className="hidden min-[1440px]:inline">{a.patient.firstName} {a.patient.lastName.charAt(0)}.</span>
                             </span>
                           </span>
                         ))}
@@ -220,7 +223,7 @@ export default async function CalendarPage({ searchParams }: PageProps<"/calenda
         {/* Beside the grid on large screens, stacked underneath on small ones.
             Sticky so it stays put while a long month scrolls past. */}
         {/* The same schedule panel as Today, pinned right, showing the chosen day. */}
-        <div className="xl:fixed xl:top-3 xl:right-3 xl:bottom-3 xl:z-10 xl:w-[340px]">
+        <div className="max-xl:h-[480px] xl:fixed xl:top-3 xl:right-3 xl:bottom-3 xl:z-10 xl:w-[340px]">
           <ScheduleRail
             items={selected}
             dayKey={selectedDay ?? todayKey}

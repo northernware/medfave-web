@@ -33,6 +33,7 @@ import {
 } from "@/lib/domain";
 import { appointmentListQuery, loadClinicHours, loadSchedule, toAppointmentListItem } from "@/lib/queries";
 import { Badge, Card, EmptyState, PageHeader, buttonClass } from "@/components/ui";
+import { ClipboardPopup } from "./clipboard-popup";
 import { LastVisitDetails, PatientsList, ScheduleRail, StatCard, type LastVisit } from "./panels";
 
 /** Whole minutes between two moments, floored — the number a receptionist reads. */
@@ -173,6 +174,13 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
   }
   const selected = [...upcoming, ...recent].find((a) => a.id === visit) ?? upcoming[0] ?? recent[0] ?? null;
   const lastVisit = selected ? await loadLastVisit(selected.patient.id, doctor.id) : null;
+  // A red tag on each card: where the clipboard is a click away, allergies still show.
+  const listed = [...new Set([...upcoming, ...recent].map((a) => a.patient.id))];
+  const allergyCount: Record<string, number> = {};
+  for (const a of listed.length
+    ? await orm.PatientAllergy.select("patientId").where((a) => a.patientId.in(listed)).all()
+    : [])
+    allergyCount[a.patientId] = (allergyCount[a.patientId] ?? 0) + 1;
   const todayKey = dayKey(now);
 
   // Prisma 8 reads temporal columns as text; the UI works in `Date`, so each list
@@ -371,7 +379,8 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
               </Card>
           ) : null}
 
-          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,24rem)]">
+          {/* 1280–1439px, beside the schedule panel: the list takes the width, the clipboard opens over it. */}
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,24rem)] xl:max-[1439px]:grid-cols-1">
             <PatientsList
               upcoming={upcoming}
               moreFor={Object.fromEntries(moreFor)}
@@ -379,8 +388,16 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
               selectedId={selected?.id ?? null}
               todayKey={todayKey}
               day={railDay === todayKey ? undefined : railDay}
+              allergyCount={allergyCount}
             />
-            <LastVisitDetails visit={lastVisit} doctorName={doctor.fullName} />
+            <div className="xl:max-[1439px]:hidden">
+              <LastVisitDetails visit={lastVisit} doctorName={doctor.fullName} />
+            </div>
+            {typeof visit === "string" && selected ? (
+              <ClipboardPopup key={visit} title={fullName(selected.patient)}>
+                <LastVisitDetails visit={lastVisit} doctorName={doctor.fullName} />
+              </ClipboardPopup>
+            ) : null}
           </div>
 
           {leftoverRows.length > 0 ? (

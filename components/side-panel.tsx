@@ -8,15 +8,20 @@ import { type ReactNode, useEffect, useRef } from "react";
  * losing your place. It is a route (an intercepted one), so closing it is
  * going back: the close button, Esc and the backdrop all do that.
  */
-export function SidePanel({ title, children }: { title: string; children: ReactNode }) {
+export function SidePanel({ title, children, onClose }: { title: string; children: ReactNode; onClose?: () => void }) {
   const router = useRouter();
+  // Not a route (a panel the page opens itself): closing is the page's to do.
+  const close = useRef(onClose ?? (() => router.back()));
+  useEffect(() => {
+    close.current = onClose ?? (() => router.back());
+  });
   const panel = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const before = document.activeElement as HTMLElement | null;
     panel.current?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") router.back();
+      if (e.key === "Escape") close.current();
     };
     document.addEventListener("keydown", onKey);
     // The page underneath stays put while the panel scrolls.
@@ -31,7 +36,7 @@ export function SidePanel({ title, children }: { title: string; children: ReactN
 
   return (
     <div className="fixed inset-0 z-50">
-      <div aria-hidden className="absolute inset-0 bg-black/40 motion-safe:animate-[fade-in_150ms_ease-out]" onClick={() => router.back()} />
+      <div aria-hidden className="absolute inset-0 bg-black/40 motion-safe:animate-[fade-in_150ms_ease-out]" onClick={() => close.current()} />
       <div
         ref={panel}
         role="dialog"
@@ -42,7 +47,7 @@ export function SidePanel({ title, children }: { title: string; children: ReactN
       >
         <div className="flex items-center justify-between gap-4 border-b border-border px-5 py-3">
           <p className="truncate font-display text-base font-semibold">{title}</p>
-          <button type="button" onClick={() => router.back()} className="rounded-md px-2 py-1 text-sm font-medium text-ink-muted hover:bg-surface-muted hover:text-ink">
+          <button type="button" onClick={() => close.current()} className="rounded-md px-2 py-1 text-sm font-medium text-ink-muted hover:bg-surface-muted hover:text-ink">
             Close
           </button>
         </div>

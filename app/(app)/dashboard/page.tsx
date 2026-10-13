@@ -389,12 +389,13 @@ export default async function DashboardPage({ searchParams }: PageProps<"/dashbo
               todayKey={todayKey}
               day={railDay === todayKey ? undefined : railDay}
               allergyCount={allergyCount}
+              picked={typeof visit === "string"}
             />
             <div className="xl:max-[1439px]:hidden">
               <LastVisitDetails visit={lastVisit} doctorName={doctor.fullName} />
             </div>
             {typeof visit === "string" && selected ? (
-              <ClipboardPopup key={visit} title={fullName(selected.patient)}>
+              <ClipboardPopup key={visit} title="Clipboard">
                 <LastVisitDetails visit={lastVisit} doctorName={doctor.fullName} />
               </ClipboardPopup>
             ) : null}

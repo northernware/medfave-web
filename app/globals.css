@@ -342,3 +342,23 @@ input[type="time"]::-webkit-date-and-time-value {
     cursor: pointer;
   }
 }
+
+/* Today, 1280–1439px: the clipboard is a panel, so the first patient isn't lit until clicked. */
+@media (min-width: 1280px) and (max-width: 1439px) {
+  [data-default-pick] {
+    background: var(--surface-muted) !important;
+    color: var(--ink) !important;
+  }
+  [data-default-pick] * {
+    color: inherit !important;
+  }
+  /* Its initials, "+1" and allergy tag as on the other cards. */
+  [data-default-pick] [data-pick-soft] {
+    background: var(--accent-soft) !important;
+    color: var(--accent-ink) !important;
+  }
+  [data-default-pick] [data-pick-danger] {
+    background: var(--alert-danger) !important;
+    color: var(--on-alert-danger) !important;
+  }
+}

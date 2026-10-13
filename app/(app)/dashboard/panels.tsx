@@ -76,7 +76,10 @@ export function PatientsList({
   day,
   moreFor = {},
   recent = [],
+  allergyCount = {},
 }: {
+  /** Allergies recorded per patient: a red tag on the card where the clipboard isn't beside it. */
+  allergyCount?: Record<string, number>;
   upcoming: AppointmentListItem[];
   /** Patients seen lately (their last visit), filling the list when few are booked. */
   recent?: AppointmentListItem[];
@@ -128,6 +131,13 @@ export function PatientsList({
                           className={`shrink-0 rounded-full px-1.5 text-[11px] leading-[18px] font-semibold ${on ? "bg-on-accent/15 text-on-accent" : "bg-accent-soft text-accent-ink"}`}
                         >
                           +{moreFor[a.patient.id]}
+                        </span>
+                      ) : null}
+                      {allergyCount[a.patient.id] ? (
+                        <span
+                          className={`hidden shrink-0 rounded-full px-1.5 text-[11px] leading-[18px] font-semibold xl:max-[1439px]:inline ${on ? "bg-on-accent/15 text-on-accent" : "bg-alert-danger text-on-alert-danger"}`}
+                        >
+                          {allergyCount[a.patient.id]} {allergyCount[a.patient.id] === 1 ? "allergy" : "allergies"}
                         </span>
                       ) : null}
                     </span>

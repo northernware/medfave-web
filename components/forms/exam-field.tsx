@@ -95,9 +95,10 @@ export function ExamField({ name, defaultValue, onEdit }: { name: string; defaul
                   <button
                     type="button"
                     onClick={() => set(s.key, undefined)}
+                    title="Clear this finding (not examined)"
                     className="rounded-full px-2.5 py-1 text-xs text-ink-muted hover:bg-surface-muted hover:text-ink"
                   >
-                    Not examined
+                    Clear
                   </button>
                 ) : (
                   <>
@@ -267,8 +268,8 @@ function PartsEditor({ systemKey, text, onChange }: { systemKey: string; text: s
                     </button>
                   </>
                 ) : (
-                  <button type="button" onClick={() => put(part.name, undefined)} className="rounded-full px-2 py-0.5 text-xs text-ink-faint hover:text-ink">
-                    Not examined
+                  <button type="button" onClick={() => put(part.name, undefined)} title="Clear this finding (not examined)" className="rounded-full px-2 py-0.5 text-xs text-ink-faint hover:text-ink">
+                    Clear
                   </button>
                 )}
               </div>

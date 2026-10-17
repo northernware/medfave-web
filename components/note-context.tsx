@@ -139,7 +139,7 @@ export async function NoteContext({
         {/* Changed in place: what the doctor learns at the visit goes straight on the chart. */}
         <AllergyBanner status={patient.allergyStatus} allergies={patient.allergies} patientId={patientId} />
         <AlertBanner alerts={patient.alerts} patientId={patientId} />
-      <Box plain title="Ongoing conditions">
+      <Box title="Ongoing conditions">
           {patient.conditions.length ? (
             <ul className="space-y-0.5">
               {patient.conditions.map((c) => (
@@ -169,7 +169,7 @@ export async function NoteContext({
           </Add>
         </Box>
 
-        <Box plain title="Current medicines">
+        <Box title="Current medicines">
           {patient.medications.length ? (
             <ul className="space-y-0.5">
               {patient.medications.map((m) => (

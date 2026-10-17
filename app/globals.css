@@ -40,16 +40,19 @@
   --logo-heart: light-dark(#e91e83, #ffffff);
   --logo-word: light-dark(#32132c, #ffffff);
 
-  /* Plum grounds the dark theme too — surfaces are deep plum, not grey. */
-  --canvas: light-dark(#fff9fc, #1d0b19);
-  --surface: light-dark(#ffffff, #271122);
-  --surface-muted: light-dark(#fbeff4, #33182d);
-  --border: light-dark(#f0dce6, #43233b);
-  --border-strong: light-dark(#dfc2d1, #5b3551);
+  /* Calm grounds (owner's call, 2026-10-17; the app matches, medfave-mobile
+     src/constants/theme.ts): near-neutral surfaces and text with a faint plum
+     undertone, so pink means an action or a selection and the allergy and
+     alert boxes are the loudest things on screen. */
+  --canvas: light-dark(#fbf9fa, #221d21);
+  --surface: light-dark(#ffffff, #2c262b);
+  --surface-muted: light-dark(#f3eff1, #363035);
+  --border: light-dark(#e9e3e6, #3d363b);
+  --border-strong: light-dark(#d9d1d6, #4f474d);
 
-  --ink: light-dark(#32132c, #fff1f7);
-  --ink-muted: light-dark(#6b4f63, #d8bccd);
-  --ink-faint: light-dark(#7b6174, #af93a5);
+  --ink: light-dark(#2a1f27, #f4f1f3);
+  --ink-muted: light-dark(#5f5560, #c2b9bf);
+  --ink-faint: light-dark(#6b6168, #a39aa0);
 
   /* Dark takes a lighter pink with plum labels: fuchsia with white text would
      fall below 4.5:1 at button size. */

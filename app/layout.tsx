@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   description: "Appointments and medical records for family practice, organised by household.",
 };
 
-const CANVAS = { light: "#fff9fc", dark: "#1d0b19" };
+const CANVAS = { light: "#fbf9fa", dark: "#221d21" };
 
 async function currentTheme() {
   return parseTheme((await cookies()).get(THEME_COOKIE)?.value);

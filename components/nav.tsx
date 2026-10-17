@@ -4,10 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Buildings2Icon } from "@solar-icons/react/linear/buildings-2";
 import { CalendarIcon } from "@solar-icons/react/linear/calendar";
+import { CalendarMarkIcon } from "@solar-icons/react/linear/calendar-mark";
 import { ClipboardListIcon } from "@solar-icons/react/linear/clipboard-list";
 import { ClockCircleIcon } from "@solar-icons/react/linear/clock-circle";
 import { DocumentTextIcon } from "@solar-icons/react/linear/document-text";
-import { Home2Icon } from "@solar-icons/react/linear/home-2";
 import { InboxInIcon } from "@solar-icons/react/linear/inbox-in";
 import { NotesIcon } from "@solar-icons/react/linear/notes";
 import { SettingsIcon } from "@solar-icons/react/linear/settings";
@@ -19,9 +19,10 @@ import { UsersGroupRoundedIcon } from "@solar-icons/react/linear/users-group-rou
 import { UsersGroupTwoRoundedIcon } from "@solar-icons/react/linear/users-group-two-rounded";
 import { DOCTOR_LINKS, type IconKey, type NavLink } from "@/components/nav-links";
 
-const ICONS: Record<IconKey, typeof Home2Icon> = {
+const ICONS: Record<IconKey, typeof CalendarIcon> = {
   feedback: ChatRoundLikeIcon,
-  today: Home2Icon,
+  // Today: one day marked on a calendar (Calendar is the whole month).
+  today: CalendarMarkIcon,
   calendar: CalendarIcon,
   appointments: ClipboardListIcon,
   households: UsersGroupTwoRoundedIcon,

@@ -455,7 +455,8 @@ export default async function PatientPage({
       <div>
         <dl className="grid grid-cols-2 gap-x-4 gap-y-3.5">
           <Detail
-            className="col-span-2"
+            // Outlined, like the allergies box when there are none.
+            className="col-span-2 rounded-md border border-border bg-surface px-3.5 py-3"
             label="Current medications"
             value={
               currentMedications.length > 0 ? (
@@ -500,7 +501,8 @@ export default async function PatientPage({
             />
           ) : null}
           <Detail
-            className="col-span-2"
+            // Outlined, like the allergies box when there are none.
+            className="col-span-2 rounded-md border border-border bg-surface px-3.5 py-3"
             label="Ongoing conditions"
             value={
               activeConditions.length > 0 ? (

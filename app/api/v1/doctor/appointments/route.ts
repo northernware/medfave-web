@@ -15,13 +15,16 @@ const PAGE = 50;
 /**
  * This doctor's visits as a list, for the app's Visits tab:
  * `?view=upcoming` (default; from now, soonest first) or `past` (most recent
- * first), optionally `&q=` a patient's name → `{ appointments[], more }`, each
+ * first), optionally `&q=` a patient's name → `{ appointments[], more, needsNote }`, each
  * as in `/doctor/day` (with `nextStatuses`) plus `note`: the visit's note
  * (`{ id, status: "DRAFT" | "SIGNED" }`) or null.
  *
  * Past only: `&filter=` one of PAST_FILTERS. Pages of 50: `more` says there are
  * further ones; ask for the next with `&before=` (past) or `&after=`
  * (upcoming) the last one's `scheduledAt`.
+ *
+ * `needsNote`: how many of this doctor's visits are seen but not written up
+ * and signed, whatever the view, filter or search (the app's chip and badge).
  */
 export async function GET(request: Request) {
   const doctor = await apiDoctor(request);
@@ -55,12 +58,19 @@ export async function GET(request: Request) {
       .where((a) => a.medicalRecord.none((r) => r.status.in(["FINALIZED", "AMENDED"])));
   }
 
-  const rows = await query.all();
+  const [rows, owed] = await Promise.all([
+    query.all(),
+    orm.Appointment
+      .where((a) => a.doctorId.eq(doctor.doctorId))
+      .where((a) => a.status.eq("COMPLETED"))
+      .where((a) => a.medicalRecord.none((r) => r.status.in(["FINALIZED", "AMENDED"])))
+      .aggregate((agg) => ({ n: agg.count() })),
+  ]);
   const appointments = rows.slice(0, PAGE).map((a) => ({
     ...shapeAppointment(a),
     note: a.medicalRecord ? { id: a.medicalRecord.id, status: a.medicalRecord.status === "DRAFT" ? "DRAFT" : "SIGNED" } : null,
   }));
-  return Response.json({ appointments, more: rows.length > PAGE });
+  return Response.json({ appointments, more: rows.length > PAGE, needsNote: owed.n });
 }
 
 /**

@@ -24,7 +24,7 @@ export async function GET(request: Request, ctx: RouteContext<"/api/v1/doctor/pa
   const patient = await orm.Patient
     .select(
       "id", "firstName", "middleName", "lastName", "patientNumber", "dateOfBirth", "sex", "contactNumber", "email",
-      "archivedAt", "allergyStatus", "medicationStatus", "conditionStatus", "bloodType",
+      "archivedAt", "accountId", "allergyStatus", "medicationStatus", "conditionStatus", "bloodType",
       "emergencyContactName", "emergencyContactRelationship", "emergencyContactNumber",
     )
     .include("household", (h) => h.select("id", "name"))
@@ -103,6 +103,8 @@ export async function GET(request: Request, ctx: RouteContext<"/api/v1/doctor/pa
       sexLabel: patient.sex ? SEX_LABELS[patient.sex] : null,
       contactNumber: patient.contactNumber,
       email: patient.email,
+      /** Has a Medfave login of their own: no app code to give them. */
+      hasLogin: patient.accountId !== null,
       household: {
         id: patient.household.id,
         name: patient.household.name,

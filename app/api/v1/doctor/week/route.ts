@@ -1,6 +1,6 @@
 import { apiDoctor, apiError } from "@/lib/api";
 import { dayKey, instantFromDb, instantToDb, startOfClinicDay } from "@/lib/datetime";
-import { ACTIVE_STATUSES, fullName } from "@/lib/domain";
+import { ACTIVE_STATUSES, fullName, SERVICE_LABELS } from "@/lib/domain";
 import { orm } from "@/src/prisma/db";
 
 /**
@@ -9,7 +9,7 @@ import { orm } from "@/src/prisma/db";
  * (800 with `names=1`, the calendar's whole range in one call).
  * `&count=any`: every visit not cancelled, past ones too (the calendar's dots), not
  * only those still expected. `&names=1`: each day's visits too, `visits: [{ id,
- * patientId, time, minutes, name, status }]` by time (the calendar's Details and List).
+ * patientId, time, minutes, name, status, service }]` by time (the calendar's Details and List).
  */
 export async function GET(request: Request) {
   const doctor = await apiDoctor(request);
@@ -29,7 +29,7 @@ export async function GET(request: Request) {
   const end = new Date(start.getTime() + days * 24 * 60 * 60 * 1000);
 
   const rows = await orm.Appointment
-    .select("id", "scheduledAt", "durationMinutes", "status")
+    .select("id", "scheduledAt", "durationMinutes", "status", "service")
     .include("patient", (p) => p.select("id", "firstName", "middleName", "lastName"))
     .where((a) => a.doctorId.eq(doctor.doctorId))
     .where((a) => (any ? a.status.notIn(["CANCELLED"]) : a.status.in(ACTIVE_STATUSES)))
@@ -38,14 +38,14 @@ export async function GET(request: Request) {
     .all();
 
   const counts = new Map<string, number>();
-  const visits = new Map<string, { id: string; patientId: string; time: string; minutes: number; name: string; status: string }[]>();
+  const visits = new Map<string, { id: string; patientId: string; time: string; minutes: number; name: string; status: string; service: string }[]>();
   for (const r of [...rows].sort((x, y) => String(x.scheduledAt).localeCompare(String(y.scheduledAt)))) {
     const at = instantFromDb(r.scheduledAt);
     const key = dayKey(at);
     counts.set(key, (counts.get(key) ?? 0) + 1);
     if (names) {
       const list = visits.get(key) ?? [];
-      list.push({ id: r.id, patientId: r.patient.id, time: at.toISOString(), minutes: r.durationMinutes, name: fullName(r.patient), status: r.status });
+      list.push({ id: r.id, patientId: r.patient.id, time: at.toISOString(), minutes: r.durationMinutes, name: fullName(r.patient), status: r.status, service: SERVICE_LABELS[r.service] ?? r.service });
       visits.set(key, list);
     }
   }

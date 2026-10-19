@@ -8,6 +8,8 @@ import { orm } from "@/src/prisma/db";
 
 /** Past visits, by how they ended; `needs-note` are seen but not yet written up and signed. */
 const PAST_FILTERS = ["completed", "missed", "cancelled", "needs-note"] as const;
+/** Upcoming, by what's still to do: `pending` are bookings not yet confirmed. */
+const UPCOMING_FILTERS = ["pending"] as const;
 type PastFilter = (typeof PAST_FILTERS)[number];
 
 const PAGE = 50;
@@ -24,7 +26,7 @@ const UNDER_WAY = ["CHECKED_IN", "IN_CONSULTATION"] as const;
  * as in `/doctor/day` (with `nextStatuses`) plus `note`: the visit's note
  * (`{ id, status: "DRAFT" | "SIGNED" }`) or null.
  *
- * Past only: `&filter=` one of PAST_FILTERS. Pages of 50: `more` says there are
+ * `&filter=`: for Past one of PAST_FILTERS, for Upcoming one of UPCOMING_FILTERS. Pages of 50: `more` says there are
  * further ones; ask for the next with `&before=` (past) or `&after=`
  * (upcoming) the last one's `scheduledAt`.
  *
@@ -63,6 +65,8 @@ export async function GET(request: Request) {
     const like = `%${likeSafe(q)}%`;
     query = query.where((a) => a.patient.some((p) => or(p.firstName.ilike(like), p.lastName.ilike(like))));
   }
+  const upcomingFilter = UPCOMING_FILTERS.find((f) => f === params.get("filter"));
+  if (!past && upcomingFilter === "pending") query = query.where((a) => a.status.eq("PENDING"));
   if (past && filter === "completed") query = query.where((a) => a.status.eq("COMPLETED"));
   if (past && filter === "missed") query = query.where((a) => a.status.eq("NO_SHOW"));
   if (past && filter === "cancelled") query = query.where((a) => a.status.eq("CANCELLED"));

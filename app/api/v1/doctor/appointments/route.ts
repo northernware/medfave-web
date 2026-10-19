@@ -28,8 +28,8 @@ const UNDER_WAY = ["CHECKED_IN", "IN_CONSULTATION"] as const;
  * further ones; ask for the next with `&before=` (past) or `&after=`
  * (upcoming) the last one's `scheduledAt`.
  *
- * `needsNote`: how many of this doctor's visits are seen but not written up
- * and signed, whatever the view, filter or search (the app's chip and badge).
+ * How many visits need a note comes from `/doctor/pulse` (it was counted here
+ * on every call).
  */
 export async function GET(request: Request) {
   const doctor = await apiDoctor(request);
@@ -72,19 +72,12 @@ export async function GET(request: Request) {
       .where((a) => a.medicalRecord.none((r) => r.status.in(["FINALIZED", "AMENDED"])));
   }
 
-  const [rows, owed] = await Promise.all([
-    query.all(),
-    orm.Appointment
-      .where((a) => a.doctorId.eq(doctor.doctorId))
-      .where((a) => a.status.eq("COMPLETED"))
-      .where((a) => a.medicalRecord.none((r) => r.status.in(["FINALIZED", "AMENDED"])))
-      .aggregate((agg) => ({ n: agg.count() })),
-  ]);
+  const rows = await query.all();
   const appointments = rows.slice(0, PAGE).map((a) => ({
     ...shapeAppointment(a),
     note: a.medicalRecord ? { id: a.medicalRecord.id, status: a.medicalRecord.status === "DRAFT" ? "DRAFT" : "SIGNED" } : null,
   }));
-  return Response.json({ appointments, more: rows.length > PAGE, needsNote: owed.n });
+  return Response.json({ appointments, more: rows.length > PAGE });
 }
 
 /**

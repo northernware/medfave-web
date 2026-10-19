@@ -2,7 +2,7 @@ import { and, or } from "@prisma/orm-postgres/orm-client";
 import { apiDoctor, apiError, readJson } from "@/lib/api";
 import { APPOINTMENT_COLUMNS, shapeAppointment } from "@/lib/api-shapes";
 import { bookAppointment } from "@/lib/booking";
-import { instantToDb } from "@/lib/datetime";
+import { dayKey, instantToDb, startOfClinicDay } from "@/lib/datetime";
 import { likeSafe } from "@/lib/diagnosis-rank";
 import { orm } from "@/src/prisma/db";
 
@@ -18,9 +18,9 @@ const UNDER_WAY = ["CHECKED_IN", "IN_CONSULTATION"] as const;
 
 /**
  * This doctor's visits as a list, for the app's Visits tab:
- * `?view=upcoming` (default; from now, soonest first, with anyone waiting or
+ * `?view=upcoming` (default; from now, soonest first, with today's waiting or
  * with the doctor first whatever their booked time) or `past` (visits over:
- * completed, missed, cancelled; most recent first), optionally `&q=` a patient's name → `{ appointments[], more, needsNote }`, each
+ * completed, missed, cancelled, and earlier days' never closed; most recent first), optionally `&q=` a patient's name → `{ appointments[], more, needsNote }`, each
  * as in `/doctor/day` (with `nextStatuses`) plus `note`: the visit's note
  * (`{ id, status: "DRAFT" | "SIGNED" }`) or null.
  *
@@ -40,21 +40,22 @@ export async function GET(request: Request) {
   const filter = PAST_FILTERS.find((f) => f === params.get("filter")) as PastFilter | undefined;
   const cursor = params.get(past ? "before" : "after");
   const from = cursor && !Number.isNaN(Date.parse(cursor)) ? instantToDb(new Date(cursor)) : instantToDb(new Date());
+  const today = instantToDb(startOfClinicDay(dayKey(new Date())));
 
   let query = orm.Appointment
     .select(...APPOINTMENT_COLUMNS)
     .include("patient", (p) => p.select("id", "firstName", "middleName", "lastName", "householdId"))
     .include("medicalRecord", (r) => r.select("id", "status"))
     .where((a) => a.doctorId.eq(doctor.doctorId))
-    // Past: visits that are over (seen, missed, cancelled) and were due before now. Upcoming: what's
-    // ahead, and anyone waiting or with the doctor whatever their booked time (not over yet).
-    // A page after the first starts past the last one shown (a cursor).
+    // Past: visits over (seen, missed, cancelled), and ones from earlier days never closed (still
+    // checked in or in consultation: the app marks them "Not completed"). Upcoming: what's ahead, and
+    // today's under way whatever their booked time. A page after the first starts past the last shown.
     .where((a) =>
       past
-        ? and(a.scheduledAt.lt(from), a.status.in(ENDED))
+        ? and(a.scheduledAt.lt(from), or(a.status.in(ENDED), and(a.status.in(UNDER_WAY), a.scheduledAt.lt(today))))
         : cursor
           ? a.scheduledAt.gt(from)
-          : or(a.scheduledAt.gte(from), a.status.in(UNDER_WAY)),
+          : or(a.scheduledAt.gte(from), and(a.status.in(UNDER_WAY), a.scheduledAt.gte(today))),
     )
     .orderBy((a) => (past ? a.scheduledAt.desc() : a.scheduledAt.asc()))
     .limit(PAGE + 1);

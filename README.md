@@ -82,10 +82,11 @@ your own server. Put it in `DATABASE_URL`; `npm run db:migrate` applies the
 migrations under `migrations/app/` and needs no shadow database.
 
 The shared dev database (and medfave.vercel.app) is a free **Supabase** project
-(Mumbai, `ap-south-1`): no cap on queries, unlike Prisma Postgres's free plan,
+(Singapore, `ap-southeast-1`): no cap on queries, unlike Prisma Postgres's free plan,
 which this app's polling ran out of. Locally use its **Session pooler** string
 (port 5432); Vercel uses the **Transaction pooler** (port 6543). Ask the owner
-for the connection string; never commit it.
+for the connection string; never commit it. A password with `@`, `:`, `/`, `?`, `#`,
+`&`, `%` or `+` must be URL-encoded in the string (`@` → `%40`).
 
 Changing the schema is three steps: edit `src/prisma/contract.prisma`, run
 `npm run db:emit`, then either `npm run db:update` to push the change straight

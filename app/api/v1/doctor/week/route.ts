@@ -5,7 +5,8 @@ import { orm } from "@/src/prisma/db";
 
 /**
  * How many visits are still expected on each of the next days — what the
- * app's day strip marks. `?from=YYYY-MM-DD` (today by default), `&days=` up to 31.
+ * app's day strip marks. `?from=YYYY-MM-DD` (today by default), `&days=` up to 31
+ * (800 with `names=1`, the calendar's whole range in one call).
  * `&count=any`: every visit not cancelled, past ones too (the calendar's dots), not
  * only those still expected. `&names=1`: each day's visits too, `visits: [{ id,
  * patientId, time, minutes, name, status }]` by time (the calendar's Details and List).
@@ -16,7 +17,10 @@ export async function GET(request: Request) {
 
   const params = new URL(request.url).searchParams;
   const from = params.get("from") ?? dayKey(new Date());
-  const days = Math.min(31, Math.max(1, Number(params.get("days") ?? 7) || 7));
+  // Up to 31 days; the calendar (names=1) asks for its whole range at once, up to about two years,
+  // rather than a request per month.
+  const max = params.get("names") === "1" ? 800 : 31;
+  const days = Math.min(max, Math.max(1, Number(params.get("days") ?? 7) || 7));
   if (!/^\d{4}-\d{2}-\d{2}$/.test(from)) return apiError(422, "Use a date like 2026-10-01.", { from: ["Invalid date"] });
 
   const any = params.get("count") === "any";

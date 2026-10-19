@@ -7,8 +7,8 @@ import { orm } from "@/src/prisma/db";
  * How many visits are still expected on each of the next days — what the
  * app's day strip marks. `?from=YYYY-MM-DD` (today by default), `&days=` up to 31.
  * `&count=any`: every visit not cancelled, past ones too (the calendar's dots), not
- * only those still expected. `&names=1`: each day's visits too, `visits: [{ time,
- * name, status }]` by time (the calendar's Details and List).
+ * only those still expected. `&names=1`: each day's visits too, `visits: [{ id,
+ * patientId, time, name, status }]` by time (the calendar's Details and List).
  */
 export async function GET(request: Request) {
   const doctor = await apiDoctor(request);
@@ -25,8 +25,8 @@ export async function GET(request: Request) {
   const end = new Date(start.getTime() + days * 24 * 60 * 60 * 1000);
 
   const rows = await orm.Appointment
-    .select("scheduledAt", "status")
-    .include("patient", (p) => p.select("firstName", "middleName", "lastName"))
+    .select("id", "scheduledAt", "status")
+    .include("patient", (p) => p.select("id", "firstName", "middleName", "lastName"))
     .where((a) => a.doctorId.eq(doctor.doctorId))
     .where((a) => (any ? a.status.notIn(["CANCELLED"]) : a.status.in(ACTIVE_STATUSES)))
     .where((a) => a.scheduledAt.gte(instantToDb(start)))
@@ -34,14 +34,14 @@ export async function GET(request: Request) {
     .all();
 
   const counts = new Map<string, number>();
-  const visits = new Map<string, { time: string; name: string; status: string }[]>();
+  const visits = new Map<string, { id: string; patientId: string; time: string; name: string; status: string }[]>();
   for (const r of [...rows].sort((x, y) => String(x.scheduledAt).localeCompare(String(y.scheduledAt)))) {
     const at = instantFromDb(r.scheduledAt);
     const key = dayKey(at);
     counts.set(key, (counts.get(key) ?? 0) + 1);
     if (names) {
       const list = visits.get(key) ?? [];
-      list.push({ time: at.toISOString(), name: fullName(r.patient), status: r.status });
+      list.push({ id: r.id, patientId: r.patient.id, time: at.toISOString(), name: fullName(r.patient), status: r.status });
       visits.set(key, list);
     }
   }

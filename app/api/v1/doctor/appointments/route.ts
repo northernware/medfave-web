@@ -1,4 +1,4 @@
-import { or } from "@prisma/orm-postgres/orm-client";
+import { and, or } from "@prisma/orm-postgres/orm-client";
 import { apiDoctor, apiError, readJson } from "@/lib/api";
 import { APPOINTMENT_COLUMNS, shapeAppointment } from "@/lib/api-shapes";
 import { bookAppointment } from "@/lib/booking";
@@ -12,10 +12,15 @@ type PastFilter = (typeof PAST_FILTERS)[number];
 
 const PAGE = 50;
 
+/** Visits that are over, for Past; under way ones stay in Upcoming whatever their booked time. */
+const ENDED = ["COMPLETED", "CANCELLED", "NO_SHOW"] as const;
+const UNDER_WAY = ["CHECKED_IN", "IN_CONSULTATION"] as const;
+
 /**
  * This doctor's visits as a list, for the app's Visits tab:
- * `?view=upcoming` (default; from now, soonest first) or `past` (most recent
- * first), optionally `&q=` a patient's name → `{ appointments[], more, needsNote }`, each
+ * `?view=upcoming` (default; from now, soonest first, with anyone waiting or
+ * with the doctor first whatever their booked time) or `past` (visits over:
+ * completed, missed, cancelled; most recent first), optionally `&q=` a patient's name → `{ appointments[], more, needsNote }`, each
  * as in `/doctor/day` (with `nextStatuses`) plus `note`: the visit's note
  * (`{ id, status: "DRAFT" | "SIGNED" }`) or null.
  *
@@ -41,8 +46,16 @@ export async function GET(request: Request) {
     .include("patient", (p) => p.select("id", "firstName", "middleName", "lastName", "householdId"))
     .include("medicalRecord", (r) => r.select("id", "status"))
     .where((a) => a.doctorId.eq(doctor.doctorId))
-    // A page after the first starts past the last one shown (a cursor, not "from now").
-    .where((a) => (past ? a.scheduledAt.lt(from) : cursor ? a.scheduledAt.gt(from) : a.scheduledAt.gte(from)))
+    // Past: visits that are over (seen, missed, cancelled) and were due before now. Upcoming: what's
+    // ahead, and anyone waiting or with the doctor whatever their booked time (not over yet).
+    // A page after the first starts past the last one shown (a cursor).
+    .where((a) =>
+      past
+        ? and(a.scheduledAt.lt(from), a.status.in(ENDED))
+        : cursor
+          ? a.scheduledAt.gt(from)
+          : or(a.scheduledAt.gte(from), a.status.in(UNDER_WAY)),
+    )
     .orderBy((a) => (past ? a.scheduledAt.desc() : a.scheduledAt.asc()))
     .limit(PAGE + 1);
   if (q) {

@@ -81,6 +81,12 @@ Any PostgreSQL connection string works — Prisma Postgres, Neon, Supabase, RDS 
 your own server. Put it in `DATABASE_URL`; `npm run db:migrate` applies the
 migrations under `migrations/app/` and needs no shadow database.
 
+The shared dev database (and medfave.vercel.app) is a free **Supabase** project
+(Mumbai, `ap-south-1`): no cap on queries, unlike Prisma Postgres's free plan,
+which this app's polling ran out of. Locally use its **Session pooler** string
+(port 5432); Vercel uses the **Transaction pooler** (port 6543). Ask the owner
+for the connection string; never commit it.
+
 Changing the schema is three steps: edit `src/prisma/contract.prisma`, run
 `npm run db:emit`, then either `npm run db:update` to push the change straight
 into a development database, or `npm run db:plan` to write a migration to disk

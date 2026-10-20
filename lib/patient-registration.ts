@@ -194,6 +194,7 @@ export type PatientScalars = Omit<
   | "alerts"
   | "familyHistory"
   | "pastHistory"
+  | "immunizations"
   | "primaryContactFor"
   | "chartAccesses"
   | "documentRequests"

@@ -144,6 +144,15 @@ namespace public {
     menstrualCycle    String?
     lastMenstrualPeriod String?
     obNotes           String?
+    /// Birth history (children): TERM, PRETERM or POSTTERM; birth weight as
+    /// written ("3.2 kg"); delivery (NSD, CS, ASSISTED); a note.
+    birthTerm         String?
+    birthWeight       String?
+    birthDelivery     String?
+    birthNotes        String?
+    /// Developmental history (children): ON_TRACK or DELAYED, and milestones.
+    development       String?
+    developmentNotes  String?
     contactNumber     String?
     email             String?
     /// Whether this person wants to hear from the clinic before a visit, and
@@ -185,6 +194,7 @@ namespace public {
     alerts            PatientAlert[]
     familyHistory     PatientFamilyHistory[]
     pastHistory       PatientPastHistory[]
+    immunizations     PatientImmunization[]
     documentRequests  DocumentRequest[]
     activations       PatientActivation[]
     /// Logins that look after this person (a parent, a guardian) — not theirs.
@@ -454,6 +464,24 @@ namespace public {
     @@index([patientId], map: "PatientPastHistory_patientId_idx")
 
     @@map("PatientPastHistory")
+  }
+
+  /// A dose given: the vaccine (the app's code, as "PENTA", or a name typed),
+  /// which dose ("1", "booster"), and when (YYYY-MM-DD). Removed if recorded by
+  /// mistake. The app shows the Philippine childhood schedule against these.
+  model PatientImmunization {
+    id        String       @id(map: "PatientImmunization_pkey")
+    patientId String
+    vaccine   String
+    dose      String?
+    givenOn   String?
+    notes     String?
+    createdAt TimestampString(3) @default(now())
+    patient   Patient      @relation(fields: [patientId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "PatientImmunization_patientId_fkey")
+
+    @@index([patientId], map: "PatientImmunization_patientId_idx")
+
+    @@map("PatientImmunization")
   }
 
   model PatientAlert {

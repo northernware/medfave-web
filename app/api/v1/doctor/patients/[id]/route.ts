@@ -27,6 +27,7 @@ export async function GET(request: Request, ctx: RouteContext<"/api/v1/doctor/pa
       "archivedAt", "accountId", "allergyStatus", "medicationStatus", "conditionStatus", "bloodType",
       "emergencyContactName", "emergencyContactRelationship", "emergencyContactNumber",
       "emergencyContact2Name", "emergencyContact2Relationship", "emergencyContact2Number",
+      "smoking", "packYears", "alcohol", "occupation", "socialNotes",
     )
     .include("household", (h) => h.select("id", "name"))
     .where((p) => p.id.eq(id))
@@ -63,6 +64,8 @@ export async function GET(request: Request, ctx: RouteContext<"/api/v1/doctor/pa
           orm.PatientAlert.select("id", "label", "notes").where((x) => x.patientId.eq(id)).all(),
           orm.PatientCondition.select("id", "label", "notes").where((x) => x.patientId.eq(id)).where((x) => x.resolvedAt.isNull()).all(),
           orm.PatientMedication.select("id", "label", "dosage", "frequency", "notes").where((x) => x.patientId.eq(id)).where((x) => x.stoppedAt.isNull()).all(),
+          orm.PatientFamilyHistory.select("id", "condition", "relative", "notes").where((x) => x.patientId.eq(id)).orderBy((x) => x.createdAt.asc()).all(),
+          orm.PatientPastHistory.select("id", "kind", "label", "year", "notes").where((x) => x.patientId.eq(id)).orderBy((x) => x.createdAt.asc()).all(),
         ])
       : null,
     cares
@@ -144,6 +147,18 @@ export async function GET(request: Request, ctx: RouteContext<"/api/v1/doctor/pa
           alerts: chart[1],
           conditions: chart[2],
           medications: chart[3],
+          /** Illness in the family: `{ id, condition, relative, notes }`. */
+          familyHistory: chart[4],
+          /** Past illnesses, surgeries and hospitalisations: `{ id, kind, label, year, notes }`. */
+          pastHistory: chart[5],
+          /** Personal and social history; each null until asked. */
+          social: {
+            smoking: patient.smoking,
+            packYears: patient.packYears,
+            alcohol: patient.alcohol,
+            occupation: patient.occupation,
+            notes: patient.socialNotes,
+          },
         }
       : null,
     visits: visits

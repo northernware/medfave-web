@@ -116,12 +116,20 @@
       "model": "PatientCondition",
       "namespace": "public"
     },
+    "PatientFamilyHistory": {
+      "model": "PatientFamilyHistory",
+      "namespace": "public"
+    },
     "PatientMedication": {
       "model": "PatientMedication",
       "namespace": "public"
     },
     "PatientNumberCounter": {
       "model": "PatientNumberCounter",
+      "namespace": "public"
+    },
+    "PatientPastHistory": {
+      "model": "PatientPastHistory",
       "namespace": "public"
     },
     "Prescription": {
@@ -5089,6 +5097,13 @@
                   "kind": "scalar"
                 }
               },
+              "alcohol": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "allergyStatus": {
                 "nullable": false,
                 "type": {
@@ -5268,6 +5283,20 @@
                   "kind": "scalar"
                 }
               },
+              "occupation": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "packYears": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "patientNumber": {
                 "nullable": true,
                 "type": {
@@ -5310,6 +5339,20 @@
                   "typeParams": {
                     "typeName": "Sex"
                   }
+                }
+              },
+              "smoking": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "socialNotes": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
                 }
               },
               "updatedAt": {
@@ -5489,6 +5532,21 @@
                   "namespace": "public"
                 }
               },
+              "familyHistory": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "patientId"
+                  ]
+                },
+                "to": {
+                  "model": "PatientFamilyHistory",
+                  "namespace": "public"
+                }
+              },
               "household": {
                 "cardinality": "N:1",
                 "on": {
@@ -5534,6 +5592,21 @@
                   "namespace": "public"
                 }
               },
+              "pastHistory": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "patientId"
+                  ]
+                },
+                "to": {
+                  "model": "PatientPastHistory",
+                  "namespace": "public"
+                }
+              },
               "primaryContactFor": {
                 "cardinality": "1:N",
                 "on": {
@@ -5569,6 +5642,9 @@
               "fields": {
                 "accountId": {
                   "column": "accountId"
+                },
+                "alcohol": {
+                  "column": "alcohol"
                 },
                 "allergyStatus": {
                   "column": "allergyStatus"
@@ -5639,6 +5715,12 @@
                 "middleName": {
                   "column": "middleName"
                 },
+                "occupation": {
+                  "column": "occupation"
+                },
+                "packYears": {
+                  "column": "packYears"
+                },
                 "patientNumber": {
                   "column": "patientNumber"
                 },
@@ -5653,6 +5735,12 @@
                 },
                 "sex": {
                   "column": "sex"
+                },
+                "smoking": {
+                  "column": "smoking"
+                },
+                "socialNotes": {
+                  "column": "socialNotes"
                 },
                 "updatedAt": {
                   "column": "updatedAt"
@@ -6160,6 +6248,96 @@
               "table": "PatientCondition"
             }
           },
+          "PatientFamilyHistory": {
+            "fields": {
+              "condition": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamp-string@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "notes": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "patientId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "relative": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "patient": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "patientId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Patient",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "condition": {
+                  "column": "condition"
+                },
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "notes": {
+                  "column": "notes"
+                },
+                "patientId": {
+                  "column": "patientId"
+                },
+                "relative": {
+                  "column": "relative"
+                }
+              },
+              "namespaceId": "public",
+              "table": "PatientFamilyHistory"
+            }
+          },
           "PatientMedication": {
             "fields": {
               "createdAt": {
@@ -6312,6 +6490,106 @@
               },
               "namespaceId": "public",
               "table": "PatientNumberCounter"
+            }
+          },
+          "PatientPastHistory": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamp-string@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "kind": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "label": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "notes": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "patientId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "year": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "patient": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "patientId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Patient",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "kind": {
+                  "column": "kind"
+                },
+                "label": {
+                  "column": "label"
+                },
+                "notes": {
+                  "column": "notes"
+                },
+                "patientId": {
+                  "column": "patientId"
+                },
+                "year": {
+                  "column": "year"
+                }
+              },
+              "namespaceId": "public",
+              "table": "PatientPastHistory"
             }
           },
           "Prescription": {
@@ -11018,6 +11296,11 @@
                   "nativeType": "text",
                   "nullable": true
                 },
+                "alcohol": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "allergyStatus": {
                   "codecId": "pg/enum@1",
                   "default": {
@@ -11195,6 +11478,16 @@
                   "nativeType": "text",
                   "nullable": true
                 },
+                "occupation": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "packYears": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "patientNumber": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
@@ -11254,6 +11547,16 @@
                     "namespaceId": "public",
                     "plane": "storage"
                   }
+                },
+                "smoking": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "socialNotes": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
                 },
                 "updatedAt": {
                   "codecId": "pg/timestamp-string@1",
@@ -11880,6 +12183,84 @@
               },
               "uniques": []
             },
+            "PatientFamilyHistory": {
+              "columns": {
+                "condition": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "createdAt": {
+                  "codecId": "pg/timestamp-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamp",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "notes": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "patientId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "relative": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "name": "PatientFamilyHistory_patientId_fkey",
+                  "onDelete": "cascade",
+                  "onUpdate": "cascade",
+                  "source": {
+                    "columns": [
+                      "patientId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "PatientFamilyHistory"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "Patient"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "patientId"
+                  ],
+                  "name": "PatientFamilyHistory_patientId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ],
+                "name": "PatientFamilyHistory_pkey"
+              },
+              "uniques": []
+            },
             "PatientMedication": {
               "columns": {
                 "createdAt": {
@@ -12008,6 +12389,89 @@
                   "year"
                 ],
                 "name": "PatientNumberCounter_pkey"
+              },
+              "uniques": []
+            },
+            "PatientPastHistory": {
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamp-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamp",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "kind": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "label": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "notes": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "patientId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "year": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                }
+              },
+              "foreignKeys": [
+                {
+                  "name": "PatientPastHistory_patientId_fkey",
+                  "onDelete": "cascade",
+                  "onUpdate": "cascade",
+                  "source": {
+                    "columns": [
+                      "patientId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "PatientPastHistory"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "Patient"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "patientId"
+                  ],
+                  "name": "PatientPastHistory_patientId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ],
+                "name": "PatientPastHistory_pkey"
               },
               "uniques": []
             },
@@ -12970,7 +13434,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "0a8de520290ab6063ac82c2d4dcccf42779030df40563dae5002f3dde0d1623a"
+    "storageHash": "a540cec3b8ef4e6cb8e0dd6b3d18209e9b80d9090a406d732e3caaffdf8e4ec9"
   },
   "capabilities": {
     "postgres": {

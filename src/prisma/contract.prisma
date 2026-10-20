@@ -121,6 +121,15 @@ namespace public {
     sex               pg.enum(Sex)
     relationship      pg.enum(Relationship)       @default("OTHER")
     bloodType         pg.enum(BloodType)          @default("UNKNOWN")
+    /// Personal and social history: smoking (NEVER, FORMER, CURRENT), pack-years
+    /// as written, alcohol (NONE, OCCASIONAL, REGULAR), occupation, and a note.
+    /// Plain text, not enums: the history-taking words differ by doctor, and an
+    /// unknown value must not break a chart.
+    smoking           String?
+    packYears         String?
+    alcohol           String?
+    occupation        String?
+    socialNotes       String?
     contactNumber     String?
     email             String?
     /// Whether this person wants to hear from the clinic before a visit, and
@@ -160,6 +169,8 @@ namespace public {
     conditions        PatientCondition[]
     medications       PatientMedication[]
     alerts            PatientAlert[]
+    familyHistory     PatientFamilyHistory[]
+    pastHistory       PatientPastHistory[]
     documentRequests  DocumentRequest[]
     activations       PatientActivation[]
     /// Logins that look after this person (a parent, a guardian) — not theirs.
@@ -397,6 +408,40 @@ namespace public {
   // A standing warning that belongs at the top of the chart — anticoagulants, a
   // pacemaker, a difficult airway. Separate from conditions because these are
   // things to act on before touching the patient, not history.
+  /// Illness in the family: a condition and who had it ("Hypertension", "Mother").
+  /// Recorded by mistake, it's removed; there's no history to keep.
+  model PatientFamilyHistory {
+    id        String       @id(map: "PatientFamilyHistory_pkey")
+    patientId String
+    condition String
+    relative  String
+    notes     String?
+    createdAt TimestampString(3) @default(now())
+    patient   Patient      @relation(fields: [patientId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "PatientFamilyHistory_patientId_fkey")
+
+    @@index([patientId], map: "PatientFamilyHistory_patientId_idx")
+
+    @@map("PatientFamilyHistory")
+  }
+
+  /// Past medical history beyond the chart's conditions: an illness, a surgery
+  /// or a hospitalisation (`kind`: ILLNESS, SURGERY, HOSPITALIZATION), with the
+  /// year as told ("2015", "childhood"). Removed if recorded by mistake.
+  model PatientPastHistory {
+    id        String       @id(map: "PatientPastHistory_pkey")
+    patientId String
+    kind      String
+    label     String
+    year      String?
+    notes     String?
+    createdAt TimestampString(3) @default(now())
+    patient   Patient      @relation(fields: [patientId], references: [id], onDelete: Cascade, onUpdate: Cascade, map: "PatientPastHistory_patientId_fkey")
+
+    @@index([patientId], map: "PatientPastHistory_patientId_idx")
+
+    @@map("PatientPastHistory")
+  }
+
   model PatientAlert {
     id        String       @id(map: "PatientAlert_pkey")
     patientId String

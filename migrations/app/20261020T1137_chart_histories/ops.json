@@ -1,0 +1,452 @@
+[
+  {
+    "id": "table.PatientFamilyHistory",
+    "label": "Create table \"PatientFamilyHistory\"",
+    "summary": "Creates table \"PatientFamilyHistory\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "PatientFamilyHistory"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"PatientFamilyHistory\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"PatientFamilyHistory\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"PatientFamilyHistory\"",
+        "sql": "CREATE TABLE \"public\".\"PatientFamilyHistory\" (\n  \"condition\" text NOT NULL,\n  \"createdAt\" timestamp(3) DEFAULT (now()) NOT NULL,\n  \"id\" text NOT NULL,\n  \"notes\" text,\n  \"patientId\" text NOT NULL,\n  \"relative\" text NOT NULL,\n  CONSTRAINT \"PatientFamilyHistory_pkey\" PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"PatientFamilyHistory\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"PatientFamilyHistory\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.PatientPastHistory",
+    "label": "Create table \"PatientPastHistory\"",
+    "summary": "Creates table \"PatientPastHistory\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "PatientPastHistory"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"PatientPastHistory\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"PatientPastHistory\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"PatientPastHistory\"",
+        "sql": "CREATE TABLE \"public\".\"PatientPastHistory\" (\n  \"createdAt\" timestamp(3) DEFAULT (now()) NOT NULL,\n  \"id\" text NOT NULL,\n  \"kind\" text NOT NULL,\n  \"label\" text NOT NULL,\n  \"notes\" text,\n  \"patientId\" text NOT NULL,\n  \"year\" text,\n  CONSTRAINT \"PatientPastHistory_pkey\" PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"PatientPastHistory\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"PatientPastHistory\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Patient.alcohol",
+    "label": "Add column \"alcohol\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "alcohol",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"alcohol\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "alcohol"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"alcohol\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"alcohol\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"alcohol\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "alcohol"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Patient.occupation",
+    "label": "Add column \"occupation\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "occupation",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"occupation\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "occupation"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"occupation\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"occupation\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"occupation\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "occupation"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Patient.packYears",
+    "label": "Add column \"packYears\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "packYears",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"packYears\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "packYears"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"packYears\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"packYears\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"packYears\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "packYears"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Patient.smoking",
+    "label": "Add column \"smoking\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "smoking",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"smoking\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "smoking"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"smoking\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"smoking\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"smoking\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "smoking"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Patient.socialNotes",
+    "label": "Add column \"socialNotes\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "socialNotes",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"socialNotes\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "socialNotes"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"socialNotes\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"socialNotes\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"socialNotes\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "socialNotes"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.PatientFamilyHistory.PatientFamilyHistory_patientId_idx",
+    "label": "Create index \"PatientFamilyHistory_patientId_idx\" on \"PatientFamilyHistory\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "PatientFamilyHistory_patientId_idx",
+        "table": "PatientFamilyHistory"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"PatientFamilyHistory_patientId_idx\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"PatientFamilyHistory_patientId_idx\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"PatientFamilyHistory_patientId_idx\"",
+        "sql": "CREATE INDEX \"PatientFamilyHistory_patientId_idx\" ON \"public\".\"PatientFamilyHistory\" (\"patientId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"PatientFamilyHistory_patientId_idx\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"PatientFamilyHistory_patientId_idx\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.PatientPastHistory.PatientPastHistory_patientId_idx",
+    "label": "Create index \"PatientPastHistory_patientId_idx\" on \"PatientPastHistory\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "PatientPastHistory_patientId_idx",
+        "table": "PatientPastHistory"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"PatientPastHistory_patientId_idx\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"PatientPastHistory_patientId_idx\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"PatientPastHistory_patientId_idx\"",
+        "sql": "CREATE INDEX \"PatientPastHistory_patientId_idx\" ON \"public\".\"PatientPastHistory\" (\"patientId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"PatientPastHistory_patientId_idx\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"PatientPastHistory_patientId_idx\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.PatientFamilyHistory.PatientFamilyHistory_patientId_fkey",
+    "label": "Add foreign key \"PatientFamilyHistory_patientId_fkey\" on \"PatientFamilyHistory\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "PatientFamilyHistory_patientId_fkey",
+        "table": "PatientFamilyHistory"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"PatientFamilyHistory_patientId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "PatientFamilyHistory_patientId_fkey",
+          "public",
+          "\"public\".\"PatientFamilyHistory\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"PatientFamilyHistory_patientId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"PatientFamilyHistory\"\nADD CONSTRAINT \"PatientFamilyHistory_patientId_fkey\"\nFOREIGN KEY (\"patientId\")\nREFERENCES \"public\".\"Patient\" (\"id\")\nON DELETE CASCADE\nON UPDATE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"PatientFamilyHistory_patientId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "PatientFamilyHistory_patientId_fkey",
+          "public",
+          "\"public\".\"PatientFamilyHistory\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.PatientPastHistory.PatientPastHistory_patientId_fkey",
+    "label": "Add foreign key \"PatientPastHistory_patientId_fkey\" on \"PatientPastHistory\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "PatientPastHistory_patientId_fkey",
+        "table": "PatientPastHistory"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"PatientPastHistory_patientId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "PatientPastHistory_patientId_fkey",
+          "public",
+          "\"public\".\"PatientPastHistory\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"PatientPastHistory_patientId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"PatientPastHistory\"\nADD CONSTRAINT \"PatientPastHistory_patientId_fkey\"\nFOREIGN KEY (\"patientId\")\nREFERENCES \"public\".\"Patient\" (\"id\")\nON DELETE CASCADE\nON UPDATE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"PatientPastHistory_patientId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "PatientPastHistory_patientId_fkey",
+          "public",
+          "\"public\".\"PatientPastHistory\""
+        ]
+      }
+    ]
+  }
+]

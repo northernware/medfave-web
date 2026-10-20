@@ -105,6 +105,26 @@ export async function editChart(doctor: Doctor, form: FormData): Promise<ChartEd
       await orm.PatientPastHistory.where((x) => x.id.eq(id)).delete();
       return { ok: true };
     }
+    case "ob.set": {
+      // The whole OB history at once, for a woman's chart; a blank field clears it.
+      const sex = await orm.Patient.select("sex").where((p) => p.id.eq(patientId)).first();
+      if (sex?.sex !== "FEMALE") return { ok: false, message: "OB history is for female patients." };
+      const lmp = text(form.get("lastMenstrualPeriod"), 10);
+      if (lmp && !/^\d{4}-\d{2}-\d{2}$/.test(lmp)) return { ok: false, message: "Give the last period as a date." };
+      await orm.Patient.where((p) => p.id.eq(patientId)).update({
+        obGravida: text(form.get("gravida"), 10),
+        obPara: text(form.get("para"), 10),
+        obTerm: text(form.get("term"), 10),
+        obPreterm: text(form.get("preterm"), 10),
+        obAbortions: text(form.get("abortions"), 10),
+        obLiving: text(form.get("living"), 10),
+        menarche: text(form.get("menarche"), 40),
+        menstrualCycle: text(form.get("cycle"), 120),
+        lastMenstrualPeriod: lmp,
+        obNotes: text(form.get("notes"), 1000),
+      });
+      return { ok: true };
+    }
     case "social.set": {
       // The whole personal and social history at once; a blank field clears it.
       const pick = (v: FormDataEntryValue | null, allowed: string[]) => {

@@ -5259,6 +5259,13 @@
                   "kind": "scalar"
                 }
               },
+              "lastMenstrualPeriod": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "lastName": {
                 "nullable": false,
                 "type": {
@@ -5276,7 +5283,70 @@
                   }
                 }
               },
+              "menarche": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "menstrualCycle": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "middleName": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "obAbortions": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "obGravida": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "obLiving": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "obNotes": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "obPara": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "obPreterm": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "obTerm": {
                 "nullable": true,
                 "type": {
                   "codecId": "pg/text@1",
@@ -5706,14 +5776,44 @@
                 "id": {
                   "column": "id"
                 },
+                "lastMenstrualPeriod": {
+                  "column": "lastMenstrualPeriod"
+                },
                 "lastName": {
                   "column": "lastName"
                 },
                 "medicationStatus": {
                   "column": "medicationStatus"
                 },
+                "menarche": {
+                  "column": "menarche"
+                },
+                "menstrualCycle": {
+                  "column": "menstrualCycle"
+                },
                 "middleName": {
                   "column": "middleName"
+                },
+                "obAbortions": {
+                  "column": "obAbortions"
+                },
+                "obGravida": {
+                  "column": "obGravida"
+                },
+                "obLiving": {
+                  "column": "obLiving"
+                },
+                "obNotes": {
+                  "column": "obNotes"
+                },
+                "obPara": {
+                  "column": "obPara"
+                },
+                "obPreterm": {
+                  "column": "obPreterm"
+                },
+                "obTerm": {
+                  "column": "obTerm"
                 },
                 "occupation": {
                   "column": "occupation"
@@ -11450,6 +11550,11 @@
                   "nativeType": "text",
                   "nullable": false
                 },
+                "lastMenstrualPeriod": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "lastName": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
@@ -11473,7 +11578,52 @@
                     "plane": "storage"
                   }
                 },
+                "menarche": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "menstrualCycle": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "middleName": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "obAbortions": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "obGravida": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "obLiving": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "obNotes": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "obPara": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "obPreterm": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "obTerm": {
                   "codecId": "pg/text@1",
                   "nativeType": "text",
                   "nullable": true
@@ -13434,7 +13584,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "a540cec3b8ef4e6cb8e0dd6b3d18209e9b80d9090a406d732e3caaffdf8e4ec9"
+    "storageHash": "300c94238c321170949720385c4142c0b2a3e5e2221fda345a0f863a0c009691"
   },
   "capabilities": {
     "postgres": {

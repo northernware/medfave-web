@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { archivePatient, deletePatient, reopenCondition, restorePatient } from "@/app/actions/patients";
 import { ChartForm } from "@/components/chart-form";
+import { AddDose, AddFamily, AddPast, EditChild, EditOb, EditSocial } from "@/components/history-forms";
 import { requireDoctor } from "@/lib/auth";
 import { StartHousehold } from "@/components/start-household";
 import { caresFor, logChartAccess, sharesCharts } from "@/lib/care";
@@ -562,8 +563,8 @@ export default async function PatientPage({
             />
           ) : null}
         </dl>
-        {/* The history (filled in from the app's clipboard): past medical, family, personal and social,
-            OB for a woman, birth, development and vaccines for a child. Each line removable if wrong. */}
+        {/* The history: past medical, family, personal and social, OB for a woman, birth, development and
+            vaccines for a child. Added and edited here or in the app's clipboard. */}
         <HistoryBlock patient={patient} />
         {activeConditions.some((c) => c.notes) ? (
           <dl className="mt-4 space-y-2 border-t border-border pt-4">
@@ -707,7 +708,7 @@ const VACCINE_NAMES: Record<string, string> = {
   MMR: "MMR",
 };
 
-/** The chart's history, read-only but for removing a line recorded by mistake. Edited in the app. */
+/** The chart's history: each section, with its Add or Edit form, as the app's clipboard. */
 function HistoryBlock({
   patient,
 }: {
@@ -732,9 +733,11 @@ function HistoryBlock({
     menarche: string | null;
     menstrualCycle: string | null;
     lastMenstrualPeriod: string | null;
+    obNotes: string | null;
     birthTerm: string | null;
     birthWeight: string | null;
     birthDelivery: string | null;
+    birthNotes: string | null;
     development: string | null;
     developmentNotes: string | null;
   };
@@ -770,73 +773,101 @@ function HistoryBlock({
     p.development ? `development ${WORDS[p.development] ?? p.development}` : null,
     p.developmentNotes,
   ].filter(Boolean);
-  const nothing =
-    !p.pastHistory.length && !p.familyHistory.length && !social.length && !(p.sex === "FEMALE" && ob.length) && !(child && (birth.length || p.immunizations.length));
+  const quiet = <span className="text-xs text-ink-muted">Not recorded</span>;
   return (
-    <dl className="mt-4 space-y-3 border-t border-border pt-4 text-sm">
-      {nothing ? <p className="text-xs text-ink-muted">No history recorded yet. Fill it in from the Medfave app&apos;s clipboard.</p> : null}
-      {p.pastHistory.length ? (
-        <div>
-          <dt className="text-xs font-medium text-ink-faint">Past medical history</dt>
-          <dd className="space-y-0.5">
-            {p.pastHistory.map((h) => (
-              <div key={h.id} className="flex items-center gap-2">
-                <span>
-                  {h.label} <span className="text-ink-faint">· {[PAST_KIND[h.kind] ?? h.kind, h.year].filter(Boolean).join(", ")}</span>
-                </span>
-                {remove("past.remove", h.id, h.label)}
-              </div>
-            ))}
-          </dd>
-        </div>
-      ) : null}
-      {p.familyHistory.length ? (
-        <div>
-          <dt className="text-xs font-medium text-ink-faint">Family history</dt>
-          <dd className="space-y-0.5">
-            {p.familyHistory.map((f) => (
-              <div key={f.id} className="flex items-center gap-2">
-                <span>
-                  {f.condition} <span className="text-ink-faint">· {f.relative}</span>
-                </span>
-                {remove("family.remove", f.id, f.condition)}
-              </div>
-            ))}
-          </dd>
-        </div>
-      ) : null}
-      {social.length ? (
-        <div>
-          <dt className="text-xs font-medium text-ink-faint">Personal and social</dt>
-          <dd>{social.join(" · ")}</dd>
-        </div>
-      ) : null}
-      {p.sex === "FEMALE" && ob.length ? (
-        <div>
+    <dl className="mt-4 space-y-4 border-t border-border pt-4 text-sm">
+      <div className="space-y-1">
+        <dt className="text-xs font-medium text-ink-faint">Past medical history</dt>
+        <dd className="space-y-0.5">
+          {p.pastHistory.length
+            ? p.pastHistory.map((h) => (
+                <div key={h.id} className="flex items-center gap-2">
+                  <span>
+                    {h.label} <span className="text-ink-faint">· {[PAST_KIND[h.kind] ?? h.kind, h.year].filter(Boolean).join(", ")}</span>
+                  </span>
+                  {remove("past.remove", h.id, h.label)}
+                </div>
+              ))
+            : quiet}
+        </dd>
+        <AddPast patientId={p.id} />
+      </div>
+      <div className="space-y-1">
+        <dt className="text-xs font-medium text-ink-faint">Family history</dt>
+        <dd className="space-y-0.5">
+          {p.familyHistory.length
+            ? p.familyHistory.map((f) => (
+                <div key={f.id} className="flex items-center gap-2">
+                  <span>
+                    {f.condition} <span className="text-ink-faint">· {f.relative}</span>
+                  </span>
+                  {remove("family.remove", f.id, f.condition)}
+                </div>
+              ))
+            : quiet}
+        </dd>
+        <AddFamily patientId={p.id} />
+      </div>
+      <div className="space-y-1">
+        <dt className="text-xs font-medium text-ink-faint">Personal and social</dt>
+        <dd>{social.length ? social.join(" · ") : quiet}</dd>
+        <EditSocial patientId={p.id} smoking={p.smoking} packYears={p.packYears} alcohol={p.alcohol} occupation={p.occupation} notes={p.socialNotes} />
+      </div>
+      {p.sex === "FEMALE" ? (
+        <div className="space-y-1">
           <dt className="text-xs font-medium text-ink-faint">OB history</dt>
-          <dd>{ob.join(" · ")}</dd>
+          <dd>{ob.length ? ob.join(" · ") : quiet}</dd>
+          <EditOb
+            patientId={p.id}
+            ob={{
+              gravida: p.obGravida,
+              para: p.obPara,
+              term: p.obTerm,
+              preterm: p.obPreterm,
+              abortions: p.obAbortions,
+              living: p.obLiving,
+              menarche: p.menarche,
+              cycle: p.menstrualCycle,
+              lastMenstrualPeriod: p.lastMenstrualPeriod,
+              notes: p.obNotes,
+            }}
+          />
         </div>
       ) : null}
-      {child && birth.length ? (
-        <div>
+      {child ? (
+        <div className="space-y-1">
           <dt className="text-xs font-medium text-ink-faint">Birth and development</dt>
-          <dd>{birth.join(" · ")}</dd>
+          <dd>{birth.length ? birth.join(" · ") : quiet}</dd>
+          <EditChild
+            patientId={p.id}
+            child={{
+              birthTerm: p.birthTerm,
+              birthWeight: p.birthWeight,
+              birthDelivery: p.birthDelivery,
+              birthNotes: p.birthNotes,
+              development: p.development,
+              developmentNotes: p.developmentNotes,
+            }}
+          />
         </div>
       ) : null}
-      {child && p.immunizations.length ? (
-        <div>
+      {child ? (
+        <div className="space-y-1">
           <dt className="text-xs font-medium text-ink-faint">Immunizations</dt>
           <dd className="space-y-0.5">
-            {p.immunizations.map((i) => (
-              <div key={i.id} className="flex items-center gap-2">
-                <span>
-                  {[VACCINE_NAMES[i.vaccine] ?? i.vaccine, i.dose].filter(Boolean).join(" ")}
-                  {i.givenOn ? <span className="text-ink-faint"> · {formatCalendarDate(calendarDateFromDb(i.givenOn))}</span> : null}
-                </span>
-                {remove("immunization.remove", i.id, `${VACCINE_NAMES[i.vaccine] ?? i.vaccine} ${i.dose ?? ""}`.trim())}
-              </div>
-            ))}
+            {p.immunizations.length
+              ? p.immunizations.map((i) => (
+                  <div key={i.id} className="flex items-center gap-2">
+                    <span>
+                      {[VACCINE_NAMES[i.vaccine] ?? i.vaccine, i.dose].filter(Boolean).join(" ")}
+                      {i.givenOn ? <span className="text-ink-faint"> · {formatCalendarDate(calendarDateFromDb(i.givenOn))}</span> : null}
+                    </span>
+                    {remove("immunization.remove", i.id, `${VACCINE_NAMES[i.vaccine] ?? i.vaccine} ${i.dose ?? ""}`.trim())}
+                  </div>
+                ))
+              : quiet}
           </dd>
+          <AddDose patientId={p.id} />
         </div>
       ) : null}
     </dl>

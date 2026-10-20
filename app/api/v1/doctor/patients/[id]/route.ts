@@ -26,6 +26,7 @@ export async function GET(request: Request, ctx: RouteContext<"/api/v1/doctor/pa
       "id", "firstName", "middleName", "lastName", "patientNumber", "dateOfBirth", "sex", "contactNumber", "email",
       "archivedAt", "accountId", "allergyStatus", "medicationStatus", "conditionStatus", "bloodType",
       "emergencyContactName", "emergencyContactRelationship", "emergencyContactNumber",
+      "emergencyContact2Name", "emergencyContact2Relationship", "emergencyContact2Number",
     )
     .include("household", (h) => h.select("id", "name"))
     .where((p) => p.id.eq(id))
@@ -121,6 +122,14 @@ export async function GET(request: Request, ctx: RouteContext<"/api/v1/doctor/pa
             name: patient.emergencyContactName,
             relationship: patient.emergencyContactRelationship,
             number: patient.emergencyContactNumber,
+          }
+        : null,
+      /** A second emergency contact, if one was given. */
+      secondaryContact: patient.emergencyContact2Name
+        ? {
+            name: patient.emergencyContact2Name,
+            relationship: patient.emergencyContact2Relationship,
+            number: patient.emergencyContact2Number,
           }
         : null,
     },

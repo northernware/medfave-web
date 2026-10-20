@@ -7,12 +7,13 @@ import {
   clinicDayRange,
   dayKey,
   formatDateTime,
+  formatTime,
   fromDateTimeLocalValue,
   instantFromDb,
   instantToDb,
 } from "@/lib/datetime";
 import { newId } from "@/lib/ids";
-import { canMoveTo, fullName, movesFrom, SERVICE_MINUTES } from "@/lib/domain";
+import { APPOINTMENT_STATUS_LABELS, canMoveTo, fullName, movesFrom, SERVICE_MINUTES } from "@/lib/domain";
 import { NO_SHOW_GRACE_MINUTES } from "@/lib/no-show";
 import { formatSpan, minuteOfDay, occupiesSlot, overlaps } from "@/lib/scheduling";
 import { checkAvailability, durationFor } from "@/lib/availability";
@@ -344,8 +345,15 @@ function revalidateAppointmentPages(appointmentId?: string, patientId?: string) 
 
 export type BookResult =
   | { ok: true; id: string; patientId: string }
-  /** `clash` when the time was taken by another booking; otherwise the input broke a rule. */
-  | ({ ok: false; clash?: boolean } & FormState);
+  /**
+   * `clash` when the time was taken by another booking; `existing` when the patient
+   * already has a visit still open that day (book anyway with `allowSecond`);
+   * otherwise the input broke a rule.
+   */
+  | ({ ok: false; clash?: boolean; existing?: { id: string; scheduledAt: string; status: AppointmentStatus } } & FormState);
+
+/** A visit that hasn't ended: booked, here, or with the doctor. */
+const OPEN_STATUSES: AppointmentStatus[] = ["PENDING", "CONFIRMED", "CHECKED_IN", "IN_CONSULTATION"];
 
 /**
  * Books a visit — the booking form's and the app's walk-in button alike.
@@ -359,6 +367,8 @@ export async function bookAppointment(
   actor: Actor,
   input: Record<string, unknown>,
   followUpFor = "",
+  /** Book even though the patient already has an open visit that day (seen this morning, back tonight). */
+  allowSecond = false,
 ): Promise<BookResult> {
   const parsed = appointmentSchema.safeParse(input);
   if (!parsed.success) return { ...toFieldErrors(parsed.error), ok: false };
@@ -383,6 +393,32 @@ export async function bookAppointment(
     resolved.data.reminderPreference === "NONE" && standing?.reminderPreference === "EMAIL"
       ? ("EMAIL" as const)
       : resolved.data.reminderPreference;
+
+  // One open visit per patient per day with this doctor, unless asked for: a second walk-in for somebody
+  // already here (or already booked that day) is almost always a slip, and showed them twice in the room.
+  if (!allowSecond) {
+    const day = clinicDayRange(resolved.scheduledAt);
+    const existing = await orm.Appointment
+      .select("id", "scheduledAt", "status")
+      .where((a) => a.patientId.eq(parsed.data.patientId))
+      .where((a) => a.doctorId.eq(doctorId))
+      .where((a) => a.clinicId.eq(actor.clinicId))
+      .where((a) => a.status.in(OPEN_STATUSES))
+      .where((a) => a.scheduledAt.gte(instantToDb(day.start)))
+      .where((a) => a.scheduledAt.lt(instantToDb(day.end)))
+      .orderBy((a) => a.scheduledAt.asc())
+      .first();
+    if (existing) {
+      const at = instantFromDb(existing.scheduledAt);
+      return {
+        ok: false,
+        existing: { id: existing.id, scheduledAt: at.toISOString(), status: existing.status },
+        message: `They already have a visit that day (${formatTime(at)}, ${APPOINTMENT_STATUS_LABELS[existing.status].toLowerCase()}).`,
+        // The web form offers "book another anyway" when this is set.
+        fieldErrors: { allowSecond: ["Book another visit that day anyway"] },
+      };
+    }
+  }
 
   // Availability is re-checked here, inside the lock, rather than trusting the
   // check the form did: between rendering the slot list and this write, anyone

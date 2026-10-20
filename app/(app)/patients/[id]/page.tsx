@@ -8,6 +8,7 @@ import { ChartForm } from "@/components/chart-form";
 import { requireDoctor } from "@/lib/auth";
 import { StartHousehold } from "@/components/start-household";
 import { caresFor, logChartAccess, sharesCharts } from "@/lib/care";
+import { isAdult } from "@/lib/households";
 import { orm } from "@/src/prisma/db";
 import { appointmentListQuery, toAppointmentListItem } from "@/lib/queries";
 import { calendarDateFromDb, instantFromDb } from "@/lib/datetime";
@@ -72,6 +73,9 @@ export default async function PatientPage({
         .orderBy((x) => x.label.asc()),
     )
     .include("alerts", (a) => a.select("id", "label", "notes").orderBy((x) => x.label.asc()))
+    .include("pastHistory", (h) => h.select("id", "kind", "label", "year").orderBy((x) => x.createdAt.asc()))
+    .include("familyHistory", (f) => f.select("id", "condition", "relative").orderBy((x) => x.createdAt.asc()))
+    .include("immunizations", (i) => i.select("id", "vaccine", "dose", "givenOn").orderBy((x) => x.givenOn.asc()))
     .include("medicalRecords", (r) =>
       r
         .select(
@@ -558,6 +562,9 @@ export default async function PatientPage({
             />
           ) : null}
         </dl>
+        {/* The history (filled in from the app's clipboard): past medical, family, personal and social,
+            OB for a woman, birth, development and vaccines for a child. Each line removable if wrong. */}
+        <HistoryBlock patient={patient} />
         {activeConditions.some((c) => c.notes) ? (
           <dl className="mt-4 space-y-2 border-t border-border pt-4">
             {activeConditions
@@ -670,5 +677,168 @@ function AccessLine({ entry }: { entry: { account: { fullName: string }; recordI
       </span>
       <span className="tabular shrink-0 text-ink-muted">{formatDateTime(instantFromDb(entry.openedAt))}</span>
     </li>
+  );
+}
+
+const PAST_KIND: Record<string, string> = { ILLNESS: "Illness", SURGERY: "Surgery", HOSPITALIZATION: "Hospitalization" };
+const WORDS: Record<string, string> = {
+  NEVER: "never",
+  FORMER: "former",
+  CURRENT: "current",
+  NONE: "none",
+  OCCASIONAL: "occasional",
+  REGULAR: "regular",
+  TERM: "Term",
+  PRETERM: "Preterm",
+  POSTTERM: "Post-term",
+  NSD: "normal delivery",
+  CS: "caesarean",
+  ASSISTED: "assisted delivery",
+  ON_TRACK: "on track",
+  DELAYED: "delayed",
+};
+const VACCINE_NAMES: Record<string, string> = {
+  BCG: "BCG",
+  HEPB: "Hepatitis B",
+  PENTA: "Pentavalent",
+  OPV: "OPV",
+  IPV: "IPV",
+  PCV: "PCV",
+  MMR: "MMR",
+};
+
+/** The chart's history, read-only but for removing a line recorded by mistake. Edited in the app. */
+function HistoryBlock({
+  patient,
+}: {
+  patient: {
+    id: string;
+    sex: string;
+    dateOfBirth: string;
+    pastHistory: { id: string; kind: string; label: string; year: string | null }[];
+    familyHistory: { id: string; condition: string; relative: string }[];
+    immunizations: { id: string; vaccine: string; dose: string | null; givenOn: string | null }[];
+    smoking: string | null;
+    packYears: string | null;
+    alcohol: string | null;
+    occupation: string | null;
+    socialNotes: string | null;
+    obGravida: string | null;
+    obPara: string | null;
+    obTerm: string | null;
+    obPreterm: string | null;
+    obAbortions: string | null;
+    obLiving: string | null;
+    menarche: string | null;
+    menstrualCycle: string | null;
+    lastMenstrualPeriod: string | null;
+    birthTerm: string | null;
+    birthWeight: string | null;
+    birthDelivery: string | null;
+    development: string | null;
+    developmentNotes: string | null;
+  };
+}) {
+  const p = patient;
+  const child = !isAdult(String(p.dateOfBirth));
+  const remove = (action: string, id: string, what: string) => (
+    <ChartForm patientId={p.id} action={action} id={id} confirm={`Remove ${what}? Only if it was recorded by mistake.`} className="inline">
+      <button className="text-[11px] text-ink-muted hover:text-ink" aria-label={`Remove ${what}`}>
+        Remove
+      </button>
+    </ChartForm>
+  );
+  const social = [
+    p.smoking ? `Smoking: ${WORDS[p.smoking] ?? p.smoking}${p.packYears ? ` (${p.packYears} pack-years)` : ""}` : null,
+    p.alcohol ? `Alcohol: ${WORDS[p.alcohol] ?? p.alcohol}` : null,
+    p.occupation,
+    p.socialNotes,
+  ].filter(Boolean);
+  const tpal = [p.obTerm, p.obPreterm, p.obAbortions, p.obLiving];
+  const ob = [
+    [p.obGravida ? `G${p.obGravida}` : null, p.obPara ? `P${p.obPara}` : null, tpal.some(Boolean) ? `(${tpal.map((x) => x || "?").join("-")})` : null]
+      .filter(Boolean)
+      .join(" "),
+    p.lastMenstrualPeriod ? `LMP ${formatCalendarDate(calendarDateFromDb(p.lastMenstrualPeriod))}` : null,
+    p.menarche ? `menarche ${p.menarche}` : null,
+    p.menstrualCycle,
+  ].filter(Boolean);
+  const birth = [
+    p.birthTerm ? WORDS[p.birthTerm] : null,
+    p.birthWeight,
+    p.birthDelivery ? WORDS[p.birthDelivery] : null,
+    p.development ? `development ${WORDS[p.development] ?? p.development}` : null,
+    p.developmentNotes,
+  ].filter(Boolean);
+  const nothing =
+    !p.pastHistory.length && !p.familyHistory.length && !social.length && !(p.sex === "FEMALE" && ob.length) && !(child && (birth.length || p.immunizations.length));
+  return (
+    <dl className="mt-4 space-y-3 border-t border-border pt-4 text-sm">
+      {nothing ? <p className="text-xs text-ink-muted">No history recorded yet. Fill it in from the Medfave app&apos;s clipboard.</p> : null}
+      {p.pastHistory.length ? (
+        <div>
+          <dt className="text-xs font-medium text-ink-faint">Past medical history</dt>
+          <dd className="space-y-0.5">
+            {p.pastHistory.map((h) => (
+              <div key={h.id} className="flex items-center gap-2">
+                <span>
+                  {h.label} <span className="text-ink-faint">· {[PAST_KIND[h.kind] ?? h.kind, h.year].filter(Boolean).join(", ")}</span>
+                </span>
+                {remove("past.remove", h.id, h.label)}
+              </div>
+            ))}
+          </dd>
+        </div>
+      ) : null}
+      {p.familyHistory.length ? (
+        <div>
+          <dt className="text-xs font-medium text-ink-faint">Family history</dt>
+          <dd className="space-y-0.5">
+            {p.familyHistory.map((f) => (
+              <div key={f.id} className="flex items-center gap-2">
+                <span>
+                  {f.condition} <span className="text-ink-faint">· {f.relative}</span>
+                </span>
+                {remove("family.remove", f.id, f.condition)}
+              </div>
+            ))}
+          </dd>
+        </div>
+      ) : null}
+      {social.length ? (
+        <div>
+          <dt className="text-xs font-medium text-ink-faint">Personal and social</dt>
+          <dd>{social.join(" · ")}</dd>
+        </div>
+      ) : null}
+      {p.sex === "FEMALE" && ob.length ? (
+        <div>
+          <dt className="text-xs font-medium text-ink-faint">OB history</dt>
+          <dd>{ob.join(" · ")}</dd>
+        </div>
+      ) : null}
+      {child && birth.length ? (
+        <div>
+          <dt className="text-xs font-medium text-ink-faint">Birth and development</dt>
+          <dd>{birth.join(" · ")}</dd>
+        </div>
+      ) : null}
+      {child && p.immunizations.length ? (
+        <div>
+          <dt className="text-xs font-medium text-ink-faint">Immunizations</dt>
+          <dd className="space-y-0.5">
+            {p.immunizations.map((i) => (
+              <div key={i.id} className="flex items-center gap-2">
+                <span>
+                  {[VACCINE_NAMES[i.vaccine] ?? i.vaccine, i.dose].filter(Boolean).join(" ")}
+                  {i.givenOn ? <span className="text-ink-faint"> · {formatCalendarDate(calendarDateFromDb(i.givenOn))}</span> : null}
+                </span>
+                {remove("immunization.remove", i.id, `${VACCINE_NAMES[i.vaccine] ?? i.vaccine} ${i.dose ?? ""}`.trim())}
+              </div>
+            ))}
+          </dd>
+        </div>
+      ) : null}
+    </dl>
   );
 }

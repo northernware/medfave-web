@@ -108,8 +108,10 @@ export async function POST(request: Request) {
     time: text(body.time),
     source: body.walkIn === true ? "WALK_IN" : "STAFF",
     status: "CONFIRMED",
-  });
+  }, "", body.allowSecond === true);
   if (!result.ok) {
+    // Already an open visit that day: 409 with it, so the app can offer to open it or book anyway.
+    if (result.existing) return Response.json({ error: result.message, existing: result.existing }, { status: 409 });
     return apiError(result.clash ? 409 : 422, result.message ?? "Check the booking details.", result.fieldErrors);
   }
   return Response.json({ id: result.id }, { status: 201 });

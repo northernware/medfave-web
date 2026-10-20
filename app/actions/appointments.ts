@@ -30,6 +30,7 @@ export async function createAppointment(_prev: FormState, formData: FormData): P
     staff,
     Object.fromEntries(formData),
     String(formData.get("followUpFor") ?? ""),
+    formData.get("allowSecond") === "1",
   );
   if (!result.ok) return result;
   redirect(`/appointments/${result.id}`);

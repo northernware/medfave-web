@@ -135,6 +135,13 @@ export function AppointmentForm({
     <form action={formAction} className="space-y-7">
       {doctorId ? <input type="hidden" name="doctorId" value={doctorId} /> : null}
       <FormError message={state.message} />
+      {/* Already a visit open that day: say so, and let a genuine second one through (back the same evening). */}
+      {state.fieldErrors?.allowSecond ? (
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="allowSecond" value="1" />
+          {state.fieldErrors.allowSecond[0]}
+        </label>
+      ) : null}
       {followUpForRecordId ? (
         <input type="hidden" name="followUpFor" value={followUpForRecordId} />
       ) : null}

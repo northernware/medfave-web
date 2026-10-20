@@ -1,4 +1,6 @@
+import { or } from "@prisma/orm-postgres/orm-client";
 import { apiDoctor, apiError } from "@/lib/api";
+import { likeSafe } from "@/lib/diagnosis-rank";
 import { DOCUMENT_LIST_COLUMNS, loadDocument, shapeDocumentItem } from "@/lib/document-api";
 import { checkDetails } from "@/lib/documents";
 import { instantToDb } from "@/lib/datetime";
@@ -7,21 +9,38 @@ import { DocumentType } from "@/lib/enums";
 import { newId } from "@/lib/ids";
 import { orm } from "@/src/prisma/db";
 
-/** `?patientId=` → `{ documents[] }`: this doctor's documents for the patient, newest first. */
+/**
+ * → `{ documents[] }`, newest first: this doctor's documents, each with its `patient`
+ * (`{ id, fullName }`). `?patientId=` keeps one patient's (at most 50); otherwise all of them
+ * (the app's Documents directory, at most 200), narrowed by `?q=` (the patient's name) and
+ * `?show=drafts|signed|shared`.
+ */
 export async function GET(request: Request) {
   const doctor = await apiDoctor(request);
   if (doctor instanceof Response) return doctor;
-  const patientId = new URL(request.url).searchParams.get("patientId");
-  if (!patientId) return apiError(400, "Say whose: ?patientId=");
-  const rows = await orm.DocumentRequest
+  const url = new URL(request.url);
+  const patientId = url.searchParams.get("patientId");
+  const q = (url.searchParams.get("q") ?? "").trim().slice(0, 80);
+  const show = url.searchParams.get("show");
+
+  let query = orm.DocumentRequest
     .select(...DOCUMENT_LIST_COLUMNS)
-    .where((r) => r.patientId.eq(patientId))
+    .include("patient", (p) => p.select("id", "firstName", "middleName", "lastName"))
     .where((r) => r.clinicId.eq(doctor.clinicId))
-    .where((r) => r.doctorId.eq(doctor.doctorId))
-    .orderBy((r) => r.createdAt.desc())
-    .limit(50)
-    .all();
-  return Response.json({ documents: rows.map(shapeDocumentItem) });
+    .where((r) => r.doctorId.eq(doctor.doctorId));
+  if (patientId) query = query.where((r) => r.patientId.eq(patientId));
+  if (q) {
+    const like = `%${likeSafe(q)}%`;
+    query = query.where((r) => r.patient.some((p) => or(p.firstName.ilike(like), p.lastName.ilike(like))));
+  }
+  if (show === "drafts") query = query.where((r) => r.status.eq("REQUESTED"));
+  else if (show === "signed") query = query.where((r) => r.status.in(["READY", "RELEASED"]));
+  else if (show === "shared") query = query.where((r) => r.sharedWithPatientAt.isNotNull());
+
+  const rows = await query.orderBy((r) => r.createdAt.desc()).limit(patientId ? 50 : 200).all();
+  return Response.json({
+    documents: rows.map((r) => ({ ...shapeDocumentItem(r), patient: { id: r.patient.id, fullName: fullName(r.patient) } })),
+  });
 }
 
 /**

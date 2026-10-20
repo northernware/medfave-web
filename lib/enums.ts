@@ -36,6 +36,7 @@ export const DocumentType = {
   MEDICO_LEGAL_CERTIFICATE: "MEDICO_LEGAL_CERTIFICATE",
   INSURANCE_CLAIM: "INSURANCE_CLAIM",
   RECORD_COPIES: "RECORD_COPIES",
+  OUTPATIENT_CERTIFICATE: "OUTPATIENT_CERTIFICATE",
 } as const;
 export type DocumentType = (typeof DocumentType)[keyof typeof DocumentType];
 

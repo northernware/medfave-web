@@ -234,6 +234,27 @@ function Body({
 }) {
   const d = details;
 
+  if (type === "OUTPATIENT_CERTIFICATE") {
+    return (
+      <section className="py-6 text-sm">
+        <p className="leading-relaxed">
+          This is to certify that <strong>{patient}</strong> was seen and examined by me on{" "}
+          <strong>{onDate(d.seenOn)}</strong>, and was found to have the condition stated below.
+        </p>
+        <Clause label="Diagnosis">{text(d.diagnosis)}</Clause>
+        {d.restFrom || d.restTo ? (
+          <Clause label="Recommendation">
+            Advised rest from {onDate(d.restFrom)} to {onDate(d.restTo)}
+            {d.fitOn ? `, and may return to work, school or usual activity on ${onDate(d.fitOn)}.` : "."}
+          </Clause>
+        ) : d.fitOn ? (
+          <Clause label="Recommendation">Fit to return to work, school or usual activity on {onDate(d.fitOn)}.</Clause>
+        ) : null}
+        {d.remarks ? <Clause label="Remarks">{d.remarks}</Clause> : null}
+      </section>
+    );
+  }
+
   if (type === "MEDICAL_CERTIFICATE") {
     return (
       <section className="py-6 text-sm">

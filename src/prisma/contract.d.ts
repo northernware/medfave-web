@@ -33,7 +33,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'228bca9984e62f86efa14fbf5f3eabcbfef29a035a47af3a1eee8a7b139b12c0'>;
+  StorageHashBase<'0a8de520290ab6063ac82c2d4dcccf42779030df40563dae5002f3dde0d1623a'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
@@ -477,7 +477,8 @@ export type FieldOutputTypes = {
         | 'MEDICAL_ABSTRACT'
         | 'MEDICO_LEGAL_CERTIFICATE'
         | 'INSURANCE_CLAIM'
-        | 'RECORD_COPIES';
+        | 'RECORD_COPIES'
+        | 'OUTPATIENT_CERTIFICATE';
       readonly status: 'REQUESTED' | 'READY' | 'RELEASED' | 'DECLINED';
       readonly purpose: CodecTypes['pg/text@1']['output'];
       readonly requesterName: CodecTypes['pg/text@1']['output'];
@@ -1007,7 +1008,8 @@ export type FieldInputTypes = {
         | 'MEDICAL_ABSTRACT'
         | 'MEDICO_LEGAL_CERTIFICATE'
         | 'INSURANCE_CLAIM'
-        | 'RECORD_COPIES';
+        | 'RECORD_COPIES'
+        | 'OUTPATIENT_CERTIFICATE';
       readonly status: 'REQUESTED' | 'READY' | 'RELEASED' | 'DECLINED';
       readonly purpose: CodecTypes['pg/text@1']['input'];
       readonly requesterName: CodecTypes['pg/text@1']['input'];
@@ -1549,7 +1551,8 @@ export type StorageColumnTypes = {
         | 'MEDICAL_ABSTRACT'
         | 'MEDICO_LEGAL_CERTIFICATE'
         | 'INSURANCE_CLAIM'
-        | 'RECORD_COPIES';
+        | 'RECORD_COPIES'
+        | 'OUTPATIENT_CERTIFICATE';
       readonly updatedAt: TimestampString<3>;
     };
     readonly EmailVerification: {
@@ -2079,7 +2082,8 @@ export type StorageColumnInputTypes = {
         | 'MEDICAL_ABSTRACT'
         | 'MEDICO_LEGAL_CERTIFICATE'
         | 'INSURANCE_CLAIM'
-        | 'RECORD_COPIES';
+        | 'RECORD_COPIES'
+        | 'OUTPATIENT_CERTIFICATE';
       readonly updatedAt: CodecTypes['pg/timestamp-string@1']['input'];
     };
     readonly EmailVerification: {
@@ -6584,6 +6588,7 @@ type ContractBase = Omit<
                 'MEDICO_LEGAL_CERTIFICATE',
                 'INSURANCE_CLAIM',
                 'RECORD_COPIES',
+                'OUTPATIENT_CERTIFICATE',
               ];
             };
             readonly IdentityProvider: {

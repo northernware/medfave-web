@@ -52,7 +52,7 @@ export default async function NewDocumentPage({ searchParams }: PageProps<"/docu
             type:
               typeof type === "string" && type in DocumentType
                 ? (type as DocumentType)
-                : DocumentType.MEDICAL_CERTIFICATE,
+                : DocumentType.OUTPATIENT_CERTIFICATE,
             medicalRecordId: typeof recordId === "string" ? recordId : "",
             purpose: "",
             requesterName: "",

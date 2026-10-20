@@ -29,6 +29,7 @@ export async function GET(request: Request, ctx: RouteContext<"/api/v1/doctor/pa
       "emergencyContact2Name", "emergencyContact2Relationship", "emergencyContact2Number",
       "smoking", "packYears", "alcohol", "occupation", "socialNotes",
       "obGravida", "obPara", "obTerm", "obPreterm", "obAbortions", "obLiving", "menarche", "menstrualCycle", "lastMenstrualPeriod", "obNotes",
+      "birthTerm", "birthWeight", "birthDelivery", "birthNotes", "development", "developmentNotes",
     )
     .include("household", (h) => h.select("id", "name"))
     .where((p) => p.id.eq(id))
@@ -67,6 +68,7 @@ export async function GET(request: Request, ctx: RouteContext<"/api/v1/doctor/pa
           orm.PatientMedication.select("id", "label", "dosage", "frequency", "notes").where((x) => x.patientId.eq(id)).where((x) => x.stoppedAt.isNull()).all(),
           orm.PatientFamilyHistory.select("id", "condition", "relative", "notes").where((x) => x.patientId.eq(id)).orderBy((x) => x.createdAt.asc()).all(),
           orm.PatientPastHistory.select("id", "kind", "label", "year", "notes").where((x) => x.patientId.eq(id)).orderBy((x) => x.createdAt.asc()).all(),
+          orm.PatientImmunization.select("id", "vaccine", "dose", "givenOn", "notes").where((x) => x.patientId.eq(id)).orderBy((x) => x.createdAt.asc()).all(),
         ])
       : null,
     cares
@@ -176,6 +178,18 @@ export async function GET(request: Request, ctx: RouteContext<"/api/v1/doctor/pa
                   notes: patient.obNotes,
                 }
               : null,
+          /** A child's chart (under 18): birth and developmental history, and the doses given. Null for adults. */
+          child: isAdult(String(patient.dateOfBirth))
+            ? null
+            : {
+                birthTerm: patient.birthTerm,
+                birthWeight: patient.birthWeight,
+                birthDelivery: patient.birthDelivery,
+                birthNotes: patient.birthNotes,
+                development: patient.development,
+                developmentNotes: patient.developmentNotes,
+                immunizations: chart[6],
+              },
         }
       : null,
     visits: visits

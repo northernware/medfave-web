@@ -120,6 +120,10 @@
       "model": "PatientFamilyHistory",
       "namespace": "public"
     },
+    "PatientImmunization": {
+      "model": "PatientImmunization",
+      "namespace": "public"
+    },
     "PatientMedication": {
       "model": "PatientMedication",
       "namespace": "public"
@@ -5138,6 +5142,34 @@
                   "kind": "scalar"
                 }
               },
+              "birthDelivery": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "birthNotes": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "birthTerm": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "birthWeight": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
               "bloodType": {
                 "nullable": false,
                 "type": {
@@ -5186,6 +5218,20 @@
                 "nullable": false,
                 "type": {
                   "codecId": "pg/date-string@1",
+                  "kind": "scalar"
+                }
+              },
+              "development": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "developmentNotes": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
                   "kind": "scalar"
                 }
               },
@@ -5632,6 +5678,21 @@
                   "namespace": "public"
                 }
               },
+              "immunizations": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "patientId"
+                  ]
+                },
+                "to": {
+                  "model": "PatientImmunization",
+                  "namespace": "public"
+                }
+              },
               "medicalRecords": {
                 "cardinality": "1:N",
                 "on": {
@@ -5728,6 +5789,18 @@
                 "archivedById": {
                   "column": "archivedById"
                 },
+                "birthDelivery": {
+                  "column": "birthDelivery"
+                },
+                "birthNotes": {
+                  "column": "birthNotes"
+                },
+                "birthTerm": {
+                  "column": "birthTerm"
+                },
+                "birthWeight": {
+                  "column": "birthWeight"
+                },
                 "bloodType": {
                   "column": "bloodType"
                 },
@@ -5745,6 +5818,12 @@
                 },
                 "dateOfBirth": {
                   "column": "dateOfBirth"
+                },
+                "development": {
+                  "column": "development"
+                },
+                "developmentNotes": {
+                  "column": "developmentNotes"
                 },
                 "email": {
                   "column": "email"
@@ -6436,6 +6515,106 @@
               },
               "namespaceId": "public",
               "table": "PatientFamilyHistory"
+            }
+          },
+          "PatientImmunization": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamp-string@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
+              "dose": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "givenOn": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "notes": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "patientId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "vaccine": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "patient": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "patientId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Patient",
+                  "namespace": "public"
+                }
+              }
+            },
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "dose": {
+                  "column": "dose"
+                },
+                "givenOn": {
+                  "column": "givenOn"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "notes": {
+                  "column": "notes"
+                },
+                "patientId": {
+                  "column": "patientId"
+                },
+                "vaccine": {
+                  "column": "vaccine"
+                }
+              },
+              "namespaceId": "public",
+              "table": "PatientImmunization"
             }
           },
           "PatientMedication": {
@@ -11437,6 +11616,26 @@
                   "nativeType": "text",
                   "nullable": true
                 },
+                "birthDelivery": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "birthNotes": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "birthTerm": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "birthWeight": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
                 "bloodType": {
                   "codecId": "pg/enum@1",
                   "default": {
@@ -11499,6 +11698,16 @@
                   "codecId": "pg/date-string@1",
                   "nativeType": "date",
                   "nullable": false
+                },
+                "development": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "developmentNotes": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
                 },
                 "email": {
                   "codecId": "pg/text@1",
@@ -12408,6 +12617,89 @@
                   "id"
                 ],
                 "name": "PatientFamilyHistory_pkey"
+              },
+              "uniques": []
+            },
+            "PatientImmunization": {
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamp-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamp",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
+                "dose": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "givenOn": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "notes": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "patientId": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "vaccine": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [
+                {
+                  "name": "PatientImmunization_patientId_fkey",
+                  "onDelete": "cascade",
+                  "onUpdate": "cascade",
+                  "source": {
+                    "columns": [
+                      "patientId"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "PatientImmunization"
+                  },
+                  "target": {
+                    "columns": [
+                      "id"
+                    ],
+                    "namespaceId": "public",
+                    "tableName": "Patient"
+                  }
+                }
+              ],
+              "indexes": [
+                {
+                  "columns": [
+                    "patientId"
+                  ],
+                  "name": "PatientImmunization_patientId_idx",
+                  "unique": false
+                }
+              ],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ],
+                "name": "PatientImmunization_pkey"
               },
               "uniques": []
             },
@@ -13584,7 +13876,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "300c94238c321170949720385c4142c0b2a3e5e2221fda345a0f863a0c009691"
+    "storageHash": "508d85bbb09bba252b8a43feafddb52f40d766c0f0722a34690e767a298a2b9d"
   },
   "capabilities": {
     "postgres": {

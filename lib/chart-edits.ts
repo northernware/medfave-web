@@ -3,6 +3,7 @@ import { caresFor } from "@/lib/care";
 import { instantToDb } from "@/lib/datetime";
 import { newId } from "@/lib/ids";
 import { likeSafe } from "@/lib/diagnosis-rank";
+import { isAdult } from "@/lib/households";
 import { orm } from "@/src/prisma/db";
 
 /*
@@ -123,6 +124,37 @@ export async function editChart(doctor: Doctor, form: FormData): Promise<ChartEd
         lastMenstrualPeriod: lmp,
         obNotes: text(form.get("notes"), 1000),
       });
+      return { ok: true };
+    }
+    case "child.set": {
+      // Birth and developmental history, for a child's chart; the whole of it, blanks clear.
+      const born = await orm.Patient.select("dateOfBirth").where((p) => p.id.eq(patientId)).first();
+      if (!born || isAdult(String(born.dateOfBirth))) return { ok: false, message: "Birth and developmental history are for children." };
+      const one = (v: FormDataEntryValue | null, allowed: string[]) => {
+        const t = text(v, 20);
+        return t && allowed.includes(t) ? t : null;
+      };
+      await orm.Patient.where((p) => p.id.eq(patientId)).update({
+        birthTerm: one(form.get("birthTerm"), ["TERM", "PRETERM", "POSTTERM"]),
+        birthWeight: text(form.get("birthWeight"), 20),
+        birthDelivery: one(form.get("birthDelivery"), ["NSD", "CS", "ASSISTED"]),
+        birthNotes: text(form.get("birthNotes"), 1000),
+        development: one(form.get("development"), ["ON_TRACK", "DELAYED"]),
+        developmentNotes: text(form.get("developmentNotes"), 1000),
+      });
+      return { ok: true };
+    }
+    case "immunization.add": {
+      const vaccine = text(form.get("label"), 80);
+      if (!vaccine) return { ok: false, message: "Name the vaccine." };
+      const givenOn = text(form.get("givenOn"), 10);
+      if (givenOn && !/^\d{4}-\d{2}-\d{2}$/.test(givenOn)) return { ok: false, message: "Give the date it was given." };
+      await orm.PatientImmunization.create({ id: newId(), patientId, vaccine, dose: text(form.get("dose"), 20), givenOn, notes: text(form.get("notes"), 500), createdAt: now() });
+      return { ok: true };
+    }
+    case "immunization.remove": {
+      if (!(await owned(await orm.PatientImmunization.select("id", "patientId").where((x) => x.id.eq(id)).first(), patientId))) return refused;
+      await orm.PatientImmunization.where((x) => x.id.eq(id)).delete();
       return { ok: true };
     }
     case "social.set": {

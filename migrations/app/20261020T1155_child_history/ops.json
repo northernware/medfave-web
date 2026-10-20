@@ -1,0 +1,374 @@
+[
+  {
+    "id": "table.PatientImmunization",
+    "label": "Create table \"PatientImmunization\"",
+    "summary": "Creates table \"PatientImmunization\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "PatientImmunization"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"PatientImmunization\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"PatientImmunization\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"PatientImmunization\"",
+        "sql": "CREATE TABLE \"public\".\"PatientImmunization\" (\n  \"createdAt\" timestamp(3) DEFAULT (now()) NOT NULL,\n  \"dose\" text,\n  \"givenOn\" text,\n  \"id\" text NOT NULL,\n  \"notes\" text,\n  \"patientId\" text NOT NULL,\n  \"vaccine\" text NOT NULL,\n  CONSTRAINT \"PatientImmunization_pkey\" PRIMARY KEY (\"id\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"PatientImmunization\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"PatientImmunization\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Patient.birthDelivery",
+    "label": "Add column \"birthDelivery\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "birthDelivery",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"birthDelivery\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "birthDelivery"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"birthDelivery\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"birthDelivery\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"birthDelivery\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "birthDelivery"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Patient.birthNotes",
+    "label": "Add column \"birthNotes\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "birthNotes",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"birthNotes\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "birthNotes"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"birthNotes\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"birthNotes\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"birthNotes\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "birthNotes"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Patient.birthTerm",
+    "label": "Add column \"birthTerm\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "birthTerm",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"birthTerm\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "birthTerm"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"birthTerm\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"birthTerm\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"birthTerm\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "birthTerm"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Patient.birthWeight",
+    "label": "Add column \"birthWeight\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "birthWeight",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"birthWeight\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "birthWeight"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"birthWeight\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"birthWeight\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"birthWeight\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "birthWeight"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Patient.development",
+    "label": "Add column \"development\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "development",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"development\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "development"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"development\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"development\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"development\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "development"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Patient.developmentNotes",
+    "label": "Add column \"developmentNotes\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "developmentNotes",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"developmentNotes\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "developmentNotes"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"developmentNotes\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"developmentNotes\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"developmentNotes\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "developmentNotes"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.PatientImmunization.PatientImmunization_patientId_idx",
+    "label": "Create index \"PatientImmunization_patientId_idx\" on \"PatientImmunization\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "PatientImmunization_patientId_idx",
+        "table": "PatientImmunization"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"PatientImmunization_patientId_idx\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"PatientImmunization_patientId_idx\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"PatientImmunization_patientId_idx\"",
+        "sql": "CREATE INDEX \"PatientImmunization_patientId_idx\" ON \"public\".\"PatientImmunization\" (\"patientId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"PatientImmunization_patientId_idx\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"PatientImmunization_patientId_idx\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.PatientImmunization.PatientImmunization_patientId_fkey",
+    "label": "Add foreign key \"PatientImmunization_patientId_fkey\" on \"PatientImmunization\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "PatientImmunization_patientId_fkey",
+        "table": "PatientImmunization"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"PatientImmunization_patientId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "PatientImmunization_patientId_fkey",
+          "public",
+          "\"public\".\"PatientImmunization\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"PatientImmunization_patientId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"PatientImmunization\"\nADD CONSTRAINT \"PatientImmunization_patientId_fkey\"\nFOREIGN KEY (\"patientId\")\nREFERENCES \"public\".\"Patient\" (\"id\")\nON DELETE CASCADE\nON UPDATE CASCADE"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"PatientImmunization_patientId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "PatientImmunization_patientId_fkey",
+          "public",
+          "\"public\".\"PatientImmunization\""
+        ]
+      }
+    ]
+  }
+]

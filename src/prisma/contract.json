@@ -7205,7 +7205,8 @@
                 "MEDICAL_ABSTRACT",
                 "MEDICO_LEGAL_CERTIFICATE",
                 "INSURANCE_CLAIM",
-                "RECORD_COPIES"
+                "RECORD_COPIES",
+                "OUTPATIENT_CERTIFICATE"
               ],
               "typeName": "DocumentType"
             },
@@ -12867,7 +12868,8 @@
                 "MEDICAL_ABSTRACT",
                 "MEDICO_LEGAL_CERTIFICATE",
                 "INSURANCE_CLAIM",
-                "RECORD_COPIES"
+                "RECORD_COPIES",
+                "OUTPATIENT_CERTIFICATE"
               ]
             },
             "IdentityProvider": {
@@ -12968,7 +12970,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "228bca9984e62f86efa14fbf5f3eabcbfef29a035a47af3a1eee8a7b139b12c0"
+    "storageHash": "0a8de520290ab6063ac82c2d4dcccf42779030df40563dae5002f3dde0d1623a"
   },
   "capabilities": {
     "postgres": {

@@ -1225,6 +1225,10 @@ namespace public {
     MEDICO_LEGAL_CERTIFICATE = "MEDICO_LEGAL_CERTIFICATE"
     INSURANCE_CLAIM = "INSURANCE_CLAIM"
     RECORD_COPIES = "RECORD_COPIES"
+    /// The everyday outpatient certificate: seen on a date, the diagnosis, rest
+    /// days, fit to return. Written from a visit. (MEDICAL_CERTIFICATE is the
+    /// inpatient one, a certificate of confinement.)
+    OUTPATIENT_CERTIFICATE = "OUTPATIENT_CERTIFICATE"
   }
 
   native_enum DocumentRequestStatus {

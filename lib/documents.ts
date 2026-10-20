@@ -1,7 +1,9 @@
 import type { DocumentRequestStatus, DocumentType } from "@/lib/enums";
 
 export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
-  MEDICAL_CERTIFICATE: "Medical certificate",
+  // The everyday one first: a clinic writes these daily (sick leave, fit to work).
+  OUTPATIENT_CERTIFICATE: "Medical certificate",
+  MEDICAL_CERTIFICATE: "Certificate of confinement",
   MEDICAL_ABSTRACT: "Medical abstract",
   MEDICO_LEGAL_CERTIFICATE: "Medico-legal certificate",
   INSURANCE_CLAIM: "Insurance claim form",
@@ -10,6 +12,8 @@ export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
 
 /** What each is for, in the words a person at the records desk would use. */
 export const DOCUMENT_TYPE_BLURBS: Record<DocumentType, string> = {
+  OUTPATIENT_CERTIFICATE:
+    "Certifies that the patient was seen, for what, and the rest advised: sick leave, fit to work or school, clearance. Written from the visit.",
   MEDICAL_CERTIFICATE:
     "Certifies a period of confinement and the diagnosis it was for. For inpatients only — an outpatient visit is certified on the visit's own record.",
   MEDICAL_ABSTRACT:
@@ -85,6 +89,19 @@ export type DetailField = {
  * rather than a new column, a new form and a new validator.
  */
 export const DOCUMENT_FIELDS: Record<DocumentType, DetailField[]> = {
+  OUTPATIENT_CERTIFICATE: [
+    { name: "seenOn", label: "Seen on", kind: "date", required: true },
+    { name: "diagnosis", label: "Diagnosis", kind: "text", required: true, wide: true },
+    { name: "restFrom", label: "Advised rest from", kind: "date" },
+    { name: "restTo", label: "Advised rest to", kind: "date" },
+    {
+      name: "fitOn",
+      label: "Fit to return on",
+      kind: "date",
+      hint: "To work, school or usual activity.",
+    },
+    { name: "remarks", label: "Remarks", kind: "textarea", wide: true },
+  ],
   MEDICAL_CERTIFICATE: [
     { name: "admittedOn", label: "Admitted on", kind: "date", required: true },
     { name: "dischargedOn", label: "Discharged on", kind: "date", required: true },
@@ -189,3 +206,31 @@ export function parseDetails(json: string | null): DocumentDetails {
 
 /** The document types, in the order the records desk lists them. */
 export const DOCUMENT_TYPES = Object.keys(DOCUMENT_TYPE_LABELS) as DocumentType[];
+
+const MAX_DETAIL = 4000;
+
+/**
+ * Checks details sent as an object (the app's JSON) against the fields the type
+ * declares, and keeps only those: the same rules the web form's action applies.
+ * `partial` skips required fields, for a draft still being written.
+ */
+export function checkDetails(
+  type: DocumentType,
+  input: unknown,
+  partial = false,
+): { details: DocumentDetails } | { fieldErrors: Record<string, string[]> } {
+  const given = typeof input === "object" && input !== null ? (input as Record<string, unknown>) : {};
+  const details: DocumentDetails = {};
+  const fieldErrors: Record<string, string[]> = {};
+  for (const field of DOCUMENT_FIELDS[type]) {
+    const raw = String(given[field.name] ?? "").trim();
+    if (!raw) {
+      if (field.required && !partial) fieldErrors[field.name] = [`${field.label} is required`];
+      continue;
+    }
+    if (raw.length > MAX_DETAIL) fieldErrors[field.name] = [`Keep ${field.label.toLowerCase()} under ${MAX_DETAIL} characters`];
+    else if (field.kind === "number" && Number.isNaN(Number(raw))) fieldErrors[field.name] = [`${field.label} must be a number`];
+    else details[field.name] = raw;
+  }
+  return Object.keys(fieldErrors).length ? { fieldErrors } : { details };
+}

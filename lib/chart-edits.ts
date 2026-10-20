@@ -7,7 +7,7 @@ import { orm } from "@/src/prisma/db";
 
 /*
  * Small changes to a patient's chart made while writing a note (the side
- * column): an allergy, an alert, a condition or a medicine added, or one
+ * column): an allergy, an alert, a condition, a medicine or family history added, or one
  * resolved, stopped or removed. Each is its own write, apart from the note,
  * and only by a doctor caring for the patient. Conditions and medicines keep
  * their history (resolved / stopped with a date); an allergy or alert removed
@@ -78,6 +78,46 @@ export async function editChart(doctor: Doctor, form: FormData): Promise<ChartEd
       const exists = await orm.PatientAlert.select("id").where((a) => a.patientId.eq(patientId)).where((a) => a.label.ilike(likeSafe(label))).first();
       if (exists) return { ok: false, message: "That alert is already there." };
       await orm.PatientAlert.create({ id: newId(), patientId, label, notes: text(form.get("notes"), 500), createdAt: now() });
+      return { ok: true };
+    }
+    case "family.add": {
+      const condition = text(form.get("label"));
+      const relative = text(form.get("relative"), 80);
+      if (!condition) return { ok: false, message: "Name the condition." };
+      if (!relative) return { ok: false, message: "Say who in the family had it." };
+      await orm.PatientFamilyHistory.create({ id: newId(), patientId, condition, relative, notes: text(form.get("notes"), 500), createdAt: now() });
+      return { ok: true };
+    }
+    case "family.remove": {
+      if (!(await owned(await orm.PatientFamilyHistory.select("id", "patientId").where((f) => f.id.eq(id)).first(), patientId))) return refused;
+      await orm.PatientFamilyHistory.where((f) => f.id.eq(id)).delete();
+      return { ok: true };
+    }
+    case "past.add": {
+      const label = text(form.get("label"));
+      const kind = ["ILLNESS", "SURGERY", "HOSPITALIZATION"].find((k) => k === form.get("kind")) ?? "ILLNESS";
+      if (!label) return { ok: false, message: kind === "SURGERY" ? "Name the operation." : "Say what it was." };
+      await orm.PatientPastHistory.create({ id: newId(), patientId, kind, label, year: text(form.get("year"), 40), notes: text(form.get("notes"), 500), createdAt: now() });
+      return { ok: true };
+    }
+    case "past.remove": {
+      if (!(await owned(await orm.PatientPastHistory.select("id", "patientId").where((x) => x.id.eq(id)).first(), patientId))) return refused;
+      await orm.PatientPastHistory.where((x) => x.id.eq(id)).delete();
+      return { ok: true };
+    }
+    case "social.set": {
+      // The whole personal and social history at once; a blank field clears it.
+      const pick = (v: FormDataEntryValue | null, allowed: string[]) => {
+        const t = text(v, 20);
+        return t && allowed.includes(t) ? t : null;
+      };
+      await orm.Patient.where((p) => p.id.eq(patientId)).update({
+        smoking: pick(form.get("smoking"), ["NEVER", "FORMER", "CURRENT"]),
+        packYears: text(form.get("packYears"), 20),
+        alcohol: pick(form.get("alcohol"), ["NONE", "OCCASIONAL", "REGULAR"]),
+        occupation: text(form.get("occupation"), 120),
+        socialNotes: text(form.get("notes"), 1000),
+      });
       return { ok: true };
     }
     case "alert.remove": {

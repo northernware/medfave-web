@@ -33,7 +33,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'0a8de520290ab6063ac82c2d4dcccf42779030df40563dae5002f3dde0d1623a'>;
+  StorageHashBase<'a540cec3b8ef4e6cb8e0dd6b3d18209e9b80d9090a406d732e3caaffdf8e4ec9'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
@@ -613,6 +613,11 @@ export type FieldOutputTypes = {
         'HEAD' | 'SPOUSE' | 'CHILD' | 'PARENT' | 'SIBLING' | 'GRANDPARENT' | 'OTHER';
       readonly bloodType:
         'A_POS' | 'A_NEG' | 'B_POS' | 'B_NEG' | 'AB_POS' | 'AB_NEG' | 'O_POS' | 'O_NEG' | 'UNKNOWN';
+      readonly smoking: CodecTypes['pg/text@1']['output'] | null;
+      readonly packYears: CodecTypes['pg/text@1']['output'] | null;
+      readonly alcohol: CodecTypes['pg/text@1']['output'] | null;
+      readonly occupation: CodecTypes['pg/text@1']['output'] | null;
+      readonly socialNotes: CodecTypes['pg/text@1']['output'] | null;
       readonly contactNumber: CodecTypes['pg/text@1']['output'] | null;
       readonly email: CodecTypes['pg/text@1']['output'] | null;
       readonly reminderPreference: 'NONE' | 'SMS' | 'EMAIL' | 'APP';
@@ -673,6 +678,14 @@ export type FieldOutputTypes = {
       readonly resolvedAt: TimestampString<3> | null;
       readonly resolvedById: CodecTypes['pg/text@1']['output'] | null;
     };
+    readonly PatientFamilyHistory: {
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly patientId: CodecTypes['pg/text@1']['output'];
+      readonly condition: CodecTypes['pg/text@1']['output'];
+      readonly relative: CodecTypes['pg/text@1']['output'];
+      readonly notes: CodecTypes['pg/text@1']['output'] | null;
+      readonly createdAt: TimestampString<3>;
+    };
     readonly PatientMedication: {
       readonly id: CodecTypes['pg/text@1']['output'];
       readonly patientId: CodecTypes['pg/text@1']['output'];
@@ -687,6 +700,15 @@ export type FieldOutputTypes = {
     readonly PatientNumberCounter: {
       readonly year: CodecTypes['pg/int4@1']['output'];
       readonly lastUsed: CodecTypes['pg/int4@1']['output'];
+    };
+    readonly PatientPastHistory: {
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly patientId: CodecTypes['pg/text@1']['output'];
+      readonly kind: CodecTypes['pg/text@1']['output'];
+      readonly label: CodecTypes['pg/text@1']['output'];
+      readonly year: CodecTypes['pg/text@1']['output'] | null;
+      readonly notes: CodecTypes['pg/text@1']['output'] | null;
+      readonly createdAt: TimestampString<3>;
     };
     readonly Prescription: {
       readonly id: CodecTypes['pg/text@1']['output'];
@@ -1144,6 +1166,11 @@ export type FieldInputTypes = {
         'HEAD' | 'SPOUSE' | 'CHILD' | 'PARENT' | 'SIBLING' | 'GRANDPARENT' | 'OTHER';
       readonly bloodType:
         'A_POS' | 'A_NEG' | 'B_POS' | 'B_NEG' | 'AB_POS' | 'AB_NEG' | 'O_POS' | 'O_NEG' | 'UNKNOWN';
+      readonly smoking: CodecTypes['pg/text@1']['input'] | null;
+      readonly packYears: CodecTypes['pg/text@1']['input'] | null;
+      readonly alcohol: CodecTypes['pg/text@1']['input'] | null;
+      readonly occupation: CodecTypes['pg/text@1']['input'] | null;
+      readonly socialNotes: CodecTypes['pg/text@1']['input'] | null;
       readonly contactNumber: CodecTypes['pg/text@1']['input'] | null;
       readonly email: CodecTypes['pg/text@1']['input'] | null;
       readonly reminderPreference: 'NONE' | 'SMS' | 'EMAIL' | 'APP';
@@ -1204,6 +1231,14 @@ export type FieldInputTypes = {
       readonly resolvedAt: CodecTypes['pg/timestamp-string@1']['input'] | null;
       readonly resolvedById: CodecTypes['pg/text@1']['input'] | null;
     };
+    readonly PatientFamilyHistory: {
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly patientId: CodecTypes['pg/text@1']['input'];
+      readonly condition: CodecTypes['pg/text@1']['input'];
+      readonly relative: CodecTypes['pg/text@1']['input'];
+      readonly notes: CodecTypes['pg/text@1']['input'] | null;
+      readonly createdAt: CodecTypes['pg/timestamp-string@1']['input'];
+    };
     readonly PatientMedication: {
       readonly id: CodecTypes['pg/text@1']['input'];
       readonly patientId: CodecTypes['pg/text@1']['input'];
@@ -1218,6 +1253,15 @@ export type FieldInputTypes = {
     readonly PatientNumberCounter: {
       readonly year: CodecTypes['pg/int4@1']['input'];
       readonly lastUsed: CodecTypes['pg/int4@1']['input'];
+    };
+    readonly PatientPastHistory: {
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly patientId: CodecTypes['pg/text@1']['input'];
+      readonly kind: CodecTypes['pg/text@1']['input'];
+      readonly label: CodecTypes['pg/text@1']['input'];
+      readonly year: CodecTypes['pg/text@1']['input'] | null;
+      readonly notes: CodecTypes['pg/text@1']['input'] | null;
+      readonly createdAt: CodecTypes['pg/timestamp-string@1']['input'];
     };
     readonly Prescription: {
       readonly id: CodecTypes['pg/text@1']['input'];
@@ -1662,6 +1706,7 @@ export type StorageColumnTypes = {
     };
     readonly Patient: {
       readonly accountId: CodecTypes['pg/text@1']['output'] | null;
+      readonly alcohol: CodecTypes['pg/text@1']['output'] | null;
       readonly allergyStatus: 'RECORDED' | 'NONE_KNOWN' | 'UNKNOWN';
       readonly archivedAt: TimestampString<3> | null;
       readonly archivedById: CodecTypes['pg/text@1']['output'] | null;
@@ -1686,12 +1731,16 @@ export type StorageColumnTypes = {
       readonly lastName: CodecTypes['pg/text@1']['output'];
       readonly medicationStatus: 'RECORDED' | 'NONE_KNOWN' | 'UNKNOWN';
       readonly middleName: CodecTypes['pg/text@1']['output'] | null;
+      readonly occupation: CodecTypes['pg/text@1']['output'] | null;
+      readonly packYears: CodecTypes['pg/text@1']['output'] | null;
       readonly patientNumber: CodecTypes['pg/text@1']['output'] | null;
       readonly primaryDoctorId: CodecTypes['pg/text@1']['output'] | null;
       readonly relationship:
         'HEAD' | 'SPOUSE' | 'CHILD' | 'PARENT' | 'SIBLING' | 'GRANDPARENT' | 'OTHER';
       readonly reminderPreference: 'NONE' | 'SMS' | 'EMAIL' | 'APP';
       readonly sex: 'MALE' | 'FEMALE';
+      readonly smoking: CodecTypes['pg/text@1']['output'] | null;
+      readonly socialNotes: CodecTypes['pg/text@1']['output'] | null;
       readonly updatedAt: TimestampString<3>;
     };
     readonly PatientActivation: {
@@ -1735,6 +1784,14 @@ export type StorageColumnTypes = {
       readonly resolvedAt: TimestampString<3> | null;
       readonly resolvedById: CodecTypes['pg/text@1']['output'] | null;
     };
+    readonly PatientFamilyHistory: {
+      readonly condition: CodecTypes['pg/text@1']['output'];
+      readonly createdAt: TimestampString<3>;
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly notes: CodecTypes['pg/text@1']['output'] | null;
+      readonly patientId: CodecTypes['pg/text@1']['output'];
+      readonly relative: CodecTypes['pg/text@1']['output'];
+    };
     readonly PatientMedication: {
       readonly createdAt: TimestampString<3>;
       readonly dosage: CodecTypes['pg/text@1']['output'] | null;
@@ -1749,6 +1806,15 @@ export type StorageColumnTypes = {
     readonly PatientNumberCounter: {
       readonly lastUsed: CodecTypes['pg/int4@1']['output'];
       readonly year: CodecTypes['pg/int4@1']['output'];
+    };
+    readonly PatientPastHistory: {
+      readonly createdAt: TimestampString<3>;
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly kind: CodecTypes['pg/text@1']['output'];
+      readonly label: CodecTypes['pg/text@1']['output'];
+      readonly notes: CodecTypes['pg/text@1']['output'] | null;
+      readonly patientId: CodecTypes['pg/text@1']['output'];
+      readonly year: CodecTypes['pg/text@1']['output'] | null;
     };
     readonly Prescription: {
       readonly createdAt: TimestampString<3>;
@@ -2193,6 +2259,7 @@ export type StorageColumnInputTypes = {
     };
     readonly Patient: {
       readonly accountId: CodecTypes['pg/text@1']['input'] | null;
+      readonly alcohol: CodecTypes['pg/text@1']['input'] | null;
       readonly allergyStatus: 'RECORDED' | 'NONE_KNOWN' | 'UNKNOWN';
       readonly archivedAt: CodecTypes['pg/timestamp-string@1']['input'] | null;
       readonly archivedById: CodecTypes['pg/text@1']['input'] | null;
@@ -2217,12 +2284,16 @@ export type StorageColumnInputTypes = {
       readonly lastName: CodecTypes['pg/text@1']['input'];
       readonly medicationStatus: 'RECORDED' | 'NONE_KNOWN' | 'UNKNOWN';
       readonly middleName: CodecTypes['pg/text@1']['input'] | null;
+      readonly occupation: CodecTypes['pg/text@1']['input'] | null;
+      readonly packYears: CodecTypes['pg/text@1']['input'] | null;
       readonly patientNumber: CodecTypes['pg/text@1']['input'] | null;
       readonly primaryDoctorId: CodecTypes['pg/text@1']['input'] | null;
       readonly relationship:
         'HEAD' | 'SPOUSE' | 'CHILD' | 'PARENT' | 'SIBLING' | 'GRANDPARENT' | 'OTHER';
       readonly reminderPreference: 'NONE' | 'SMS' | 'EMAIL' | 'APP';
       readonly sex: 'MALE' | 'FEMALE';
+      readonly smoking: CodecTypes['pg/text@1']['input'] | null;
+      readonly socialNotes: CodecTypes['pg/text@1']['input'] | null;
       readonly updatedAt: CodecTypes['pg/timestamp-string@1']['input'];
     };
     readonly PatientActivation: {
@@ -2266,6 +2337,14 @@ export type StorageColumnInputTypes = {
       readonly resolvedAt: CodecTypes['pg/timestamp-string@1']['input'] | null;
       readonly resolvedById: CodecTypes['pg/text@1']['input'] | null;
     };
+    readonly PatientFamilyHistory: {
+      readonly condition: CodecTypes['pg/text@1']['input'];
+      readonly createdAt: CodecTypes['pg/timestamp-string@1']['input'];
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly notes: CodecTypes['pg/text@1']['input'] | null;
+      readonly patientId: CodecTypes['pg/text@1']['input'];
+      readonly relative: CodecTypes['pg/text@1']['input'];
+    };
     readonly PatientMedication: {
       readonly createdAt: CodecTypes['pg/timestamp-string@1']['input'];
       readonly dosage: CodecTypes['pg/text@1']['input'] | null;
@@ -2280,6 +2359,15 @@ export type StorageColumnInputTypes = {
     readonly PatientNumberCounter: {
       readonly lastUsed: CodecTypes['pg/int4@1']['input'];
       readonly year: CodecTypes['pg/int4@1']['input'];
+    };
+    readonly PatientPastHistory: {
+      readonly createdAt: CodecTypes['pg/timestamp-string@1']['input'];
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly kind: CodecTypes['pg/text@1']['input'];
+      readonly label: CodecTypes['pg/text@1']['input'];
+      readonly notes: CodecTypes['pg/text@1']['input'] | null;
+      readonly patientId: CodecTypes['pg/text@1']['input'];
+      readonly year: CodecTypes['pg/text@1']['input'] | null;
     };
     readonly Prescription: {
       readonly createdAt: CodecTypes['pg/timestamp-string@1']['input'];
@@ -5247,6 +5335,31 @@ type ContractBase = Omit<
                   };
                   readonly typeParams: { readonly typeName: 'BloodType' };
                 };
+                readonly smoking: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly packYears: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly alcohol: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly occupation: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly socialNotes: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
                 readonly contactNumber: {
                   readonly nativeType: 'text';
                   readonly codecId: 'pg/text@1';
@@ -5823,6 +5936,69 @@ type ContractBase = Omit<
                 },
               ];
             };
+            readonly PatientFamilyHistory: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly patientId: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly condition: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly relative: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly notes: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly createdAt: {
+                  readonly nativeType: 'timestamp';
+                  readonly codecId: 'pg/timestamp-string@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              primaryKey: {
+                readonly columns: readonly ['id'];
+                readonly name: 'PatientFamilyHistory_pkey';
+              };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'PatientFamilyHistory_patientId_idx';
+                  readonly columns: readonly ['patientId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'PatientFamilyHistory';
+                    readonly columns: readonly ['patientId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Patient';
+                    readonly columns: readonly ['id'];
+                  };
+                  readonly name: 'PatientFamilyHistory_patientId_fkey';
+                },
+              ];
+            };
             readonly PatientMedication: {
               columns: {
                 readonly id: {
@@ -5931,6 +6107,74 @@ type ContractBase = Omit<
               uniques: readonly [];
               indexes: readonly [];
               foreignKeys: readonly [];
+            };
+            readonly PatientPastHistory: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly patientId: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly kind: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly label: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly year: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly notes: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly createdAt: {
+                  readonly nativeType: 'timestamp';
+                  readonly codecId: 'pg/timestamp-string@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              primaryKey: {
+                readonly columns: readonly ['id'];
+                readonly name: 'PatientPastHistory_pkey';
+              };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'PatientPastHistory_patientId_idx';
+                  readonly columns: readonly ['patientId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'PatientPastHistory';
+                    readonly columns: readonly ['patientId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Patient';
+                    readonly columns: readonly ['id'];
+                  };
+                  readonly name: 'PatientPastHistory_patientId_fkey';
+                },
+              ];
             };
             readonly Prescription: {
               columns: {
@@ -6688,6 +6932,14 @@ type ContractBase = Omit<
     readonly PatientMedication: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'PatientMedication';
+    };
+    readonly PatientFamilyHistory: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'PatientFamilyHistory';
+    };
+    readonly PatientPastHistory: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'PatientPastHistory';
     };
     readonly PatientAlert: {
       readonly namespace: 'public' & NamespaceId;
@@ -10067,6 +10319,26 @@ type ContractBase = Omit<
                   readonly typeParams: { readonly typeName: 'BloodType' };
                 };
               };
+              readonly smoking: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly packYears: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly alcohol: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly occupation: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly socialNotes: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
               readonly contactNumber: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -10290,6 +10562,17 @@ type ContractBase = Omit<
                   readonly targetFields: readonly ['patientId'];
                 };
               };
+              readonly familyHistory: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'PatientFamilyHistory';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['patientId'];
+                };
+              };
               readonly household: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -10316,6 +10599,17 @@ type ContractBase = Omit<
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
                   readonly model: 'PatientMedication';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['patientId'];
+                };
+              };
+              readonly pastHistory: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'PatientPastHistory';
                 };
                 readonly cardinality: '1:N';
                 readonly on: {
@@ -10362,6 +10656,11 @@ type ContractBase = Omit<
                 readonly sex: { readonly column: 'sex' };
                 readonly relationship: { readonly column: 'relationship' };
                 readonly bloodType: { readonly column: 'bloodType' };
+                readonly smoking: { readonly column: 'smoking' };
+                readonly packYears: { readonly column: 'packYears' };
+                readonly alcohol: { readonly column: 'alcohol' };
+                readonly occupation: { readonly column: 'occupation' };
+                readonly socialNotes: { readonly column: 'socialNotes' };
                 readonly contactNumber: { readonly column: 'contactNumber' };
                 readonly email: { readonly column: 'email' };
                 readonly reminderPreference: { readonly column: 'reminderPreference' };
@@ -10706,6 +11005,63 @@ type ContractBase = Omit<
               };
             };
           };
+          readonly PatientFamilyHistory: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly patientId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly condition: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly relative: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly notes: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamp-string@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+            };
+            readonly relations: {
+              readonly patient: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Patient';
+                };
+                readonly cardinality: 'N:1';
+                readonly on: {
+                  readonly localFields: readonly ['patientId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'PatientFamilyHistory';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly patientId: { readonly column: 'patientId' };
+                readonly condition: { readonly column: 'condition' };
+                readonly relative: { readonly column: 'relative' };
+                readonly notes: { readonly column: 'notes' };
+                readonly createdAt: { readonly column: 'createdAt' };
+              };
+            };
+          };
           readonly PatientMedication: {
             readonly fields: {
               readonly id: {
@@ -10800,6 +11156,68 @@ type ContractBase = Omit<
               readonly fields: {
                 readonly year: { readonly column: 'year' };
                 readonly lastUsed: { readonly column: 'lastUsed' };
+              };
+            };
+          };
+          readonly PatientPastHistory: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly patientId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly kind: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly label: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly year: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly notes: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamp-string@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+            };
+            readonly relations: {
+              readonly patient: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Patient';
+                };
+                readonly cardinality: 'N:1';
+                readonly on: {
+                  readonly localFields: readonly ['patientId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'PatientPastHistory';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly patientId: { readonly column: 'patientId' };
+                readonly kind: { readonly column: 'kind' };
+                readonly label: { readonly column: 'label' };
+                readonly year: { readonly column: 'year' };
+                readonly notes: { readonly column: 'notes' };
+                readonly createdAt: { readonly column: 'createdAt' };
               };
             };
           };

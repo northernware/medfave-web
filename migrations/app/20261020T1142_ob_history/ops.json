@@ -1,0 +1,422 @@
+[
+  {
+    "id": "column.public.Patient.lastMenstrualPeriod",
+    "label": "Add column \"lastMenstrualPeriod\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "lastMenstrualPeriod",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"lastMenstrualPeriod\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "lastMenstrualPeriod"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"lastMenstrualPeriod\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"lastMenstrualPeriod\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"lastMenstrualPeriod\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "lastMenstrualPeriod"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Patient.menarche",
+    "label": "Add column \"menarche\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "menarche",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"menarche\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "menarche"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"menarche\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"menarche\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"menarche\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "menarche"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Patient.menstrualCycle",
+    "label": "Add column \"menstrualCycle\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "menstrualCycle",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"menstrualCycle\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "menstrualCycle"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"menstrualCycle\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"menstrualCycle\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"menstrualCycle\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "menstrualCycle"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Patient.obAbortions",
+    "label": "Add column \"obAbortions\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "obAbortions",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"obAbortions\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "obAbortions"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"obAbortions\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"obAbortions\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"obAbortions\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "obAbortions"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Patient.obGravida",
+    "label": "Add column \"obGravida\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "obGravida",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"obGravida\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "obGravida"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"obGravida\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"obGravida\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"obGravida\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "obGravida"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Patient.obLiving",
+    "label": "Add column \"obLiving\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "obLiving",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"obLiving\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "obLiving"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"obLiving\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"obLiving\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"obLiving\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "obLiving"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Patient.obNotes",
+    "label": "Add column \"obNotes\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "obNotes",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"obNotes\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "obNotes"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"obNotes\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"obNotes\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"obNotes\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "obNotes"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Patient.obPara",
+    "label": "Add column \"obPara\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "obPara",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"obPara\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "obPara"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"obPara\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"obPara\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"obPara\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "obPara"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Patient.obPreterm",
+    "label": "Add column \"obPreterm\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "obPreterm",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"obPreterm\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "obPreterm"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"obPreterm\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"obPreterm\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"obPreterm\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "obPreterm"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.public.Patient.obTerm",
+    "label": "Add column \"obTerm\" to \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "obTerm",
+        "table": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"obTerm\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "obTerm"
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"obTerm\"",
+        "sql": "ALTER TABLE \"public\".\"Patient\" ADD COLUMN \"obTerm\" text"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"obTerm\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Patient",
+          "obTerm"
+        ]
+      }
+    ]
+  }
+]

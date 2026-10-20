@@ -130,6 +130,20 @@ namespace public {
     alcohol           String?
     occupation        String?
     socialNotes       String?
+    /// OB history (women): gravida and para, with para's four parts (term,
+    /// preterm, abortions, living children: the "T-P-A-L" of "G3 P2 (2-0-1-2)"),
+    /// menstrual history (age at menarche, cycle, last menstrual period as
+    /// YYYY-MM-DD) and a note. Text, as written, so "unsure" can be said.
+    obGravida         String?
+    obPara            String?
+    obTerm            String?
+    obPreterm         String?
+    obAbortions       String?
+    obLiving          String?
+    menarche          String?
+    menstrualCycle    String?
+    lastMenstrualPeriod String?
+    obNotes           String?
     contactNumber     String?
     email             String?
     /// Whether this person wants to hear from the clinic before a visit, and

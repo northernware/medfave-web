@@ -28,6 +28,7 @@ export async function GET(request: Request, ctx: RouteContext<"/api/v1/doctor/pa
       "emergencyContactName", "emergencyContactRelationship", "emergencyContactNumber",
       "emergencyContact2Name", "emergencyContact2Relationship", "emergencyContact2Number",
       "smoking", "packYears", "alcohol", "occupation", "socialNotes",
+      "obGravida", "obPara", "obTerm", "obPreterm", "obAbortions", "obLiving", "menarche", "menstrualCycle", "lastMenstrualPeriod", "obNotes",
     )
     .include("household", (h) => h.select("id", "name"))
     .where((p) => p.id.eq(id))
@@ -159,6 +160,22 @@ export async function GET(request: Request, ctx: RouteContext<"/api/v1/doctor/pa
             occupation: patient.occupation,
             notes: patient.socialNotes,
           },
+          /** OB history, for a woman's chart (null otherwise); each field null until asked. */
+          ob:
+            patient.sex === "FEMALE"
+              ? {
+                  gravida: patient.obGravida,
+                  para: patient.obPara,
+                  term: patient.obTerm,
+                  preterm: patient.obPreterm,
+                  abortions: patient.obAbortions,
+                  living: patient.obLiving,
+                  menarche: patient.menarche,
+                  cycle: patient.menstrualCycle,
+                  lastMenstrualPeriod: patient.lastMenstrualPeriod,
+                  notes: patient.obNotes,
+                }
+              : null,
         }
       : null,
     visits: visits

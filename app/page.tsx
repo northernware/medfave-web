@@ -57,11 +57,12 @@ function Header() {
   return (
     <header className="sticky top-0 z-20 border-b border-border/50">
       {/*
-        The header's background is its own layer and reaches above the header (iOS Safari shows the
-        page under the status bar). On phones it's the solid canvas colour, the same as the theme
-        colour Safari paints the status bar with, so the two read as one bar; desktop is frosted.
+        Above the header, behind iOS Safari's status bar (Safari shows the page there), a solid
+        strip in the canvas colour, the theme colour Safari paints that bar with. The header itself
+        is frosted glass. Off screen on other browsers.
       */}
-      <div aria-hidden className="absolute inset-x-0 -top-28 bottom-0 -z-10 bg-canvas lg:bg-canvas/70 lg:backdrop-blur-xl lg:backdrop-saturate-150" />
+      <div aria-hidden className="absolute inset-x-0 -top-28 h-28 -z-10 bg-canvas" />
+      <div aria-hidden className="absolute inset-0 -z-10 bg-canvas/70 backdrop-blur-xl backdrop-saturate-150" />
       <div className={`${wrap} flex items-center justify-between gap-4 py-3`}>
         <Link href="/" aria-label="Medfave home" className="rounded-md focus-visible:outline-2 focus-visible:outline-accent">
           <Lockup className="h-7 w-auto" />

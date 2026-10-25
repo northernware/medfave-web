@@ -55,7 +55,7 @@ const inPanel = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10";
 
 function Header() {
   return (
-    <header className="sticky top-0 z-20 border-b border-border/60 bg-canvas/95 lg:bg-canvas/80 lg:backdrop-blur-xl">
+    <header className="sticky top-0 z-20 border-b border-border/50 bg-canvas/70 backdrop-blur-xl backdrop-saturate-150">
       <div className={`${wrap} flex items-center justify-between gap-4 py-3`}>
         <Link href="/" aria-label="Medfave home" className="rounded-md focus-visible:outline-2 focus-visible:outline-accent">
           <Lockup className="h-7 w-auto" />

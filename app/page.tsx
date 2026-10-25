@@ -1,299 +1,293 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { CalendarIcon } from "@solar-icons/react/linear/calendar";
-import { ClockCircleIcon } from "@solar-icons/react/linear/clock-circle";
-import { DocumentTextIcon } from "@solar-icons/react/linear/document-text";
-import { LetterIcon } from "@solar-icons/react/linear/letter";
-import { ShieldCheckIcon } from "@solar-icons/react/linear/shield-check";
-import { UsersGroupTwoRoundedIcon } from "@solar-icons/react/linear/users-group-two-rounded";
 import { redirect } from "next/navigation";
 import { getViewer, homeFor } from "@/lib/auth";
-import { Brand, HeartMark } from "@/components/brand";
+import { HeartMark, Lockup } from "@/components/brand";
+import { HeroFilm } from "@/components/landing/film";
+import { Story, type StoryStep } from "@/components/landing/story";
+import { WaitlistForm } from "@/components/landing/waitlist-form";
 import { buttonClass } from "@/components/ui";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export const metadata: Metadata = {
-  title: { absolute: "Medfave — appointments and records for family practice" },
+  title: { absolute: "Medfave — the whole visit, in one place" },
+  description:
+    "Medfave keeps the whole visit in one place for doctors and clinics in the Philippines: the day, the chart, ICD-11 coded notes, certificates and the family. On the web today; apps coming soon.",
 };
 
 /*
  * The public front door. Anyone signed in already has a home, and it is not a
  * sales page: they go straight to it.
+ *
+ * Doctors and clinics first: the web app is live for them today. The iPhone and
+ * Android apps are coming soon, so the page collects a waitlist for them.
  */
 export default async function LandingPage() {
   const viewer = await getViewer();
   if (viewer) redirect(homeFor(viewer));
 
   return (
-    <div className="flex min-h-dvh flex-col">
-      <header className="sticky top-0 z-10 border-b border-border bg-canvas/95 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-10">
-          <Brand />
-          <nav aria-label="Main" className="flex items-center gap-2">
-            <div className="hidden items-center gap-2 sm:flex">
-              <a href="#features" className={buttonClass("ghost")}>
-                Features
-              </a>
-              <a href="#who" className={buttonClass("ghost")}>
-                Who it&rsquo;s for
-              </a>
-            </div>
-            <ThemeToggle />
-            <Link href="/login" className={buttonClass("primary")}>
-              Sign in
-            </Link>
-          </nav>
-        </div>
-      </header>
-
+    <div className="flex min-h-dvh flex-col bg-canvas">
+      <Header />
       <main className="flex-1">
         <Hero />
-        <Features />
-        <Roles />
-        <Privacy />
+        <PaperTrail />
+        <Product />
+        <Trained />
+        <Apps />
         <Closing />
       </main>
-
-      <footer className="border-t border-border">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-10">
-          <Brand />
-          <div className="flex flex-wrap gap-x-6 gap-y-2">
-            <Link href="/login" className="hover:text-ink">
-              Sign in
-            </Link>
-            <Link href="/register" className="hover:text-ink">
-              Activate a patient account
-            </Link>
-            <Link href="/forgot" className="hover:text-ink">
-              Forgot password
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
+  );
+}
+
+const wrap = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10";
+
+function Header() {
+  return (
+    <header className="sticky top-0 z-20 border-b border-border/60 bg-canvas/80 backdrop-blur-xl">
+      <div className={`${wrap} flex items-center justify-between gap-4 py-3`}>
+        <Link href="/" aria-label="Medfave home" className="rounded-md focus-visible:outline-2 focus-visible:outline-accent">
+          <Lockup className="h-7 w-auto" />
+        </Link>
+        <nav aria-label="Main" className="flex items-center gap-1 sm:gap-2">
+          <div className="hidden items-center gap-1 md:flex">
+            <a href="#product" className={buttonClass("ghost")}>Product</a>
+            <a href="#trained" className={buttonClass("ghost")}>For doctors</a>
+            <a href="#apps" className={buttonClass("ghost")}>Apps</a>
+          </div>
+          <ThemeToggle />
+          <Link href="/login" className={buttonClass("secondary")}>Sign in</Link>
+          <Link href="/signup?as=doctor" className={`${buttonClass("primary")} hidden sm:inline-flex`}>Get started</Link>
+        </nav>
+      </div>
+    </header>
   );
 }
 
 function Hero() {
   return (
-    <section className="mx-auto grid w-full max-w-6xl items-center gap-12 px-4 pt-14 pb-20 sm:px-6 lg:grid-cols-[minmax(0,6fr)_minmax(0,5fr)] lg:gap-16 lg:px-10 lg:pt-24 lg:pb-28">
-      <div>
-        <p className="inline-flex items-center gap-2 rounded-full bg-accent-tint px-3 py-1 text-sm font-semibold text-accent-ink">
-          <HeartMark className="size-4" tone="accent" />
-          For family practice
-        </p>
-        <h1 className="mt-5 text-[40px] leading-[46px] font-semibold tracking-[-0.02em] text-balance sm:text-[48px] sm:leading-[56px]">
-          Care, with a little heart — and the whole family in one place.
-        </h1>
-        <p className="mt-5 max-w-xl text-lg leading-7 text-pretty text-ink-muted">
-          Medfave keeps a family practice&rsquo;s appointments, visit notes and prescriptions together,
-          organised by household. Find relatives in a click, book a family checkup, and see
-          hereditary risk at a glance — while every patient keeps a chart of their own.
-        </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link href="/signup?as=doctor" className={buttonClass("primary", "px-6 py-3 text-base")}>
-            I&rsquo;m a doctor
-          </Link>
-          <Link href="/signup" className={buttonClass("secondary", "px-6 py-3 text-base")}>
-            I&rsquo;m a patient
-          </Link>
+    <section className="relative overflow-hidden">
+      <div aria-hidden className="pointer-events-none absolute -top-40 -right-40 size-[640px] rounded-full bg-brand-blush/70 blur-3xl dark:bg-accent-soft/40" />
+      <div aria-hidden className="pointer-events-none absolute top-80 -left-60 size-[520px] rounded-full bg-brand-blush/50 blur-3xl dark:bg-accent-soft/30" />
+      <div className={`${wrap} relative pt-16 pb-20 lg:pt-24 lg:pb-28`}>
+        <div className="mx-auto max-w-4xl text-center">
+          <p className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/80 px-4 py-1.5 text-sm font-semibold text-accent-ink shadow-[var(--shadow-card)]">
+            <HeartMark className="size-4" tone="accent" />
+            For doctors and clinics in the Philippines
+          </p>
+          <h1 className="mt-6 text-[44px] leading-[1.05] font-semibold tracking-[-0.035em] text-balance sm:text-[64px] lg:text-[84px]">
+            The whole visit,{" "}
+            <span className="text-accent-ink">in one place.</span>
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-pretty text-ink-muted sm:text-xl">
+            Your day, the chart, notes coded to ICD-11, certificates and the patient&rsquo;s family — kept together,
+            so you can give the visit your full attention.
+          </p>
+          <div className="mt-9 flex flex-wrap justify-center gap-3">
+            <Link href="/signup?as=doctor" className={buttonClass("primary", "min-h-12 px-7 text-base")}>
+              Start free on the web
+            </Link>
+            <a href="#apps" className={buttonClass("secondary", "min-h-12 px-7 text-base")}>
+              Join the app waitlist
+            </a>
+          </div>
+          <p className="mt-5 text-sm text-ink-faint">On the web today · iPhone and Android apps coming soon</p>
         </div>
-        <p className="mt-4 text-sm text-ink-faint">
-          Free to start. Already on Medfave?{" "}
-          <Link href="/login" className="font-medium text-accent-ink hover:underline">
-            Sign in
-          </Link>
-          .
-        </p>
+        <div className="landing-rise mx-auto mt-14 max-w-5xl lg:mt-20">
+          <HeroFilm />
+        </div>
       </div>
-
-      <HouseholdPreview />
     </section>
   );
 }
 
-/*
- * An illustration of the product, not live data — the names are made up, so
- * the whole panel is hidden from assistive tech rather than read out as content.
- */
-function HouseholdPreview() {
-  const members = [
-    { initials: "MR", name: "Maria Reyes", detail: "Mother · 41", note: "Hypertension" },
-    { initials: "JR", name: "Jose Reyes", detail: "Father · 44", note: "Type 2 diabetes" },
-    { initials: "AR", name: "Ana Reyes", detail: "Daughter · 9", note: "Penicillin allergy", alert: true },
-  ];
+const PAPER = [
+  ["The chart", "in a folder, allergies on page three"],
+  ["The follow-up", "on a sticky note, with no reminder sent"],
+  ["The certificate", "filled in by hand, waiting to be signed"],
+  ["The vaccines", "in a booklet that stayed at home"],
+];
 
+function PaperTrail() {
   return (
-    <div aria-hidden="true" className="brand-pattern rounded-xl border border-border p-5 sm:p-8">
-      <div className="rounded-lg border border-border bg-surface p-5 shadow-pop">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold tracking-wide text-ink-faint uppercase">Household</p>
-            <p className="mt-1 font-display text-xl font-semibold">Reyes family</p>
-          </div>
-          <span className="rounded-full bg-accent-tint px-2.5 py-1 text-xs font-medium text-accent-ink">
-            3 members
-          </span>
+    <section aria-labelledby="paper-title" className="bg-brand-plum text-[#fff9fc]">
+      <div className={`${wrap} py-20 lg:py-28`}>
+        <div className="landing-rise max-w-3xl">
+          <p className="text-sm font-semibold tracking-[0.14em] text-brand-blush uppercase">Why we built it</p>
+          <h2 id="paper-title" className="mt-4 text-[36px] leading-[1.1] font-semibold tracking-[-0.025em] text-balance sm:text-[52px]">
+            One patient, one visit, and usually a trail of paper.
+          </h2>
         </div>
-
-        <ul className="mt-5 divide-y divide-border">
-          {members.map((m) => (
-            <li key={m.initials} className="flex items-center gap-3 py-3">
-              <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-accent-soft text-sm font-semibold text-accent-ink">
-                {m.initials}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold">{m.name}</p>
-                <p className="text-xs text-ink-muted">{m.detail}</p>
-              </div>
-              <span
-                className={[
-                  "dot rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap",
-                  m.alert ? "bg-danger-tint text-danger-ink" : "bg-surface-muted text-ink-muted",
-                ].join(" ")}
-              >
-                {m.note}
-              </span>
+        <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {PAPER.map(([t, d], i) => (
+            <li key={t} className="landing-rise rounded-3xl bg-[#3e2139] p-7" style={{ animationRangeStart: `entry ${i * 6}%` }}>
+              <p className="text-xl font-semibold">{t}</p>
+              <p className="mt-2 leading-7 text-[#c6b9c2]">{d}</p>
             </li>
           ))}
         </ul>
+      </div>
+    </section>
+  );
+}
 
-        <div className="mt-4 flex items-center justify-between gap-3 rounded-md bg-surface-muted px-4 py-3">
-          <div>
-            <p className="text-xs text-ink-muted">Next visit</p>
-            <p className="nums text-sm font-semibold">Family checkup · Thu 9:30</p>
-          </div>
-          <span className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-on-accent">Booked</span>
+const STEPS: StoryStep[] = [
+  { id: "today", eyebrow: "Today", title: "Your day, at a glance.", body: "Who is with you, who is waiting and for how long, and the follow-ups that are due. Add a walk-in in one tap.", image: "/landing/web-dashboard.webp", alt: "The Medfave dashboard: today’s counts, the waiting room and upcoming visits" },
+  { id: "chart", eyebrow: "The chart", title: "Her whole picture, before you say hello.", body: "Allergies in red and alerts you can’t miss, then her conditions, medicines and history — past, family, personal and social, OB.", image: "/landing/web-corazon.webp", alt: "A patient’s chart: visit history, appointments, allergies, alerts and history" },
+  { id: "schedule", eyebrow: "The schedule", title: "Book the follow-up before she leaves.", body: "Every visit on its day. Patients ask for a time and you confirm it; a reminder goes out the day before.", image: "/landing/web-calendar.webp", alt: "The month calendar with visits on each day" },
+  { id: "households", eyebrow: "Households", title: "The whole family, one tap away.", body: "Relatives grouped together, each with a chart of their own: a child’s vaccines, an emergency contact, hereditary risk.", image: "/landing/web-households.webp", alt: "The households list with members" },
+  { id: "documents", eyebrow: "Documents", title: "The certificate, done before she reaches the door.", body: "Filled in from the visit, signed, and shared to the patient — or printed.", image: "/landing/web-documents.webp", alt: "Documents: a medical certificate ready to collect" },
+  { id: "feedback", eyebrow: "Patient feedback", title: "Hear how the visit went.", body: "One tap after the visit, a few words if they like. Only your clinic sees it.", image: "/landing/web-feedback.webp", alt: "Patient feedback: average rating and recent comments" },
+];
+
+function Product() {
+  return (
+    <section id="product" aria-labelledby="product-title" className="scroll-mt-20">
+      <div className={`${wrap} py-20 lg:py-28`}>
+        <div className="landing-rise max-w-3xl">
+          <p className="text-sm font-semibold tracking-[0.14em] text-accent-ink uppercase">On the web, today</p>
+          <h2 id="product-title" className="mt-4 text-[36px] leading-[1.1] font-semibold tracking-[-0.025em] text-balance sm:text-[52px]">
+            Everything about the visit, from the first hello to the follow-up.
+          </h2>
+        </div>
+        <div className="mt-14">
+          <Story steps={STEPS} />
         </div>
       </div>
+    </section>
+  );
+}
+
+function Trained() {
+  return (
+    <section id="trained" aria-labelledby="trained-title" className="scroll-mt-20 bg-surface-muted/60">
+      <div className={`${wrap} py-20 lg:py-28`}>
+        <div className="landing-rise max-w-3xl">
+          <p className="text-sm font-semibold tracking-[0.14em] text-accent-ink uppercase">For doctors</p>
+          <h2 id="trained-title" className="mt-4 text-[36px] leading-[1.1] font-semibold tracking-[-0.025em] text-balance sm:text-[52px]">
+            Taken the way you were trained.
+          </h2>
+        </div>
+
+        <div className="mt-12 grid gap-4 lg:grid-cols-6">
+          <article className="landing-rise flex flex-col overflow-hidden rounded-3xl bg-surface p-7 shadow-[var(--shadow-card)] lg:col-span-4">
+            <h3 className="text-2xl font-semibold tracking-[-0.015em]">Diagnoses coded to ICD-11</h3>
+            <p className="mt-2 max-w-lg leading-7 text-ink-muted">Search in plain words. Medfave finds the code, and ongoing diagnoses join the chart when the note is signed.</p>
+            <div className="mt-6 rounded-2xl border border-border bg-canvas p-4" aria-label="Example: searching hypertension finds BA00, Essential hypertension">
+              <p className="rounded-xl border border-border bg-surface px-4 py-3 text-ink">hypertension</p>
+              <ul className="mt-2 divide-y divide-border" aria-hidden>
+                {[["BA00", "Essential hypertension"], ["9C61.01", "Ocular hypertension"], ["MC80.00", "White coat hypertension"], ["JA23", "Gestational hypertension"]].map(([c, n], i) => (
+                  <li key={c} className={`flex gap-6 px-4 py-2.5 ${i === 0 ? "rounded-lg bg-accent-tint" : ""}`}>
+                    <span className="w-20 font-semibold">{c}</span>
+                    <span className="text-ink-muted">{n}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <p className="mt-4 text-xs text-ink-faint">ICD-11 MMS © World Health Organization, CC BY-ND 3.0 IGO</p>
+          </article>
+
+          <article className="landing-rise flex flex-col rounded-3xl bg-surface p-7 shadow-[var(--shadow-card)] lg:col-span-2">
+            <h3 className="text-2xl font-semibold tracking-[-0.015em]">The full history</h3>
+            <p className="mt-2 leading-7 text-ink-muted">Past, family, personal and social, OB — and birth and immunizations for children.</p>
+            <dl className="mt-6 space-y-3 text-sm">
+              {[["Past", "Cholecystectomy 2009 · Pneumonia 2018"], ["Family", "Hypertension (mother)"], ["Social", "Never smoked · retired teacher"], ["OB", "G3 P3 (3-0-0-3)"]].map(([k, v]) => (
+                <div key={k} className="flex gap-4 border-b border-border pb-3">
+                  <dt className="w-14 font-semibold">{k}</dt>
+                  <dd className="text-ink-muted">{v}</dd>
+                </div>
+              ))}
+            </dl>
+          </article>
+
+          <article className="landing-rise rounded-3xl bg-surface p-7 shadow-[var(--shadow-card)] lg:col-span-2">
+            <h3 className="text-2xl font-semibold tracking-[-0.015em]">Allergies first</h3>
+            <p className="mt-2 leading-7 text-ink-muted">In red at the top of every chart and every note, so they&rsquo;re never on page three.</p>
+            <div className="mt-6 flex flex-wrap gap-2" aria-hidden>
+              <span className="rounded-full bg-danger-soft px-4 py-2 font-semibold text-danger-ink">Sulfa drugs</span>
+              <span className="rounded-full bg-danger-tint px-4 py-2 font-semibold text-danger-ink">Shellfish</span>
+            </div>
+          </article>
+
+          <article className="landing-rise rounded-3xl bg-surface p-7 shadow-[var(--shadow-card)] lg:col-span-2">
+            <h3 className="text-2xl font-semibold tracking-[-0.015em]">Certificates in a minute</h3>
+            <p className="mt-2 leading-7 text-ink-muted">Sick leave, fit to work, school, clearance. Choose the days of rest, sign, share.</p>
+            <div className="mt-6 flex items-center justify-between rounded-2xl bg-canvas px-5 py-4" aria-hidden>
+              <span className="text-xl text-ink-faint">‹</span>
+              <span className="text-center"><span className="block text-lg font-semibold">3 days</span><span className="text-sm text-ink-muted">back Oct 24</span></span>
+              <span className="text-xl">›</span>
+            </div>
+          </article>
+
+          <article className="landing-rise rounded-3xl bg-surface p-7 shadow-[var(--shadow-card)] lg:col-span-2">
+            <h3 className="text-2xl font-semibold tracking-[-0.015em]">Vaccines on the national schedule</h3>
+            <p className="mt-2 leading-7 text-ink-muted">Every child&rsquo;s doses, from BCG at birth to MMR at 12 months.</p>
+            <div className="mt-6 flex flex-wrap gap-2" aria-hidden>
+              {["BCG", "Hep B", "Penta 1", "Penta 2", "Penta 3", "OPV 1", "PCV 1", "MMR 1"].map((d, i) => (
+                <span key={d} className={`rounded-full px-3 py-1.5 text-sm font-semibold ${i < 6 ? "bg-ok-soft text-ok-ink" : "bg-surface-muted text-ink-muted"}`}>{d}</span>
+              ))}
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Phone({ src, alt, className = "" }: { src: string; alt: string; className?: string }) {
+  return (
+    <div className={`overflow-hidden rounded-[40px] border-[7px] border-brand-plum bg-brand-plum shadow-[0_30px_70px_-20px_rgb(50_19_44/0.45)] ${className}`}>
+      <Image src={src} alt={alt} width={603} height={1311} sizes="(min-width: 1024px) 260px, 40vw" className="h-auto w-full rounded-[33px]" />
     </div>
   );
 }
 
-const FEATURES = [
-  {
-    title: "Households",
-    body: "Group relatives, record how they relate, and keep one shared address and number — without merging anyone's chart.",
-    icon: UsersGroupTwoRoundedIcon,
-  },
-  {
-    title: "Appointments & calendar",
-    body: "Book against fifteen services, from general consults to family checkups, and see the month at a glance.",
-    icon: CalendarIcon,
-  },
-  {
-    title: "Visit records",
-    body: "Document each visit with vitals, ICD-11 diagnoses, prescriptions and advice — and print the prescription on the spot.",
-    icon: DocumentTextIcon,
-  },
-  {
-    title: "Follow-ups that don't slip",
-    body: "A patient due back stays in the queue until a visit actually happens — a cancelled or missed booking doesn't count.",
-    icon: ClockCircleIcon,
-  },
-  {
-    title: "Reminders",
-    body: "Patients who ask for it get an email the day before their visit. Nobody else does.",
-    icon: LetterIcon,
-  },
-  {
-    title: "Documents",
-    body: "Certificates, abstracts, insurance forms and record copies, requested by patients and tracked to done.",
-    icon: ShieldCheckIcon,
-  },
-] as const;
-
-function Features() {
+function StoreBadge({ store }: { store: "apple" | "google" }) {
   return (
-    <section id="features" className="scroll-mt-20 border-t border-border bg-surface">
-      <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 lg:px-10 lg:py-24">
-        <div className="max-w-2xl">
-          <p className="text-sm font-semibold text-accent-ink">What&rsquo;s inside</p>
-          <h2 className="mt-2 text-[32px] leading-10 font-semibold tracking-[-0.015em] text-balance">
-            Everything a family practice runs on, and nothing it doesn&rsquo;t
-          </h2>
-        </div>
-
-        <ul className="mt-12 grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((f) => (
-            <li key={f.title}>
-              <span className="flex size-11 items-center justify-center rounded-md bg-accent-soft text-accent-ink">
-                <f.icon className="size-5" aria-hidden />
-              </span>
-              <h3 className="mt-4 text-lg font-semibold">{f.title}</h3>
-              <p className="mt-1.5 text-base leading-6 text-pretty text-ink-muted">{f.body}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
+    <span className="inline-flex min-h-12 items-center gap-3 rounded-2xl border border-brand-plum/20 bg-brand-plum px-4 py-2 text-white dark:border-white/20">
+      {store === "apple" ? (
+        <svg viewBox="0 0 24 24" className="size-6" fill="currentColor" aria-hidden><path d="M16.4 12.6c0-2.5 2-3.6 2.1-3.7-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9-.8 0-2-.9-3.3-.9-1.7 0-3.3 1-4.1 2.5-1.8 3.1-.5 7.6 1.3 10.1.8 1.2 1.8 2.6 3.1 2.5 1.3-.1 1.7-.8 3.3-.8 1.5 0 1.9.8 3.3.8 1.4 0 2.2-1.2 3-2.5 1-1.4 1.4-2.8 1.4-2.9-.1 0-2.7-1-2.7-4zM14 5.2c.7-.8 1.2-2 1-3.2-1 .1-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3.1 1.1.1 2.2-.6 2.9-1.4z" /></svg>
+      ) : (
+        <svg viewBox="0 0 24 24" className="size-6" aria-hidden><path d="M4 2.8l10.6 9.2L4 21.2c-.4-.2-.6-.6-.6-1.1V3.9c0-.5.2-.9.6-1.1z" fill="currentColor" /><path d="M14.6 12l3.3-2.9 3.3 1.9c.9.5.9 1.6 0 2.1l-3.3 1.9z" fill="currentColor" opacity=".75" /></svg>
+      )}
+      <span className="leading-tight">
+        <span className="block text-[11px] opacity-80">Coming soon to</span>
+        <span className="block text-base font-semibold">{store === "apple" ? "the App Store" : "Google Play"}</span>
+      </span>
+    </span>
   );
 }
 
-const ROLES = [
-  {
-    who: "Doctors",
-    body: "Today's queue, the calendar, households and charts — the consulting room, start to finish.",
-  },
-  {
-    who: "Front desk",
-    body: "Check patients in, book and move appointments, and answer requests without touching clinical notes.",
-  },
-  {
-    who: "Clinic managers",
-    body: "Set opening hours, breaks and closures, and invite the staff who work there.",
-  },
-  {
-    who: "Patients",
-    body: "Request an appointment, ask for a certificate or records, and keep contact details up to date.",
-  },
-] as const;
-
-function Roles() {
+function Apps() {
   return (
-    <section id="who" className="scroll-mt-20 border-t border-border">
-      <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 lg:px-10 lg:py-24">
-        <div className="max-w-2xl">
-          <p className="text-sm font-semibold text-accent-ink">Who it&rsquo;s for</p>
-          <h2 className="mt-2 text-[32px] leading-10 font-semibold tracking-[-0.015em] text-balance">
-            One clinic, a seat for everyone in it
+    <section id="apps" aria-labelledby="apps-title" className="scroll-mt-20 overflow-hidden bg-brand-blush text-brand-plum dark:bg-accent-soft dark:text-ink">
+      <div className={`${wrap} grid items-center gap-14 py-20 lg:grid-cols-2 lg:py-28`}>
+        <div className="landing-rise">
+          <p className="text-sm font-semibold tracking-[0.14em] text-accent uppercase dark:text-accent-ink">Coming soon · iPhone and Android</p>
+          <h2 id="apps-title" className="mt-4 text-[36px] leading-[1.1] font-semibold tracking-[-0.025em] text-balance sm:text-[52px]">
+            The same chart, in your pocket.
           </h2>
-          <p className="mt-3 text-base leading-6 text-pretty text-ink-muted">
-            Each person signs in to the part of Medfave that&rsquo;s theirs, and sees only what their
-            role needs.
+          <p className="mt-5 max-w-xl text-lg leading-8 text-pretty text-brand-plum/80 dark:text-ink-muted">
+            The doctor app brings Today, the chart, notes and certificates to the ward and the room. The patient app gives
+            your patients — and their families — their visits, reminders and documents. Both use the same records as the web.
           </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <StoreBadge store="apple" />
+            <StoreBadge store="google" />
+          </div>
+          <div className="mt-10 max-w-lg">
+            <h3 className="mb-4 text-xl font-semibold">Be the first to know</h3>
+            <WaitlistForm />
+          </div>
         </div>
 
-        <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {ROLES.map((r) => (
-            <li key={r.who} className="rounded-lg border border-border bg-surface p-6">
-              <h3 className="text-lg font-semibold">{r.who}</h3>
-              <p className="mt-2 text-sm leading-5 text-pretty text-ink-muted">{r.body}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  );
-}
-
-function Privacy() {
-  return (
-    <section className="border-t border-border bg-surface">
-      <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-10 lg:py-24">
-        <h2 className="text-[32px] leading-10 font-semibold tracking-[-0.015em] text-balance">
-          A chart belongs to the doctor who wrote it
-        </h2>
-        <div className="space-y-4 text-base leading-6 text-pretty text-ink-muted">
-          <p>
-            Everything a doctor creates in Medfave is visible to that doctor only. A patient signing in
-            sees their own records and nobody else&rsquo;s, and the front desk works the schedule
-            without reading clinical notes.
-          </p>
-          <p>
-            Allergies and alerts are marked in a true red, well apart from the brand&rsquo;s pink, so a
-            warning can never be mistaken for decoration.
-          </p>
+        <div className="relative mx-auto flex w-full max-w-xl items-center justify-center gap-4 sm:gap-6" aria-label="Screens from the Medfave apps">
+          <Phone src="/landing/app-today.webp" alt="Doctor app: Today, with the patient in consultation and the waiting room" className="landing-rise w-[30%] -rotate-6 translate-y-6" />
+          <Phone src="/landing/app-chart.webp" alt="Doctor app: a patient’s chart with allergies and medical alerts" className="landing-rise z-10 w-[34%]" />
+          <Phone src="/landing/app-phome.webp" alt="Patient app: the next visit and days to ask for a time" className="landing-rise w-[30%] rotate-6 translate-y-6" />
         </div>
       </div>
     </section>
@@ -302,32 +296,40 @@ function Privacy() {
 
 function Closing() {
   return (
-    <section className="bg-brand-plum">
-      <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-6 px-4 py-16 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-10">
-        <div>
-          <h2 className="text-[32px] leading-10 font-semibold tracking-[-0.015em] text-white">
-            Ready when your clinic is.
-          </h2>
-          <p className="mt-2 text-base leading-6 text-white/80">
-            Doctors sign up and set up their clinic; we check every license first. Patients sign up,
-            or activate with the code their clinic gives them.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <Link
-            href="/signup"
-            className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-base font-semibold text-brand-plum transition-colors hover:bg-brand-blush"
-          >
-            Create an account
+    <section aria-labelledby="closing-title" className="bg-brand text-white">
+      <div className={`${wrap} flex flex-col items-center py-20 text-center lg:py-28`}>
+        <Lockup className="h-12 w-auto sm:h-16" tone="white" />
+        <h2 id="closing-title" className="mt-8 text-[40px] leading-[1.1] font-semibold tracking-[-0.03em] sm:text-[60px]">
+          Care that remembers.
+        </h2>
+        <div className="mt-9 flex flex-wrap justify-center gap-3">
+          <Link href="/signup?as=doctor" className="inline-flex min-h-12 items-center rounded-full bg-white px-7 text-base font-semibold text-accent shadow-lg transition-transform hover:scale-[1.03]">
+            Start free on the web
           </Link>
-          <Link
-            href="/login"
-            className="inline-flex items-center justify-center rounded-full border border-white/40 px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-white/10"
-          >
-            Sign in
-          </Link>
+          <a href="#apps" className="inline-flex min-h-12 items-center rounded-full border-2 border-white/80 px-7 text-base font-semibold text-white transition-colors hover:bg-white/10">
+            Join the app waitlist
+          </a>
         </div>
       </div>
     </section>
   );
 }
+
+function Footer() {
+  return (
+    <footer className="border-t border-border">
+      <div className={`${wrap} flex flex-col gap-6 py-10 text-sm text-ink-muted sm:flex-row sm:items-center sm:justify-between`}>
+        <div className="flex items-center gap-4">
+          <Lockup className="h-6 w-auto" />
+          <span>by Northernware®</span>
+        </div>
+        <div className="flex flex-wrap gap-x-6 gap-y-2">
+          <Link href="/login" className="hover:text-ink">Sign in</Link>
+          <Link href="/register" className="hover:text-ink">Activate a patient account</Link>
+          <Link href="/privacy" className="hover:text-ink">Privacy</Link>
+        </div>
+      </div>
+    </footer>
+  );
+}
+

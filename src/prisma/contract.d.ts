@@ -33,7 +33,7 @@ import type {
 } from '@prisma/orm-postgres/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'508d85bbb09bba252b8a43feafddb52f40d766c0f0722a34690e767a298a2b9d'>;
+  StorageHashBase<'0dff9b84e976540f2ab92b9403dceb3cd9148ed16ea79d6c93c5b31a71ec08a5'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
@@ -814,6 +814,13 @@ export type FieldOutputTypes = {
       readonly note: CodecTypes['pg/text@1']['output'] | null;
       readonly createdAt: TimestampString<3>;
     };
+    readonly WaitlistEntry: {
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly email: CodecTypes['pg/text@1']['output'];
+      readonly role: CodecTypes['pg/text@1']['output'];
+      readonly organization: CodecTypes['pg/text@1']['output'] | null;
+      readonly createdAt: TimestampString<3>;
+    };
   };
 };
 export type FieldInputTypes = {
@@ -1390,6 +1397,13 @@ export type FieldInputTypes = {
       readonly score: CodecTypes['pg/int4@1']['input'] | null;
       readonly tags: CodecTypes['pg/text@1']['input'] | null;
       readonly note: CodecTypes['pg/text@1']['input'] | null;
+      readonly createdAt: CodecTypes['pg/timestamp-string@1']['input'];
+    };
+    readonly WaitlistEntry: {
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly email: CodecTypes['pg/text@1']['input'];
+      readonly role: CodecTypes['pg/text@1']['input'];
+      readonly organization: CodecTypes['pg/text@1']['input'] | null;
       readonly createdAt: CodecTypes['pg/timestamp-string@1']['input'];
     };
   };
@@ -1970,6 +1984,13 @@ export type StorageColumnTypes = {
       readonly score: CodecTypes['pg/int4@1']['output'] | null;
       readonly tags: CodecTypes['pg/text@1']['output'] | null;
     };
+    readonly WaitlistEntry: {
+      readonly createdAt: TimestampString<3>;
+      readonly email: CodecTypes['pg/text@1']['output'];
+      readonly id: CodecTypes['pg/text@1']['output'];
+      readonly organization: CodecTypes['pg/text@1']['output'] | null;
+      readonly role: CodecTypes['pg/text@1']['output'];
+    };
   };
 };
 export type StorageColumnInputTypes = {
@@ -2547,6 +2568,13 @@ export type StorageColumnInputTypes = {
       readonly rating: 'GOOD' | 'NOT_GREAT' | null;
       readonly score: CodecTypes['pg/int4@1']['input'] | null;
       readonly tags: CodecTypes['pg/text@1']['input'] | null;
+    };
+    readonly WaitlistEntry: {
+      readonly createdAt: CodecTypes['pg/timestamp-string@1']['input'];
+      readonly email: CodecTypes['pg/text@1']['input'];
+      readonly id: CodecTypes['pg/text@1']['input'];
+      readonly organization: CodecTypes['pg/text@1']['input'] | null;
+      readonly role: CodecTypes['pg/text@1']['input'];
     };
   };
 };
@@ -7016,6 +7044,46 @@ type ContractBase = Omit<
                 },
               ];
             };
+            readonly WaitlistEntry: {
+              columns: {
+                readonly id: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly email: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly role: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                };
+                readonly organization: {
+                  readonly nativeType: 'text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: true;
+                };
+                readonly createdAt: {
+                  readonly nativeType: 'timestamp';
+                  readonly codecId: 'pg/timestamp-string@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              primaryKey: {
+                readonly columns: readonly ['id'];
+                readonly name: 'WaitlistEntry_pkey';
+              };
+              uniques: readonly [
+                { readonly columns: readonly ['email']; readonly name: 'WaitlistEntry_email_key' },
+              ];
+              indexes: readonly [];
+              foreignKeys: readonly [];
+            };
           };
           readonly valueSet: {
             readonly AllergySeverity: {
@@ -7188,6 +7256,10 @@ type ContractBase = Omit<
     readonly PatientPastHistory: {
       readonly namespace: 'public' & NamespaceId;
       readonly model: 'PatientPastHistory';
+    };
+    readonly WaitlistEntry: {
+      readonly namespace: 'public' & NamespaceId;
+      readonly model: 'WaitlistEntry';
     };
     readonly PatientImmunization: {
       readonly namespace: 'public' & NamespaceId;
@@ -12120,6 +12192,46 @@ type ContractBase = Omit<
                 readonly score: { readonly column: 'score' };
                 readonly tags: { readonly column: 'tags' };
                 readonly note: { readonly column: 'note' };
+                readonly createdAt: { readonly column: 'createdAt' };
+              };
+            };
+          };
+          readonly WaitlistEntry: {
+            readonly fields: {
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly email: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly role: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly organization: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamp-string@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+            };
+            readonly relations: Record<string, never>;
+            readonly storage: {
+              readonly table: 'WaitlistEntry';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly id: { readonly column: 'id' };
+                readonly email: { readonly column: 'email' };
+                readonly role: { readonly column: 'role' };
+                readonly organization: { readonly column: 'organization' };
                 readonly createdAt: { readonly column: 'createdAt' };
               };
             };

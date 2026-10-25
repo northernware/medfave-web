@@ -163,6 +163,10 @@
     "VisitFeedback": {
       "model": "VisitFeedback",
       "namespace": "public"
+    },
+    "WaitlistEntry": {
+      "model": "WaitlistEntry",
+      "namespace": "public"
     }
   },
   "domain": {
@@ -7651,6 +7655,70 @@
               "namespaceId": "public",
               "table": "VisitFeedback"
             }
+          },
+          "WaitlistEntry": {
+            "fields": {
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/timestamp-string@1",
+                  "kind": "scalar",
+                  "typeParams": {
+                    "precision": 3
+                  }
+                }
+              },
+              "email": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "organization": {
+                "nullable": true,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              },
+              "role": {
+                "nullable": false,
+                "type": {
+                  "codecId": "pg/text@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {},
+            "storage": {
+              "fields": {
+                "createdAt": {
+                  "column": "createdAt"
+                },
+                "email": {
+                  "column": "email"
+                },
+                "id": {
+                  "column": "id"
+                },
+                "organization": {
+                  "column": "organization"
+                },
+                "role": {
+                  "column": "role"
+                }
+              },
+              "namespaceId": "public",
+              "table": "WaitlistEntry"
+            }
           }
         }
       }
@@ -13679,6 +13747,58 @@
                   "name": "VisitFeedback_appointmentId_accountId_key"
                 }
               ]
+            },
+            "WaitlistEntry": {
+              "columns": {
+                "createdAt": {
+                  "codecId": "pg/timestamp-string@1",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
+                  "nativeType": "timestamp",
+                  "nullable": false,
+                  "typeParams": {
+                    "precision": 3
+                  }
+                },
+                "email": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "id": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                },
+                "organization": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": true
+                },
+                "role": {
+                  "codecId": "pg/text@1",
+                  "nativeType": "text",
+                  "nullable": false
+                }
+              },
+              "foreignKeys": [],
+              "indexes": [],
+              "primaryKey": {
+                "columns": [
+                  "id"
+                ],
+                "name": "WaitlistEntry_pkey"
+              },
+              "uniques": [
+                {
+                  "columns": [
+                    "email"
+                  ],
+                  "name": "WaitlistEntry_email_key"
+                }
+              ]
             }
           },
           "valueSet": {
@@ -13876,7 +13996,7 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "508d85bbb09bba252b8a43feafddb52f40d766c0f0722a34690e767a298a2b9d"
+    "storageHash": "0dff9b84e976540f2ab92b9403dceb3cd9148ed16ea79d6c93c5b31a71ec08a5"
   },
   "capabilities": {
     "postgres": {

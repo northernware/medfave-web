@@ -27,6 +27,8 @@ export const LIMITS = {
   emailSends: { limit: 5, windowSeconds: 60 * 60 },
   /** Activation codes tried per account or address: codes are guessable only by brute force. */
   codeAttempts: { limit: 10, windowSeconds: 15 * 60 },
+  /** Waitlist sign-ups per address: a public form, so not a way to fill the table. */
+  waitlistAddress: { limit: 10, windowSeconds: 60 * 60 },
 } satisfies Record<string, Limit>;
 
 /**

@@ -469,6 +469,17 @@ namespace public {
   /// A dose given: the vaccine (the app's code, as "PENTA", or a name typed),
   /// which dose ("1", "booster"), and when (YYYY-MM-DD). Removed if recorded by
   /// mistake. The app shows the Philippine childhood schedule against these.
+  model WaitlistEntry {
+    id           String       @id(map: "WaitlistEntry_pkey")
+    email        String
+    role         String
+    organization String?
+    createdAt    TimestampString(3) @default(now())
+
+    @@unique([email], map: "WaitlistEntry_email_key")
+    @@map("WaitlistEntry")
+  }
+
   model PatientImmunization {
     id        String       @id(map: "PatientImmunization_pkey")
     patientId String

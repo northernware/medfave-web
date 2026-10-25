@@ -5,5 +5,5 @@
     <g id="x" stroke="#f6c4da" stroke-width="6.5" stroke-linecap="round"><line x1="6.7" y1="6.7" x2="17.3" y2="17.3"/><line x1="17.3" y1="6.7" x2="6.7" y2="17.3"/></g>
   </defs>
   <use href="#h" x="18" y="18"/><use href="#h" x="78" y="20"/><use href="#h" x="138" y="18"/>
-  <use href="#h" x="48" y="80"/><use href="#h" x="108" y="78"/><use href="#h" x="166" y="80"/>
+  <use href="#h" x="48" y="80"/><use href="#h" x="108" y="78"/><use href="#h" x="166" y="80"/><use href="#h" x="-14" y="80"/>
 </svg>

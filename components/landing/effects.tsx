@@ -9,6 +9,24 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
  */
 export function CursorLight({ children }: { children: ReactNode }) {
   const root = useRef<HTMLDivElement>(null);
+
+  /*
+   * Reveal on scroll where the browser has no scroll-driven animations (iOS
+   * Safari): sections and chips get `.in` as they come into view, and CSS
+   * transitions them (transform and opacity only, cheap on a phone).
+   */
+  useEffect(() => {
+    const el = root.current;
+    if (!el || CSS.supports("animation-timeline: view()") || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    el.dataset.reveal = "";
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }),
+      { rootMargin: "0px 0px -12% 0px" },
+    );
+    el.querySelectorAll(".landing-rise, .vax-chip, .phone-rise").forEach((n) => io.observe(n));
+    return () => io.disconnect();
+  }, []);
+
   useEffect(() => {
     const el = root.current;
     if (!el || matchMedia("(prefers-reduced-motion: reduce)").matches) return;

@@ -509,9 +509,29 @@ input[type="time"]::-webkit-date-and-time-value {
   to { background-color: var(--ok-soft); color: var(--ok-ink); }
 }
 
-@media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse), (max-width: 1023px) {
+/* glows keep drifting everywhere (transform only); the pattern drift repaints, so desktop only */
+@media (prefers-reduced-motion: reduce) {
   .landing-glow, .landing-glow-2, .landing-pattern-drift { animation: none; }
 }
+@media (hover: none), (pointer: coarse), (max-width: 1023px) {
+  .landing-pattern-drift { animation: none; }
+}
+
+/* reveal fallback (CursorLight adds data-reveal and .in where scroll timelines are missing) */
+[data-reveal] .landing-rise:not(.in), [data-reveal] .phone-rise:not(.in) { opacity: 0; transform: translateY(28px); }
+[data-reveal] .landing-rise, [data-reveal] .phone-rise { transition: opacity 0.7s ease-out, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+[data-reveal] .vax-chip:not(.in) { background-color: var(--surface-muted); color: var(--ink-muted); }
+[data-reveal] .vax-chip { transition: background-color 0.5s ease, color 0.5s ease; }
+[data-reveal] .vax-chip:nth-child(2) { transition-delay: 0.12s; } [data-reveal] .vax-chip:nth-child(3) { transition-delay: 0.24s; }
+[data-reveal] .vax-chip:nth-child(4) { transition-delay: 0.36s; } [data-reveal] .vax-chip:nth-child(5) { transition-delay: 0.48s; }
+[data-reveal] .vax-chip:nth-child(6) { transition-delay: 0.6s; }
+
+/* flat phones float gently (transform only) */
+@media (prefers-reduced-motion: no-preference) {
+  .phone-float { animation: phone-float 6s ease-in-out infinite; }
+  .phone-float-2 { animation: phone-float 7s ease-in-out -2.5s infinite; }
+}
+@keyframes phone-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } }
 
 /* Apps section: the three.js phones with a mouse on a wide screen; flat phones elsewhere (WebGL crashed iOS Safari). */
 .phones-3d { display: none; }

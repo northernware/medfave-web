@@ -15,6 +15,9 @@ export type PhoneSpec = { src: string; alt: string };
  * toward the pointer. Reduced motion: drawn once, at rest. No WebGL: `fallback`.
  * Rendering stops while the section is off screen.
  */
+/** Where the 3D scene runs: a mouse and a wide screen. Elsewhere the fallback shows (globals.css). */
+const FINE = "(hover: hover) and (pointer: fine) and (min-width: 1024px)";
+
 export function Phones3D({ phones, fallback }: { phones: [PhoneSpec, PhoneSpec, PhoneSpec]; fallback: ReactNode }) {
   const box = useRef<HTMLDivElement>(null);
   const [failed, setFailed] = useState(false);
@@ -22,6 +25,8 @@ export function Phones3D({ phones, fallback }: { phones: [PhoneSpec, PhoneSpec, 
   useEffect(() => {
     const el = box.current;
     if (!el) return;
+    // Phones get the flat fallback: WebGL with an environment map crashed iOS Safari's tab.
+    if (!matchMedia(FINE).matches) return;
     let cleanup = () => {};
     let cancelled = false;
 
@@ -206,7 +211,8 @@ export function Phones3D({ phones, fallback }: { phones: [PhoneSpec, PhoneSpec, 
   if (failed) return <>{fallback}</>;
   return (
     <div className="relative">
-      <div ref={box} className="aspect-[6/5] w-full" />
+      <div className="phones-fallback">{fallback}</div>
+      <div ref={box} className="phones-3d aspect-[6/5] w-full" />
       <ul className="sr-only">
         {phones.map((p) => <li key={p.src}>{p.alt}</li>)}
       </ul>

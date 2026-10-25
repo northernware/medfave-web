@@ -512,3 +512,10 @@ input[type="time"]::-webkit-date-and-time-value {
 @media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse), (max-width: 1023px) {
   .landing-glow, .landing-glow-2, .landing-pattern-drift { animation: none; }
 }
+
+/* Apps section: the three.js phones with a mouse on a wide screen; flat phones elsewhere (WebGL crashed iOS Safari). */
+.phones-3d { display: none; }
+@media (hover: hover) and (pointer: fine) and (min-width: 1024px) {
+  .phones-3d { display: block; }
+  .phones-fallback { display: none; }
+}

@@ -7,7 +7,6 @@ import { buttonClass } from "@/components/ui";
 
 const ROLES = [
   { value: "DOCTOR", label: "Doctor" },
-  { value: "CLINIC", label: "Clinic staff" },
   { value: "PATIENT", label: "Patient" },
 ];
 
@@ -61,8 +60,10 @@ export function WaitlistForm() {
         <span className="text-sm font-semibold text-ink">
           Clinic or hospital <span className="font-normal text-ink-faint">(optional)</span>
         </span>
+        <span id="waitlist-org-hint" className="-mt-1 text-xs text-ink-faint">Leave it blank if you practise on your own.</span>
         <input
           name="organization"
+          aria-describedby="waitlist-org-hint"
           autoComplete="organization"
           maxLength={120}
           defaultValue={v.organization}

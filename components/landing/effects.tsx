@@ -11,20 +11,44 @@ export function CursorLight({ children }: { children: ReactNode }) {
   const root = useRef<HTMLDivElement>(null);
 
   /*
-   * Reveal on scroll where the browser has no scroll-driven animations (iOS
-   * Safari): sections and chips get `.in` as they come into view, and CSS
-   * transitions them (transform and opacity only, cheap on a phone).
+   * Where the browser has no scroll-driven animations (iOS Safari), drive the
+   * same effects from the scroll position: sections rise and the iPhones turn
+   * into place, tied to how far they've come into view (transform and opacity
+   * only, once per frame). The vaccine chips get `.in` once, as they appear.
    */
   useEffect(() => {
     const el = root.current;
     if (!el || CSS.supports("animation-timeline: view()") || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     el.dataset.reveal = "";
+    const rise = [...el.querySelectorAll<HTMLElement>(".landing-rise")];
+    const turn = [...el.querySelectorAll<HTMLElement>(".iphone-turn")];
+    const clamp = (v: number) => Math.min(1, Math.max(0, v));
+    let queued = false;
+    const update = () => {
+      queued = false;
+      const vh = window.innerHeight;
+      for (const n of rise) {
+        const p = clamp((vh - n.getBoundingClientRect().top) / (vh * 0.4));
+        n.style.opacity = String(p);
+        n.style.transform = p >= 1 ? "" : `translate3d(0, ${(1 - p) * 32}px, 0)`;
+      }
+      for (const n of turn) {
+        const p = clamp((vh - n.getBoundingClientRect().top) / (vh * 0.6));
+        const k = 1 - (1 - p) ** 3;
+        n.style.rotate = `y ${(1 - k) * 38}deg`;
+        n.style.translate = `0 ${(1 - k) * 60}px`;
+      }
+    };
+    const onScroll = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
     const io = new IntersectionObserver(
       (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }),
       { rootMargin: "0px 0px -12% 0px" },
     );
-    el.querySelectorAll(".landing-rise, .vax-chip, .phone-rise").forEach((n) => io.observe(n));
-    return () => io.disconnect();
+    el.querySelectorAll(".vax-chip").forEach((n) => io.observe(n));
+    return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); io.disconnect(); };
   }, []);
 
   useEffect(() => {

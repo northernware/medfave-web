@@ -27,6 +27,7 @@ export function IPhone({
   className = "",
   priority = false,
   flat = false,
+  lite = false,
 }: {
   src: string;
   alt: string;
@@ -35,6 +36,8 @@ export function IPhone({
   priority?: boolean;
   /** Just the front: no edge slices, sides or tilt. Light enough for a phone's GPU. */
   flat?: boolean;
+  /** Fewer edge slices (6, not 18): the 3D phone on a phone's GPU. */
+  lite?: boolean;
 }) {
   const body = useRef<HTMLDivElement>(null);
 
@@ -64,8 +67,8 @@ export function IPhone({
 
         {!flat && <>
         {/* the titanium band: slices from the front to the back */}
-        {Array.from({ length: SLICES }, (_, i) => {
-          const t = i / (SLICES - 1);
+        {Array.from({ length: lite ? 6 : SLICES }, (_, i) => {
+          const t = i / ((lite ? 6 : SLICES) - 1);
           return (
             <div
               key={i}

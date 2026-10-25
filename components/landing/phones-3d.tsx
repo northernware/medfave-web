@@ -57,7 +57,7 @@ export function Phones3D({ phones, fallback }: { phones: [PhoneSpec, PhoneSpec, 
       // --- geometry, in mm ---
       const W = 71.5, H = 149.6, D = 8.25;
       /** A rounded rectangle with squircle (superellipse) corners, like Apple's continuous corners. */
-      const squircle = (w: number, h: number, r: number, n = 5) => {
+      const squircle = (w: number, h: number, r: number, n = 3.2) => {
         const s = new THREE.Shape();
         const pts: [number, number][] = [];
         const corners: [number, number, number][] = [[w / 2 - r, h / 2 - r, 0], [-w / 2 + r, h / 2 - r, 1], [-w / 2 + r, -h / 2 + r, 2], [w / 2 - r, -h / 2 + r, 3]];
@@ -83,14 +83,14 @@ export function Phones3D({ phones, fallback }: { phones: [PhoneSpec, PhoneSpec, 
       };
 
       const bevel = 1.1;
-      const bodyGeo = new THREE.ExtrudeGeometry(squircle(W - 2 * bevel, H - 2 * bevel, 12.2 - bevel), {
+      const bodyGeo = new THREE.ExtrudeGeometry(squircle(W - 2 * bevel, H - 2 * bevel, 17 - bevel), {
         depth: D - 2 * bevel, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 8, curveSegments: 48,
       });
       bodyGeo.translate(0, 0, -(D - 2 * bevel) / 2);
-      const glassGeo = flat(squircle(W - 0.7, H - 0.7, 11.9));
-      const screenGeo = flat(squircle(W - 4.4, H - 4.4, 10.2));
+      const glassGeo = flat(squircle(W - 0.7, H - 0.7, 16.6));
+      const screenGeo = flat(squircle(W - 4.4, H - 4.4, 14.6));
       const islandGeo = flat(squircle(20.5, 6.1, 3.05, 2));
-      const backGeo = flat(squircle(W - 1.2, H - 1.2, 11.6));
+      const backGeo = flat(squircle(W - 1.2, H - 1.2, 16.3));
       const button = (len: number, wide: number) => {
         const g = new THREE.ExtrudeGeometry(squircle(wide, len, wide / 2 - 0.05, 2), { depth: 0.7, bevelEnabled: true, bevelThickness: 0.2, bevelSize: 0.2, bevelSegments: 3 });
         return g;

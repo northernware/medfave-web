@@ -68,10 +68,10 @@ export function Story({ steps }: { steps: StoryStep[] }) {
             className="flex flex-col justify-center lg:min-h-[78vh]"
           >
             <p className="text-sm font-semibold tracking-[0.12em] text-accent-ink uppercase">{s.eyebrow}</p>
-            <h3 id={`story-${s.id}`} className="mt-3 text-[32px] leading-10 font-semibold tracking-[-0.02em] text-balance lg:text-[40px] lg:leading-[48px]">
+            <h3 id={`story-${s.id}`} className="mt-3 text-[24px] leading-8 font-semibold tracking-[-0.015em] text-balance lg:text-[30px] lg:leading-[38px]">
               {s.title}
             </h3>
-            <p className="mt-4 max-w-md text-lg leading-7 text-pretty text-ink-muted">{s.body}</p>
+            <p className="mt-3 max-w-md text-base leading-7 text-pretty text-ink-muted">{s.body}</p>
             <div className="mt-8 flex justify-center lg:hidden">
               <IPhone src={s.mobileImage} alt={s.alt} turn={i % 2 ? -12 : 12} className="w-[min(66vw,270px)]" />
             </div>

@@ -58,9 +58,9 @@ function Header() {
             <a href="#trained" className={buttonClass("ghost")}>For doctors</a>
             <a href="#apps" className={buttonClass("ghost")}>Apps</a>
           </div>
-          <ThemeToggle />
+          <span className="hidden sm:block"><ThemeToggle /></span>
           <Link href="/login" className={buttonClass("secondary")}>Sign in</Link>
-          <Link href="/signup?as=doctor" className={`${buttonClass("primary")} hidden sm:inline-flex`}>Get started</Link>
+          <span className="hidden sm:block"><Link href="/signup?as=doctor" className={buttonClass("primary")}>Get started</Link></span>
         </nav>
       </div>
     </header>
@@ -135,12 +135,12 @@ function PaperTrail() {
 }
 
 const STEPS: StoryStep[] = [
-  { id: "today", eyebrow: "Today", title: "Your day, at a glance.", body: "Who is with you, who is waiting and for how long, and the follow-ups that are due. Add a walk-in in one tap.", image: "/landing/web-dashboard.webp", alt: "The Medfave dashboard: today’s counts, the waiting room and upcoming visits" },
-  { id: "chart", eyebrow: "The chart", title: "Her whole picture, before you say hello.", body: "Allergies in red and alerts you can’t miss, then her conditions, medicines and history — past, family, personal and social, OB.", image: "/landing/web-corazon.webp", alt: "A patient’s chart: visit history, appointments, allergies, alerts and history" },
-  { id: "schedule", eyebrow: "The schedule", title: "Book the follow-up before she leaves.", body: "Every visit on its day. Patients ask for a time and you confirm it; a reminder goes out the day before.", image: "/landing/web-calendar.webp", alt: "The month calendar with visits on each day" },
-  { id: "households", eyebrow: "Households", title: "The whole family, one tap away.", body: "Relatives grouped together, each with a chart of their own: a child’s vaccines, an emergency contact, hereditary risk.", image: "/landing/web-households.webp", alt: "The households list with members" },
-  { id: "documents", eyebrow: "Documents", title: "The certificate, done before she reaches the door.", body: "Filled in from the visit, signed, and shared to the patient — or printed.", image: "/landing/web-documents.webp", alt: "Documents: a medical certificate ready to collect" },
-  { id: "feedback", eyebrow: "Patient feedback", title: "Hear how the visit went.", body: "One tap after the visit, a few words if they like. Only your clinic sees it.", image: "/landing/web-feedback.webp", alt: "Patient feedback: average rating and recent comments" },
+  { id: "today", mobileImage: "/landing/app-today.webp", eyebrow: "Today", title: "Your day, at a glance.", body: "Who is with you, who is waiting and for how long, and the follow-ups that are due. Add a walk-in in one tap.", image: "/landing/web-dashboard.webp", alt: "The Medfave dashboard: today’s counts, the waiting room and upcoming visits" },
+  { id: "chart", mobileImage: "/landing/app-chart.webp", eyebrow: "The chart", title: "Her whole picture, before you say hello.", body: "Allergies in red and alerts you can’t miss, then her conditions, medicines and history — past, family, personal and social, OB.", image: "/landing/web-corazon.webp", alt: "A patient’s chart: visit history, appointments, allergies, alerts and history" },
+  { id: "schedule", mobileImage: "/landing/app-visits.webp", eyebrow: "The schedule", title: "Book the follow-up before she leaves.", body: "Every visit on its day. Patients ask for a time and you confirm it; a reminder goes out the day before.", image: "/landing/web-calendar.webp", alt: "The month calendar with visits on each day" },
+  { id: "households", mobileImage: "/landing/app-house.webp", eyebrow: "Households", title: "The whole family, one tap away.", body: "Relatives grouped together, each with a chart of their own: a child’s vaccines, an emergency contact, hereditary risk.", image: "/landing/web-households.webp", alt: "The households list with members" },
+  { id: "documents", mobileImage: "/landing/app-cert.webp", eyebrow: "Documents", title: "The certificate, done before she reaches the door.", body: "Filled in from the visit, signed, and shared to the patient — or printed.", image: "/landing/web-documents.webp", alt: "Documents: a medical certificate ready to collect" },
+  { id: "feedback", mobileImage: "/landing/app-pfeed.webp", eyebrow: "Patient feedback", title: "Hear how the visit went.", body: "One tap after the visit, a few words if they like. Only your clinic sees it.", image: "/landing/web-feedback.webp", alt: "Patient feedback: average rating and recent comments" },
 ];
 
 function Product() {
@@ -284,10 +284,10 @@ function Apps() {
           </div>
         </div>
 
-        <div className="relative mx-auto flex w-full max-w-xl items-center justify-center gap-4 sm:gap-6" aria-label="Screens from the Medfave apps">
-          <Phone src="/landing/app-today.webp" alt="Doctor app: Today, with the patient in consultation and the waiting room" className="landing-rise w-[30%] -rotate-6 translate-y-6" />
+        <div className="relative mx-auto flex w-full max-w-xl items-center justify-center gap-3 px-2 sm:gap-6 sm:px-0" aria-label="Screens from the Medfave apps">
+          <Phone src="/landing/app-today.webp" alt="Doctor app: Today, with the patient in consultation and the waiting room" className="landing-rise w-[30%] translate-y-4 -rotate-3 sm:translate-y-6 sm:-rotate-6" />
           <Phone src="/landing/app-chart.webp" alt="Doctor app: a patient’s chart with allergies and medical alerts" className="landing-rise z-10 w-[34%]" />
-          <Phone src="/landing/app-phome.webp" alt="Patient app: the next visit and days to ask for a time" className="landing-rise w-[30%] rotate-6 translate-y-6" />
+          <Phone src="/landing/app-phome.webp" alt="Patient app: the next visit and days to ask for a time" className="landing-rise w-[30%] translate-y-4 rotate-3 sm:translate-y-6 sm:rotate-6" />
         </div>
       </div>
     </section>

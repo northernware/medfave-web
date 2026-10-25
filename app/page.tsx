@@ -264,10 +264,10 @@ const APP_PHONES: [PhoneSpec, PhoneSpec, PhoneSpec] = [
 
 function Apps() {
   return (
-    <section id="apps" aria-labelledby="apps-title" className={`${panel} scroll-mt-20 sm:mt-4 bg-brand-blush text-brand-plum dark:bg-accent-soft dark:text-ink`}>
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[url(/landing/pattern-hearts.svg)] bg-[length:180px_120px] opacity-70 [mask-image:radial-gradient(ellipse_70%_70%_at_75%_50%,#000_10%,transparent_75%)] dark:opacity-10" />
-      <div className={`${inPanel} relative grid items-center gap-14 py-20 lg:grid-cols-2 lg:py-28`}>
-        <div className="landing-rise">
+    <section id="apps" aria-labelledby="apps-title" className={`relative z-10 scroll-mt-20 sm:mx-4 sm:mt-4 sm:rounded-[44px] bg-brand-blush text-brand-plum dark:bg-accent-soft dark:text-ink`}>
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[url(/landing/pattern-hearts.svg)] bg-[length:180px_120px] opacity-70 sm:rounded-[44px] [mask-image:radial-gradient(ellipse_70%_70%_at_75%_50%,#000_10%,transparent_75%)] dark:opacity-10" />
+      <div className={`${inPanel} relative grid gap-10 pt-14 sm:pt-20 lg:grid-cols-2 lg:items-end lg:gap-14 lg:pt-28`}>
+        <div className="landing-rise lg:pb-28">
           <p className="text-sm font-semibold tracking-[0.14em] text-accent uppercase dark:text-accent-ink">Coming soon · iPhone and Android</p>
           <h2 id="apps-title" className="mt-4 text-[28px] leading-[1.15] font-semibold tracking-[-0.02em] text-balance sm:text-[40px]">
             The same chart, in your pocket.
@@ -286,8 +286,8 @@ function Apps() {
           </div>
         </div>
 
-        <div className="relative mx-auto w-full max-w-2xl">
-          <div aria-hidden className="absolute inset-x-[12%] bottom-[6%] h-10 rounded-[50%] bg-[radial-gradient(ellipse,rgb(50_19_44/0.3),transparent_70%)] lg:blur-2xl dark:bg-[radial-gradient(ellipse,rgb(0_0_0/0.5),transparent_70%)]" />
+        {/* the phones hang half over the closing band below */}
+        <div className="relative mx-auto -mb-[38%] w-full max-w-2xl lg:-mb-[44%]">
           <Phones3D
             phones={APP_PHONES}
             fallback={
@@ -309,7 +309,7 @@ function Closing() {
     <section aria-labelledby="closing-title" className={`${panel} bg-brand sm:my-4 text-white`}>
       <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden"><div className="landing-pattern-move bg-[url(/landing/pattern-tonal.svg)]" /></div>
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_50%_45%,#e91e83_30%,transparent_80%)]" />
-      <div className={`${inPanel} relative flex flex-col items-center py-20 text-center lg:py-28`}>
+      <div className={`${inPanel} relative flex flex-col items-center pt-[46vw] pb-16 text-center sm:pt-[40vw] sm:pb-20 lg:pt-[16vw] lg:pb-28`}>
         <Lockup className="h-12 w-auto sm:h-16" tone="white" />
         <h2 id="closing-title" className="mt-8 text-[32px] leading-[1.1] font-semibold tracking-[-0.025em] sm:text-[48px]">
           Care that remembers.

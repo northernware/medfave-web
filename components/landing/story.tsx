@@ -17,6 +17,8 @@ export function Story({ steps }: { steps: StoryStep[] }) {
   const refs = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
+    // Only the desktop layout pins a window that follows the steps; on phones there's nothing to track.
+    if (!matchMedia("(min-width: 1024px)").matches) return;
     const seen = new Map<number, number>();
     const io = new IntersectionObserver(
       (entries) => {
@@ -73,7 +75,7 @@ export function Story({ steps }: { steps: StoryStep[] }) {
             </h3>
             <p className="mt-3 max-w-md text-base leading-7 text-pretty text-ink-muted">{s.body}</p>
             <div className="mt-6 flex justify-center lg:hidden">
-              <IPhone src={s.mobileImage} alt={s.alt} flat className="w-[min(66vw,270px)] drop-shadow-[0_24px_30px_rgb(50_19_44/0.25)]" />
+              <IPhone src={s.mobileImage} alt={s.alt} flat className="w-[min(66vw,270px)]" />
             </div>
           </section>
         ))}

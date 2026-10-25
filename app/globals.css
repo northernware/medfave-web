@@ -554,11 +554,3 @@ input[type="time"]::-webkit-date-and-time-value {
   .phones-3d { display: block; }
   .phones-fallback { display: none; }
 }
-
-/* the header's frosted layer fades out at its bottom on phones, so it has no hard edge against the page */
-@media (max-width: 1023px) {
-  .landing-header-glass {
-    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
-    mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
-  }
-}

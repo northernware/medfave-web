@@ -80,7 +80,7 @@ function Hero() {
     <section className="relative overflow-hidden">
       <div aria-hidden className="landing-glow pointer-events-none absolute -top-48 -right-40 size-[720px] rounded-full bg-[radial-gradient(circle,rgb(233_30_131/0.22),rgb(253_231_241/0.6)_45%,transparent_70%)] lg:blur-2xl" />
       <div aria-hidden className="landing-glow-2 pointer-events-none absolute top-72 -left-56 size-[620px] rounded-full bg-[radial-gradient(circle,rgb(253_231_241/0.9),rgb(233_30_131/0.12)_50%,transparent_72%)] lg:blur-2xl" />
-      <div aria-hidden className="landing-pattern-fade landing-pattern-drift pointer-events-none absolute inset-x-0 top-[38%] h-[70%] bg-[url(/landing/pattern-hearts.svg)] bg-[length:180px_120px] opacity-60 dark:opacity-15" />
+      <div aria-hidden className="landing-pattern-fade pointer-events-none absolute inset-x-0 top-[38%] h-[70%] overflow-hidden opacity-60 dark:opacity-15"><div className="landing-pattern-move bg-[url(/landing/pattern-hearts.svg)]" /></div>
       <div className={`${wrap} relative pt-10 pb-14 sm:pt-16 sm:pb-20 lg:pt-24 lg:pb-28`}>
         <div className="mx-auto max-w-4xl text-center">
           <p className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/80 px-4 py-1.5 text-sm font-semibold text-accent-ink shadow-[var(--shadow-card)]">
@@ -124,7 +124,7 @@ const PAPER = [
 function PaperTrail() {
   return (
     <section aria-labelledby="paper-title" className={`${panel} landing-spot text-[#fff9fc]`}>
-      <div aria-hidden className="landing-pattern-drift pointer-events-none absolute inset-0 bg-[url(/landing/pattern-plum.svg)] bg-[length:180px_120px] opacity-70 [mask-image:linear-gradient(to_bottom,transparent,#000_30%,#000_70%,transparent)]" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden opacity-70 [mask-image:linear-gradient(to_bottom,transparent,#000_30%,#000_70%,transparent)]"><div className="landing-pattern-move bg-[url(/landing/pattern-plum.svg)]" /></div>
       <div className={`${inPanel} relative py-14 sm:py-20 lg:py-28`}>
         <div className="landing-rise max-w-3xl">
           <p className="text-sm font-semibold tracking-[0.14em] text-brand-blush uppercase">Why we built it</p>
@@ -292,9 +292,9 @@ function Apps() {
             phones={APP_PHONES}
             fallback={
               <div className="flex items-center justify-center gap-3 px-2 sm:gap-6 sm:px-0">
-                <IPhone src={APP_PHONES[0].src} alt={APP_PHONES[0].alt} flat className="phone-rise phone-float-2 mt-12 w-[31%] -rotate-3" />
-                <IPhone src={APP_PHONES[1].src} alt={APP_PHONES[1].alt} flat className="phone-rise phone-float z-10 w-[35%]" />
-                <IPhone src={APP_PHONES[2].src} alt={APP_PHONES[2].alt} flat className="phone-rise phone-float-2 mt-12 w-[31%] rotate-3" />
+                <IPhone src={APP_PHONES[0].src} alt={APP_PHONES[0].alt} lite turn={20} className="phone-float-2 mt-12 w-[31%]" />
+                <IPhone src={APP_PHONES[1].src} alt={APP_PHONES[1].alt} lite className="phone-float z-10 w-[35%]" />
+                <IPhone src={APP_PHONES[2].src} alt={APP_PHONES[2].alt} lite turn={-20} className="phone-float-2 mt-12 w-[31%]" />
               </div>
             }
           />
@@ -307,7 +307,7 @@ function Apps() {
 function Closing() {
   return (
     <section aria-labelledby="closing-title" className={`${panel} bg-brand sm:my-4 text-white`}>
-      <div aria-hidden className="landing-pattern-drift pointer-events-none absolute inset-0 bg-[url(/landing/pattern-tonal.svg)] bg-[length:180px_120px]" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden"><div className="landing-pattern-move bg-[url(/landing/pattern-tonal.svg)]" /></div>
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_50%_45%,#e91e83_30%,transparent_80%)]" />
       <div className={`${inPanel} relative flex flex-col items-center py-20 text-center lg:py-28`}>
         <Lockup className="h-12 w-auto sm:h-16" tone="white" />

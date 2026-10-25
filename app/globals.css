@@ -422,8 +422,9 @@ input[type="time"]::-webkit-date-and-time-value {
  * separate from the brand patterns (hearts, pluses, X), which stay quiet and
  * behind content. Every moving part stops with reduced motion.
  */
+/* phones: the grain is a still texture that scrolls with the page, not a fixed full-screen blend */
 @media (hover: none), (pointer: coarse), (max-width: 1023px) {
-  .landing-grain::after { display: none; }
+  .landing-grain::after { position: absolute; mix-blend-mode: normal; opacity: 0.045; }
 }
 .landing-grain::after {
   content: "";
@@ -513,13 +514,27 @@ input[type="time"]::-webkit-date-and-time-value {
 @media (prefers-reduced-motion: reduce) {
   .landing-glow, .landing-glow-2, .landing-pattern-drift { animation: none; }
 }
-@media (hover: none), (pointer: coarse), (max-width: 1023px) {
-  .landing-pattern-drift { animation: none; }
+/* patterns move as one layer (a transform, cheap everywhere): one tile per loop, so it never jumps */
+.landing-pattern-move {
+  position: absolute; top: 0; left: 0;
+  width: calc(100% + 180px); height: calc(100% + 120px);
+  background-size: 180px 120px;
+  animation: landing-pattern-move 45s linear infinite;
 }
+@keyframes landing-pattern-move { to { transform: translate3d(-180px, -120px, 0); } }
+@media (prefers-reduced-motion: reduce) { .landing-pattern-move { animation: none; } }
+
+/* phones have no cursor: the plum band gets a slow drifting light instead */
+@media (hover: none), (pointer: coarse) {
+  .landing-spot::before {
+    content: ""; position: absolute; inset: -25%; pointer-events: none;
+    background: radial-gradient(circle at 35% 35%, rgb(233 30 131 / 0.2), transparent 40%);
+    animation: landing-drift 16s ease-in-out infinite alternate;
+  }
+}
+@media (prefers-reduced-motion: reduce) { .landing-spot::before { animation: none; } }
 
 /* reveal fallback (CursorLight adds data-reveal and .in where scroll timelines are missing) */
-[data-reveal] .landing-rise:not(.in), [data-reveal] .phone-rise:not(.in) { opacity: 0; transform: translateY(28px); }
-[data-reveal] .landing-rise, [data-reveal] .phone-rise { transition: opacity 0.7s ease-out, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
 [data-reveal] .vax-chip:not(.in) { background-color: var(--surface-muted); color: var(--ink-muted); }
 [data-reveal] .vax-chip { transition: background-color 0.5s ease, color 0.5s ease; }
 [data-reveal] .vax-chip:nth-child(2) { transition-delay: 0.12s; } [data-reveal] .vax-chip:nth-child(3) { transition-delay: 0.24s; }

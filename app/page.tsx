@@ -5,6 +5,7 @@ import { getViewer, homeFor } from "@/lib/auth";
 import { HeartMark, Lockup } from "@/components/brand";
 import { HeroFilm } from "@/components/landing/film";
 import { IPhone } from "@/components/landing/iphone";
+import { Phones3D, type PhoneSpec } from "@/components/landing/phones-3d";
 import { Story, type StoryStep } from "@/components/landing/story";
 import { WaitlistForm } from "@/components/landing/waitlist-form";
 import { buttonClass } from "@/components/ui";
@@ -253,6 +254,12 @@ function StoreBadge({ store }: { store: "apple" | "google" }) {
   );
 }
 
+const APP_PHONES: [PhoneSpec, PhoneSpec, PhoneSpec] = [
+  { src: "/landing/app-today.webp", alt: "Doctor app: Today, with the patient in consultation and the waiting room" },
+  { src: "/landing/app-chart.webp", alt: "Doctor app: a patient’s chart with allergies and medical alerts" },
+  { src: "/landing/app-phome.webp", alt: "Patient app: the next visit and days to ask for a time" },
+];
+
 function Apps() {
   return (
     <section id="apps" aria-labelledby="apps-title" className="scroll-mt-20 overflow-hidden bg-brand-blush text-brand-plum dark:bg-accent-soft dark:text-ink">
@@ -276,10 +283,17 @@ function Apps() {
           </div>
         </div>
 
-        <div className="relative mx-auto flex w-full max-w-xl items-center justify-center gap-3 px-2 sm:gap-6 sm:px-0" aria-label="Screens from the Medfave apps">
-          <IPhone src="/landing/app-today.webp" alt="Doctor app: Today, with the patient in consultation and the waiting room" turn={22} className="w-[31%] translate-y-6" />
-          <IPhone src="/landing/app-chart.webp" alt="Doctor app: a patient’s chart with allergies and medical alerts" className="z-10 w-[35%]" />
-          <IPhone src="/landing/app-phome.webp" alt="Patient app: the next visit and days to ask for a time" turn={-22} className="w-[31%] translate-y-6" />
+        <div className="relative mx-auto w-full max-w-2xl">
+          <Phones3D
+            phones={APP_PHONES}
+            fallback={
+              <div className="flex items-center justify-center gap-3 px-2 sm:gap-6 sm:px-0">
+                <IPhone src={APP_PHONES[0].src} alt={APP_PHONES[0].alt} turn={22} className="w-[31%] translate-y-6" />
+                <IPhone src={APP_PHONES[1].src} alt={APP_PHONES[1].alt} className="z-10 w-[35%]" />
+                <IPhone src={APP_PHONES[2].src} alt={APP_PHONES[2].alt} turn={-22} className="w-[31%] translate-y-6" />
+              </div>
+            }
+          />
         </div>
       </div>
     </section>

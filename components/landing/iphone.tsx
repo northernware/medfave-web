@@ -17,7 +17,7 @@ import { useRef } from "react";
  */
 const DEPTH = 11.5; // cqw: 8.25 mm of 71.5 mm
 const SLICES = 18;
-const R = "13.3% / 6.35%"; // outer corner: 9.5 mm of 71.5 × 149.6
+
 const BAND = ["#e9e6ec", "#c9c5cd", "#a39fa8", "#8a8690", "#7a7680", "#8a8690", "#a39fa8", "#c9c5cd", "#dedbe2"];
 
 export function IPhone({
@@ -55,7 +55,7 @@ export function IPhone({
         className="iphone-turn relative aspect-[71.5/149.6] w-full [transform-style:preserve-3d] [transform:rotateX(var(--rx))_rotateY(var(--ry))] transition-transform duration-500 ease-out"
       >
         {/* soft shadow under the phone */}
-        <div aria-hidden className="absolute inset-[4%] rounded-[13.3%/6.35%] bg-black/35 blur-2xl" style={{ transform: `translateZ(${-DEPTH}cqw) translateY(4%)` }} />
+        <div aria-hidden className="iphone-r0 absolute inset-[4%] bg-black/35 blur-2xl" style={{ transform: `translateZ(${-DEPTH}cqw) translateY(4%)` }} />
 
         {/* the titanium band: slices from the front to the back */}
         {Array.from({ length: SLICES }, (_, i) => {
@@ -64,9 +64,8 @@ export function IPhone({
             <div
               key={i}
               aria-hidden
-              className="absolute inset-0"
+              className="iphone-r0 absolute inset-0"
               style={{
-                borderRadius: R,
                 transform: `translateZ(${-0.3 - t * (DEPTH - 0.6)}cqw)`,
                 background: BAND[Math.round(t * (BAND.length - 1))],
               }}
@@ -74,7 +73,7 @@ export function IPhone({
           );
         })}
         {/* the back glass */}
-        <div aria-hidden className="absolute inset-0 bg-[#4b4650]" style={{ borderRadius: R, transform: `translateZ(${-DEPTH}cqw) rotateY(180deg)` }} />
+        <div aria-hidden className="iphone-r0 absolute inset-0 bg-[#4b4650]" style={{ transform: `translateZ(${-DEPTH}cqw) rotateY(180deg)` }} />
 
         {/* the side faces, carrying the buttons */}
         <Side side="left">
@@ -88,9 +87,9 @@ export function IPhone({
         </Side>
 
         {/* the front: a hairline of polished titanium, the black bezel, the screen */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#f2f0f4] via-[#9d99a3] to-[#e2dfe6] p-[0.9%]" style={{ borderRadius: R }}>
-          <div className="relative h-full w-full bg-black p-[2.3%]" style={{ borderRadius: "12.6% / 6%" }}>
-            <div className="relative h-full w-full overflow-hidden bg-white" style={{ borderRadius: "11.4% / 5.3%" }}>
+        <div className="iphone-r0 absolute inset-0 bg-gradient-to-br from-[#f2f0f4] via-[#9d99a3] to-[#e2dfe6] p-[0.9%]">
+          <div className="iphone-r1 relative h-full w-full bg-black p-[2.3%]">
+            <div className="iphone-r2 relative h-full w-full overflow-hidden bg-white">
               {/* eslint-disable-next-line @next/next/no-img-element -- already-sized webp; next/image skipped loading it inside the 3D transform */}
               <img src={src} alt={alt} loading={priority ? "eager" : "lazy"} decoding="async" className="absolute inset-0 h-full w-full object-cover object-top" />
               <span aria-hidden className="absolute top-[1.55%] left-1/2 h-[3.55%] w-[30%] -translate-x-1/2 rounded-full bg-black" />

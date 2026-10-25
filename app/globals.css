@@ -402,3 +402,17 @@ input[type="time"]::-webkit-date-and-time-value {
   from { rotate: y 38deg; translate: 0 60px; }
   to { rotate: y 0deg; translate: 0 0; }
 }
+
+/*
+ * Landing iPhones' corners. iPhones use continuous (squircle) corners; where the
+ * browser can draw them, a larger squircle radius matches the phone. Elsewhere
+ * a plain round corner sized to look the same.
+ */
+.iphone-r0 { border-radius: 16% / 7.6%; }
+.iphone-r1 { border-radius: 15% / 7.1%; }
+.iphone-r2 { border-radius: 14% / 6.4%; }
+@supports (corner-shape: squircle) {
+  .iphone-r0 { border-radius: 24% / 11.4%; corner-shape: squircle; }
+  .iphone-r1 { border-radius: 22.5% / 10.6%; corner-shape: squircle; }
+  .iphone-r2 { border-radius: 21% / 9.6%; corner-shape: squircle; }
+}

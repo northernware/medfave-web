@@ -416,3 +416,95 @@ input[type="time"]::-webkit-date-and-time-value {
   .iphone-r1 { border-radius: 22.5% / 10.6%; corner-shape: squircle; }
   .iphone-r2 { border-radius: 21% / 9.6%; corner-shape: squircle; }
 }
+
+/*
+ * Landing depth. Texture (a fine film grain over everything, soft light) is
+ * separate from the brand patterns (hearts, pluses, X), which stay quiet and
+ * behind content. Every moving part stops with reduced motion.
+ */
+.landing-grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1.1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+:root[data-theme="dark"] .landing-grain::after { opacity: 0.12; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .landing-grain::after { opacity: 0.12; } }
+
+/* slow drifting light in the hero */
+.landing-glow { animation: landing-drift 22s ease-in-out infinite alternate; }
+.landing-glow-2 { animation: landing-drift 28s ease-in-out -9s infinite alternate-reverse; }
+@keyframes landing-drift {
+  0% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-6%, 4%, 0) scale(1.08); }
+  100% { transform: translate3d(5%, -3%, 0) scale(0.96); }
+}
+
+/* a pattern that fades out from its middle */
+.landing-pattern-fade {
+  -webkit-mask-image: radial-gradient(ellipse 60% 55% at 50% 45%, #000 20%, transparent 75%);
+  mask-image: radial-gradient(ellipse 60% 55% at 50% 45%, #000 20%, transparent 75%);
+}
+.landing-pattern-drift { animation: landing-pattern 90s linear infinite; }
+@keyframes landing-pattern { to { background-position: 360px 240px; } }
+
+/* a faint dotted grid that fades at the edges */
+.landing-dots {
+  background-image: radial-gradient(circle, rgb(50 19 44 / 0.13) 1px, transparent 1.4px);
+  background-size: 22px 22px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000 30%, transparent 80%);
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000 30%, transparent 80%);
+}
+:root[data-theme="dark"] .landing-dots { background-image: radial-gradient(circle, rgb(255 255 255 / 0.1) 1px, transparent 1.4px); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .landing-dots { background-image: radial-gradient(circle, rgb(255 255 255 / 0.1) 1px, transparent 1.4px); } }
+
+/* card borders that catch the cursor's light (--mx/--my from CursorLight) */
+.spot-card { position: relative; isolation: isolate; }
+.spot-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: radial-gradient(circle 260px at var(--mx, -999px) var(--my, -999px), rgb(233 30 131 / 0.55), transparent 70%) fixed;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  pointer-events: none;
+}
+.spot-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(circle 340px at var(--mx, -999px) var(--my, -999px), rgb(233 30 131 / 0.06), transparent 70%) fixed;
+  pointer-events: none;
+}
+
+/* the plum band's spotlight */
+.landing-spot {
+  background:
+    radial-gradient(circle 520px at var(--mx, 50%) var(--my, -200px), rgb(233 30 131 / 0.16), transparent 70%) fixed,
+    #32132c;
+}
+
+/* vaccine chips tick over to "given" as they scroll in */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .vax-chip { animation: vax-given linear both; animation-timeline: view(); }
+  }
+}
+@keyframes vax-given {
+  from { background-color: var(--surface-muted); color: var(--ink-muted); }
+  to { background-color: var(--ok-soft); color: var(--ok-ink); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-glow, .landing-glow-2, .landing-pattern-drift { animation: none; }
+}

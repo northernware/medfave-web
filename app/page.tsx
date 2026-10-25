@@ -78,9 +78,9 @@ function Header() {
 function Hero() {
   return (
     <section className="relative overflow-x-clip">
-      <div aria-hidden className="landing-glow pointer-events-none absolute -top-48 -right-40 size-[720px] rounded-full bg-[radial-gradient(circle,rgb(233_30_131/0.22),rgb(253_231_241/0.6)_45%,transparent_70%)] lg:blur-2xl" />
-      <div aria-hidden className="landing-glow-2 pointer-events-none absolute top-72 -left-56 size-[620px] rounded-full bg-[radial-gradient(circle,rgb(253_231_241/0.9),rgb(233_30_131/0.12)_50%,transparent_72%)] lg:blur-2xl" />
-      <div aria-hidden className="landing-pattern-fade pointer-events-none absolute inset-x-0 top-[38%] h-[70%] overflow-hidden opacity-60 dark:opacity-15"><div className="landing-pattern-move bg-[url(/landing/pattern-hearts.svg)]" /></div>
+      <div aria-hidden className="landing-glow pointer-events-none absolute opacity-45 sm:opacity-100 -top-48 -right-40 size-[720px] rounded-full bg-[radial-gradient(circle,rgb(233_30_131/0.22),rgb(253_231_241/0.6)_45%,transparent_70%)] lg:blur-2xl" />
+      <div aria-hidden className="landing-glow-2 pointer-events-none absolute opacity-45 sm:opacity-100 top-72 -left-56 size-[620px] rounded-full bg-[radial-gradient(circle,rgb(253_231_241/0.9),rgb(233_30_131/0.12)_50%,transparent_72%)] lg:blur-2xl" />
+      <div aria-hidden className="landing-pattern-fade pointer-events-none absolute inset-x-0 top-[38%] h-[70%] overflow-hidden opacity-40 sm:opacity-60 dark:opacity-15"><div className="landing-pattern-move bg-[url(/landing/pattern-hearts.svg)]" /></div>
       <div className={`${wrap} relative pt-10 pb-8 sm:pt-16 sm:pb-20 lg:pt-24 lg:pb-28`}>
         <div className="mx-auto max-w-4xl text-center">
           <p className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/80 px-4 py-1.5 text-sm font-semibold text-accent-ink shadow-[var(--shadow-card)]">

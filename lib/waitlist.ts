@@ -6,8 +6,9 @@ import { orm } from "@/src/prisma/db";
 /** Who is waiting for the apps. Doctors and clinics first: they are who the apps are for at launch. */
 export const WAITLIST_ROLES = [
   { value: "DOCTOR", label: "I’m a doctor" },
-  { value: "CLINIC", label: "I run or work at a clinic" },
   { value: "PATIENT", label: "I’m a patient" },
+  // No longer offered on the form (clinic staff use the web and join by invitation); still accepted.
+  { value: "CLINIC", label: "I work at a clinic" },
 ] as const;
 export type WaitlistRole = (typeof WAITLIST_ROLES)[number]["value"];
 

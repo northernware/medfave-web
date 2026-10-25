@@ -1,9 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="180" height="120" viewBox="0 0 180 120">
   <defs>
-    <g id="h" stroke="rgba(255,255,255,0.16)" stroke-width="12.5" stroke-linecap="round" fill="none" transform="scale(0.75)"><line x1="16" y1="23" x2="7.5" y2="14.5"/><line x1="16" y1="23" x2="24.5" y2="14.5"/></g>
-    <g id="p" stroke="rgba(255,255,255,0.16)" stroke-width="6.5" stroke-linecap="round"><line x1="12" y1="4.5" x2="12" y2="19.5"/><line x1="4.5" y1="12" x2="19.5" y2="12"/></g>
-    <g id="x" stroke="rgba(255,255,255,0.16)" stroke-width="6.5" stroke-linecap="round"><line x1="6.7" y1="6.7" x2="17.3" y2="17.3"/><line x1="17.3" y1="6.7" x2="6.7" y2="17.3"/></g>
+    <g id="h" stroke="#ffffff" stroke-width="12.5" stroke-linecap="round" fill="none" transform="scale(0.75)"><line x1="16" y1="23" x2="7.5" y2="14.5"/><line x1="16" y1="23" x2="24.5" y2="14.5"/></g>
+    <g id="p" stroke="#ffffff" stroke-width="6.5" stroke-linecap="round"><line x1="12" y1="4.5" x2="12" y2="19.5"/><line x1="4.5" y1="12" x2="19.5" y2="12"/></g>
+    <g id="x" stroke="#ffffff" stroke-width="6.5" stroke-linecap="round"><line x1="6.7" y1="6.7" x2="17.3" y2="17.3"/><line x1="17.3" y1="6.7" x2="6.7" y2="17.3"/></g>
   </defs>
+  <g opacity="0.16">
   <use href="#h" x="18" y="18"/><use href="#p" x="78" y="20"/><use href="#h" x="138" y="18"/>
-  <use href="#x" x="48" y="80"/><use href="#h" x="108" y="78"/><use href="#p" x="166" y="80"/>
+  <use href="#x" x="48" y="80"/><use href="#h" x="108" y="78"/><use href="#p" x="166" y="80"/><use href="#p" x="-14" y="80"/>
+  </g>
 </svg>

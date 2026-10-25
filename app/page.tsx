@@ -79,11 +79,11 @@ function Hero() {
             <HeartMark className="size-4" tone="accent" />
             For doctors and clinics in the Philippines
           </p>
-          <h1 className="mt-6 text-[44px] leading-[1.05] font-semibold tracking-[-0.035em] text-balance sm:text-[64px] lg:text-[84px]">
+          <h1 className="mt-6 text-[38px] leading-[1.08] font-semibold tracking-[-0.03em] text-balance sm:text-[52px] lg:text-[64px]">
             The whole visit,{" "}
             <span className="text-accent-ink">in one place.</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-pretty text-ink-muted sm:text-xl">
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-7 text-pretty text-ink-muted sm:text-lg sm:leading-8">
             Your day, the chart, notes coded to ICD-11, certificates and the patient&rsquo;s family — kept together,
             so you can give the visit your full attention.
           </p>
@@ -118,14 +118,14 @@ function PaperTrail() {
       <div className={`${wrap} py-20 lg:py-28`}>
         <div className="landing-rise max-w-3xl">
           <p className="text-sm font-semibold tracking-[0.14em] text-brand-blush uppercase">Why we built it</p>
-          <h2 id="paper-title" className="mt-4 text-[36px] leading-[1.1] font-semibold tracking-[-0.025em] text-balance sm:text-[52px]">
+          <h2 id="paper-title" className="mt-4 text-[28px] leading-[1.15] font-semibold tracking-[-0.02em] text-balance sm:text-[40px]">
             One patient, one visit, and usually a trail of paper.
           </h2>
         </div>
         <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {PAPER.map(([t, d], i) => (
             <li key={t} className="landing-rise rounded-3xl bg-[#3e2139] p-7" style={{ animationRangeStart: `entry ${i * 6}%` }}>
-              <p className="text-xl font-semibold">{t}</p>
+              <p className="text-lg font-semibold">{t}</p>
               <p className="mt-2 leading-7 text-[#c6b9c2]">{d}</p>
             </li>
           ))}
@@ -150,7 +150,7 @@ function Product() {
       <div className={`${wrap} py-20 lg:py-28`}>
         <div className="landing-rise max-w-3xl">
           <p className="text-sm font-semibold tracking-[0.14em] text-accent-ink uppercase">On the web, today</p>
-          <h2 id="product-title" className="mt-4 text-[36px] leading-[1.1] font-semibold tracking-[-0.025em] text-balance sm:text-[52px]">
+          <h2 id="product-title" className="mt-4 text-[28px] leading-[1.15] font-semibold tracking-[-0.02em] text-balance sm:text-[40px]">
             Everything about the visit, from the first hello to the follow-up.
           </h2>
         </div>
@@ -168,14 +168,14 @@ function Trained() {
       <div className={`${wrap} py-20 lg:py-28`}>
         <div className="landing-rise max-w-3xl">
           <p className="text-sm font-semibold tracking-[0.14em] text-accent-ink uppercase">For doctors</p>
-          <h2 id="trained-title" className="mt-4 text-[36px] leading-[1.1] font-semibold tracking-[-0.025em] text-balance sm:text-[52px]">
+          <h2 id="trained-title" className="mt-4 text-[28px] leading-[1.15] font-semibold tracking-[-0.02em] text-balance sm:text-[40px]">
             Taken the way you were trained.
           </h2>
         </div>
 
         <div className="mt-12 grid gap-4 lg:grid-cols-6">
           <article className="landing-rise flex flex-col overflow-hidden rounded-3xl bg-surface p-7 shadow-[var(--shadow-card)] lg:col-span-4">
-            <h3 className="text-2xl font-semibold tracking-[-0.015em]">Diagnoses coded to ICD-11</h3>
+            <h3 className="text-xl font-semibold tracking-[-0.01em]">Diagnoses coded to ICD-11</h3>
             <p className="mt-2 max-w-lg leading-7 text-ink-muted">Search in plain words. Medfave finds the code, and ongoing diagnoses join the chart when the note is signed.</p>
             <div className="mt-6 rounded-2xl border border-border bg-canvas p-4" aria-label="Example: searching hypertension finds BA00, Essential hypertension">
               <p className="rounded-xl border border-border bg-surface px-4 py-3 text-ink">hypertension</p>
@@ -192,7 +192,7 @@ function Trained() {
           </article>
 
           <article className="landing-rise flex flex-col rounded-3xl bg-surface p-7 shadow-[var(--shadow-card)] lg:col-span-2">
-            <h3 className="text-2xl font-semibold tracking-[-0.015em]">The full history</h3>
+            <h3 className="text-xl font-semibold tracking-[-0.01em]">The full history</h3>
             <p className="mt-2 leading-7 text-ink-muted">Past, family, personal and social, OB — and birth and immunizations for children.</p>
             <dl className="mt-6 space-y-3 text-sm">
               {[["Past", "Cholecystectomy 2009 · Pneumonia 2018"], ["Family", "Hypertension (mother)"], ["Social", "Never smoked · retired teacher"], ["OB", "G3 P3 (3-0-0-3)"]].map(([k, v]) => (
@@ -205,7 +205,7 @@ function Trained() {
           </article>
 
           <article className="landing-rise rounded-3xl bg-surface p-7 shadow-[var(--shadow-card)] lg:col-span-2">
-            <h3 className="text-2xl font-semibold tracking-[-0.015em]">Allergies first</h3>
+            <h3 className="text-xl font-semibold tracking-[-0.01em]">Allergies first</h3>
             <p className="mt-2 leading-7 text-ink-muted">In red at the top of every chart and every note, so they&rsquo;re never on page three.</p>
             <div className="mt-6 flex flex-wrap gap-2" aria-hidden>
               <span className="rounded-full bg-danger-soft px-4 py-2 font-semibold text-danger-ink">Sulfa drugs</span>
@@ -214,7 +214,7 @@ function Trained() {
           </article>
 
           <article className="landing-rise rounded-3xl bg-surface p-7 shadow-[var(--shadow-card)] lg:col-span-2">
-            <h3 className="text-2xl font-semibold tracking-[-0.015em]">Certificates in a minute</h3>
+            <h3 className="text-xl font-semibold tracking-[-0.01em]">Certificates in a minute</h3>
             <p className="mt-2 leading-7 text-ink-muted">Sick leave, fit to work, school, clearance. Choose the days of rest, sign, share.</p>
             <div className="mt-6 flex items-center justify-between rounded-2xl bg-canvas px-5 py-4" aria-hidden>
               <span className="text-xl text-ink-faint">‹</span>
@@ -224,7 +224,7 @@ function Trained() {
           </article>
 
           <article className="landing-rise rounded-3xl bg-surface p-7 shadow-[var(--shadow-card)] lg:col-span-2">
-            <h3 className="text-2xl font-semibold tracking-[-0.015em]">Vaccines on the national schedule</h3>
+            <h3 className="text-xl font-semibold tracking-[-0.01em]">Vaccines on the national schedule</h3>
             <p className="mt-2 leading-7 text-ink-muted">Every child&rsquo;s doses, from BCG at birth to MMR at 12 months.</p>
             <div className="mt-6 flex flex-wrap gap-2" aria-hidden>
               {["BCG", "Hep B", "Penta 1", "Penta 2", "Penta 3", "OPV 1", "PCV 1", "MMR 1"].map((d, i) => (
@@ -266,10 +266,10 @@ function Apps() {
       <div className={`${wrap} grid items-center gap-14 py-20 lg:grid-cols-2 lg:py-28`}>
         <div className="landing-rise">
           <p className="text-sm font-semibold tracking-[0.14em] text-accent uppercase dark:text-accent-ink">Coming soon · iPhone and Android</p>
-          <h2 id="apps-title" className="mt-4 text-[36px] leading-[1.1] font-semibold tracking-[-0.025em] text-balance sm:text-[52px]">
+          <h2 id="apps-title" className="mt-4 text-[28px] leading-[1.15] font-semibold tracking-[-0.02em] text-balance sm:text-[40px]">
             The same chart, in your pocket.
           </h2>
-          <p className="mt-5 max-w-xl text-lg leading-8 text-pretty text-brand-plum/80 dark:text-ink-muted">
+          <p className="mt-5 max-w-xl text-base leading-7 text-pretty sm:text-lg sm:leading-8 text-brand-plum/80 dark:text-ink-muted">
             The doctor app brings Today, the chart, notes and certificates to the ward and the room. The patient app gives
             your patients — and their families — their visits, reminders and documents. Both use the same records as the web.
           </p>
@@ -305,7 +305,7 @@ function Closing() {
     <section aria-labelledby="closing-title" className="bg-brand text-white">
       <div className={`${wrap} flex flex-col items-center py-20 text-center lg:py-28`}>
         <Lockup className="h-12 w-auto sm:h-16" tone="white" />
-        <h2 id="closing-title" className="mt-8 text-[40px] leading-[1.1] font-semibold tracking-[-0.03em] sm:text-[60px]">
+        <h2 id="closing-title" className="mt-8 text-[32px] leading-[1.1] font-semibold tracking-[-0.025em] sm:text-[48px]">
           Care that remembers.
         </h2>
         <div className="mt-9 flex flex-wrap justify-center gap-3">

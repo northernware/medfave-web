@@ -55,7 +55,7 @@ const inPanel = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10";
 
 function Header() {
   return (
-    <header className="sticky top-0 z-20 border-b border-border/50">
+    <header className="sticky top-0 z-20 lg:border-b lg:border-border/50">
       {/*
         The frosted glass is its own layer and reaches above the header: iOS Safari shows the
         page under the status bar, and this keeps that strip frosted too (off screen elsewhere).

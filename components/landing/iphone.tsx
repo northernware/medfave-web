@@ -60,10 +60,6 @@ export function IPhone({
         style={{ ["--rx" as string]: "0deg", ["--ry" as string]: `${turn}deg` }}
         className={flat ? "relative aspect-[71.5/149.6] w-full" : "iphone-turn relative aspect-[71.5/149.6] w-full [transform-style:preserve-3d] [transform:rotateX(var(--rx))_rotateY(var(--ry))] transition-transform duration-500 ease-out"}
       >
-        {!flat && <>
-        {/* soft shadow under the phone */}
-        <div aria-hidden className="iphone-r0 absolute inset-[4%] bg-black/35 blur-2xl" style={{ transform: `translateZ(${-DEPTH}cqw) translateY(4%)` }} />
-        </>}
 
         {!flat && <>
         {/* the titanium band: slices from the front to the back */}
@@ -97,7 +93,7 @@ export function IPhone({
         </>}
 
         {/* the front: a hairline of polished titanium, the black bezel, the screen */}
-        <div className="iphone-r0 absolute inset-0 bg-gradient-to-br from-[#f2f0f4] via-[#9d99a3] to-[#e2dfe6] p-[0.9%]">
+        <div className="iphone-r0 absolute inset-0 bg-gradient-to-br from-[#f2f0f4] via-[#9d99a3] to-[#e2dfe6] p-[0.9%] shadow-[0_18px_30px_-18px_rgb(50_19_44/0.45)]">
           <div className="iphone-r1 relative h-full w-full bg-black p-[2.3%]">
             <div className="iphone-r2 relative h-full w-full overflow-hidden bg-white">
               {/* eslint-disable-next-line @next/next/no-img-element -- already-sized webp; next/image skipped loading it inside the 3D transform */}

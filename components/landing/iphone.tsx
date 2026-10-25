@@ -26,12 +26,15 @@ export function IPhone({
   turn = 0,
   className = "",
   priority = false,
+  flat = false,
 }: {
   src: string;
   alt: string;
   turn?: number;
   className?: string;
   priority?: boolean;
+  /** Just the front: no edge slices, sides or tilt. Light enough for a phone's GPU. */
+  flat?: boolean;
 }) {
   const body = useRef<HTMLDivElement>(null);
 
@@ -52,11 +55,14 @@ export function IPhone({
       <div
         ref={body}
         style={{ ["--rx" as string]: "0deg", ["--ry" as string]: `${turn}deg` }}
-        className="iphone-turn relative aspect-[71.5/149.6] w-full [transform-style:preserve-3d] [transform:rotateX(var(--rx))_rotateY(var(--ry))] transition-transform duration-500 ease-out"
+        className={flat ? "relative aspect-[71.5/149.6] w-full" : "iphone-turn relative aspect-[71.5/149.6] w-full [transform-style:preserve-3d] [transform:rotateX(var(--rx))_rotateY(var(--ry))] transition-transform duration-500 ease-out"}
       >
+        {!flat && <>
         {/* soft shadow under the phone */}
         <div aria-hidden className="iphone-r0 absolute inset-[4%] bg-black/35 blur-2xl" style={{ transform: `translateZ(${-DEPTH}cqw) translateY(4%)` }} />
+        </>}
 
+        {!flat && <>
         {/* the titanium band: slices from the front to the back */}
         {Array.from({ length: SLICES }, (_, i) => {
           const t = i / (SLICES - 1);
@@ -85,6 +91,7 @@ export function IPhone({
           <Button top={26} len={12.5} />
           <Button top={59} len={7} flush />
         </Side>
+        </>}
 
         {/* the front: a hairline of polished titanium, the black bezel, the screen */}
         <div className="iphone-r0 absolute inset-0 bg-gradient-to-br from-[#f2f0f4] via-[#9d99a3] to-[#e2dfe6] p-[0.9%]">

@@ -422,6 +422,9 @@ input[type="time"]::-webkit-date-and-time-value {
  * separate from the brand patterns (hearts, pluses, X), which stay quiet and
  * behind content. Every moving part stops with reduced motion.
  */
+@media (hover: none), (pointer: coarse), (max-width: 1023px) {
+  .landing-grain::after { display: none; }
+}
 .landing-grain::after {
   content: "";
   position: fixed;
@@ -464,6 +467,7 @@ input[type="time"]::-webkit-date-and-time-value {
 
 /* card borders that catch the cursor's light (--mx/--my from CursorLight) */
 .spot-card { position: relative; isolation: isolate; }
+@media (hover: none), (pointer: coarse) { .spot-card::before, .spot-card::after { display: none; } .landing-spot { background: #32132c !important; } }
 .spot-card::before {
   content: "";
   position: absolute;
@@ -505,6 +509,6 @@ input[type="time"]::-webkit-date-and-time-value {
   to { background-color: var(--ok-soft); color: var(--ok-ink); }
 }
 
-@media (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse), (max-width: 1023px) {
   .landing-glow, .landing-glow-2, .landing-pattern-drift { animation: none; }
 }

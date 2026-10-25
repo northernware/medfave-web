@@ -32,12 +32,13 @@ export function Phones3D({ phones, fallback }: { phones: [PhoneSpec, PhoneSpec, 
 
       let renderer: import("three").WebGLRenderer;
       try {
-        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "low-power" });
+        renderer = new THREE.WebGLRenderer({ antialias: !matchMedia("(pointer: coarse)").matches, alpha: true, powerPreference: "low-power" });
       } catch {
         setFailed(true);
         return;
       }
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      const touch = matchMedia("(hover: none), (pointer: coarse)").matches;
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, touch ? 1.25 : 2));
       renderer.outputColorSpace = THREE.SRGBColorSpace;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.toneMappingExposure = 1.05;

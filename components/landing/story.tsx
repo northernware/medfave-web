@@ -58,7 +58,7 @@ export function Story({ steps }: { steps: StoryStep[] }) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-10 lg:gap-0">
+      <div className="flex flex-col gap-14 lg:gap-0">
         {steps.map((s, i) => (
           <section
             key={s.id}
@@ -72,7 +72,7 @@ export function Story({ steps }: { steps: StoryStep[] }) {
               {s.title}
             </h3>
             <p className="mt-3 max-w-md text-base leading-7 text-pretty text-ink-muted">{s.body}</p>
-            <div className="mt-8 flex justify-center lg:hidden">
+            <div className="mt-6 flex justify-center lg:hidden">
               <IPhone src={s.mobileImage} alt={s.alt} flat className="w-[min(66vw,270px)] drop-shadow-[0_24px_30px_rgb(50_19_44/0.25)]" />
             </div>
           </section>

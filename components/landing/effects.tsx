@@ -57,15 +57,15 @@ export function IcdDemo() {
   const rows = key ? RESULTS[key] : [];
 
   return (
-    <div ref={box} className="mt-6 rounded-2xl border border-border bg-canvas p-4" role="img" aria-label="Example: searching hypertension finds BA00, Essential hypertension">
+    <div ref={box} className="mt-5 rounded-2xl border border-border bg-canvas p-2.5 sm:mt-6 sm:p-4" role="img" aria-label="Example: searching hypertension finds BA00, Essential hypertension">
       <p className="flex min-h-12 items-center rounded-xl border border-border bg-surface px-4 text-ink" aria-hidden>
         {typed}
         {n < WORD.length ? <span className="ml-0.5 inline-block h-5 w-0.5 animate-pulse bg-accent" /> : null}
       </p>
       <ul className="mt-2 min-h-[176px] divide-y divide-border" aria-hidden>
         {rows.map(([c, name], i) => (
-          <li key={c} className={`flex gap-6 px-4 py-2.5 transition-colors duration-300 ${key === "hypertension" && i === 0 ? "rounded-lg bg-accent-tint" : ""}`}>
-            <span className="w-20 font-semibold">{c}</span>
+          <li key={c} className={`flex gap-3 px-3 py-2.5 text-sm sm:gap-6 sm:px-4 sm:text-base transition-colors duration-300 ${key === "hypertension" && i === 0 ? "rounded-lg bg-accent-tint" : ""}`}>
+            <span className="w-[4.5rem] shrink-0 font-semibold sm:w-20">{c}</span>
             <span className="text-ink-muted">{name}</span>
           </li>
         ))}

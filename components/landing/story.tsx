@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { IPhone } from "./iphone";
 
 export type StoryStep = { id: string; eyebrow: string; title: string; body: string; image: string; alt: string; mobileImage: string };
 
@@ -72,9 +73,7 @@ export function Story({ steps }: { steps: StoryStep[] }) {
             </h3>
             <p className="mt-4 max-w-md text-lg leading-7 text-pretty text-ink-muted">{s.body}</p>
             <div className="mt-8 flex justify-center lg:hidden">
-              <div className="w-[min(72vw,280px)] overflow-hidden rounded-[36px] border-[6px] border-brand-plum bg-brand-plum shadow-[0_24px_60px_-20px_rgb(50_19_44/0.4)]">
-                <Image src={s.mobileImage} alt={s.alt} width={603} height={1311} sizes="72vw" className="h-auto w-full rounded-[30px]" />
-              </div>
+              <IPhone src={s.mobileImage} alt={s.alt} turn={i % 2 ? -12 : 12} className="w-[min(66vw,270px)]" />
             </div>
           </section>
         ))}

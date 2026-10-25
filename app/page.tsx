@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getViewer, homeFor } from "@/lib/auth";
 import { HeartMark, Lockup } from "@/components/brand";
 import { HeroFilm } from "@/components/landing/film";
+import { IPhone } from "@/components/landing/iphone";
 import { Story, type StoryStep } from "@/components/landing/story";
 import { WaitlistForm } from "@/components/landing/waitlist-form";
 import { buttonClass } from "@/components/ui";
@@ -237,14 +237,6 @@ function Trained() {
   );
 }
 
-function Phone({ src, alt, className = "" }: { src: string; alt: string; className?: string }) {
-  return (
-    <div className={`overflow-hidden rounded-[40px] border-[7px] border-brand-plum bg-brand-plum shadow-[0_30px_70px_-20px_rgb(50_19_44/0.45)] ${className}`}>
-      <Image src={src} alt={alt} width={603} height={1311} sizes="(min-width: 1024px) 260px, 40vw" className="h-auto w-full rounded-[33px]" />
-    </div>
-  );
-}
-
 function StoreBadge({ store }: { store: "apple" | "google" }) {
   return (
     <span className="inline-flex min-h-12 items-center gap-3 rounded-2xl border border-brand-plum/20 bg-brand-plum px-4 py-2 text-white dark:border-white/20">
@@ -285,9 +277,9 @@ function Apps() {
         </div>
 
         <div className="relative mx-auto flex w-full max-w-xl items-center justify-center gap-3 px-2 sm:gap-6 sm:px-0" aria-label="Screens from the Medfave apps">
-          <Phone src="/landing/app-today.webp" alt="Doctor app: Today, with the patient in consultation and the waiting room" className="landing-rise w-[30%] translate-y-4 -rotate-3 sm:translate-y-6 sm:-rotate-6" />
-          <Phone src="/landing/app-chart.webp" alt="Doctor app: a patient’s chart with allergies and medical alerts" className="landing-rise z-10 w-[34%]" />
-          <Phone src="/landing/app-phome.webp" alt="Patient app: the next visit and days to ask for a time" className="landing-rise w-[30%] translate-y-4 rotate-3 sm:translate-y-6 sm:rotate-6" />
+          <IPhone src="/landing/app-today.webp" alt="Doctor app: Today, with the patient in consultation and the waiting room" turn={22} className="w-[31%] translate-y-6" />
+          <IPhone src="/landing/app-chart.webp" alt="Doctor app: a patient’s chart with allergies and medical alerts" className="z-10 w-[35%]" />
+          <IPhone src="/landing/app-phome.webp" alt="Patient app: the next visit and days to ask for a time" turn={-22} className="w-[31%] translate-y-6" />
         </div>
       </div>
     </section>

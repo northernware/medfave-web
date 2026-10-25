@@ -244,7 +244,7 @@ function StoreBadge({ store }: { store: "apple" | "google" }) {
       {store === "apple" ? (
         <svg viewBox="0 0 24 24" className="size-6" fill="currentColor" aria-hidden><path d="M16.4 12.6c0-2.5 2-3.6 2.1-3.7-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9-.8 0-2-.9-3.3-.9-1.7 0-3.3 1-4.1 2.5-1.8 3.1-.5 7.6 1.3 10.1.8 1.2 1.8 2.6 3.1 2.5 1.3-.1 1.7-.8 3.3-.8 1.5 0 1.9.8 3.3.8 1.4 0 2.2-1.2 3-2.5 1-1.4 1.4-2.8 1.4-2.9-.1 0-2.7-1-2.7-4zM14 5.2c.7-.8 1.2-2 1-3.2-1 .1-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3.1 1.1.1 2.2-.6 2.9-1.4z" /></svg>
       ) : (
-        <svg viewBox="0 0 24 24" className="size-6" aria-hidden><path d="M4 2.8l10.6 9.2L4 21.2c-.4-.2-.6-.6-.6-1.1V3.9c0-.5.2-.9.6-1.1z" fill="currentColor" /><path d="M14.6 12l3.3-2.9 3.3 1.9c.9.5.9 1.6 0 2.1l-3.3 1.9z" fill="currentColor" opacity=".75" /></svg>
+        <svg viewBox="0 0 24 24" className="size-6" fill="currentColor" aria-hidden><path d="M22.018 13.298l-3.919 2.218-3.515-3.493 3.543-3.521 3.891 2.202a1.49 1.49 0 0 1 0 2.594zM1.337.924a1.486 1.486 0 0 0-.112.568v21.017c0 .217.045.419.124.6l11.155-11.087L1.337.924zm12.207 10.065l3.258-3.238L3.45.195a1.466 1.466 0 0 0-.946-.179l11.04 10.973zm0 2.067l-11 10.933c.298.036.612-.016.906-.183l13.324-7.54-3.23-3.21z" /></svg>
       )}
       <span className="leading-tight">
         <span className="block text-[11px] opacity-80">Coming soon to</span>

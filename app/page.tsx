@@ -292,9 +292,9 @@ function Apps() {
             phones={APP_PHONES}
             fallback={
               <div className="flex items-center justify-center gap-3 px-2 sm:gap-6 sm:px-0">
-                <IPhone src={APP_PHONES[0].src} alt={APP_PHONES[0].alt} flat className="w-[31%] translate-y-6 -rotate-3" />
-                <IPhone src={APP_PHONES[1].src} alt={APP_PHONES[1].alt} flat className="z-10 w-[35%]" />
-                <IPhone src={APP_PHONES[2].src} alt={APP_PHONES[2].alt} flat className="w-[31%] translate-y-6 rotate-3" />
+                <IPhone src={APP_PHONES[0].src} alt={APP_PHONES[0].alt} flat className="phone-rise phone-float-2 mt-12 w-[31%] -rotate-3" />
+                <IPhone src={APP_PHONES[1].src} alt={APP_PHONES[1].alt} flat className="phone-rise phone-float z-10 w-[35%]" />
+                <IPhone src={APP_PHONES[2].src} alt={APP_PHONES[2].alt} flat className="phone-rise phone-float-2 mt-12 w-[31%] rotate-3" />
               </div>
             }
           />

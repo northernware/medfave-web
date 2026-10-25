@@ -77,7 +77,7 @@ function Header() {
 
 function Hero() {
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-x-clip">
       <div aria-hidden className="landing-glow pointer-events-none absolute -top-48 -right-40 size-[720px] rounded-full bg-[radial-gradient(circle,rgb(233_30_131/0.22),rgb(253_231_241/0.6)_45%,transparent_70%)] lg:blur-2xl" />
       <div aria-hidden className="landing-glow-2 pointer-events-none absolute top-72 -left-56 size-[620px] rounded-full bg-[radial-gradient(circle,rgb(253_231_241/0.9),rgb(233_30_131/0.12)_50%,transparent_72%)] lg:blur-2xl" />
       <div aria-hidden className="landing-pattern-fade pointer-events-none absolute inset-x-0 top-[38%] h-[70%] overflow-hidden opacity-60 dark:opacity-15"><div className="landing-pattern-move bg-[url(/landing/pattern-hearts.svg)]" /></div>

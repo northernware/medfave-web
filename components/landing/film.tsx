@@ -15,7 +15,7 @@ export function HeroFilm() {
     <div className="relative">
       <div className="overflow-hidden rounded-[28px] border border-border bg-brand-plum shadow-[0_40px_100px_-30px_rgb(50_19_44/0.45)]">
         <video
-          className="aspect-video w-full object-cover motion-reduce:hidden"
+          className="aspect-[4/5] w-full object-cover object-[80%_50%] motion-reduce:hidden sm:aspect-video sm:object-center"
           src="/landing/hero-loop.mp4"
           poster="/landing/hero-poster.jpg"
           autoPlay
@@ -25,7 +25,7 @@ export function HeroFilm() {
           aria-hidden
         />
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/landing/hero-poster.jpg" alt="" className="hidden aspect-video w-full object-cover motion-reduce:block" />
+        <img src="/landing/hero-poster.jpg" alt="" className="hidden aspect-[4/5] w-full object-cover object-[80%_50%] motion-reduce:block sm:aspect-video sm:object-center" />
       </div>
       <button
         type="button"

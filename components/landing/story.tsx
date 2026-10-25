@@ -3,12 +3,13 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-export type StoryStep = { id: string; eyebrow: string; title: string; body: string; image: string; alt: string };
+export type StoryStep = { id: string; eyebrow: string; title: string; body: string; image: string; alt: string; mobileImage: string };
 
 /*
  * The product, told as a scroll: the steps scroll past on the right while one
  * browser window stays pinned on the left and changes to the step in view.
- * Below the large breakpoint there is no pinning: each step shows its own picture.
+ * Below the large breakpoint there is no pinning: each step shows the same screen
+ * from the phone app, which reads at phone size where a desktop screenshot can't.
  */
 export function Story({ steps }: { steps: StoryStep[] }) {
   const [active, setActive] = useState(0);
@@ -70,12 +71,10 @@ export function Story({ steps }: { steps: StoryStep[] }) {
               {s.title}
             </h3>
             <p className="mt-4 max-w-md text-lg leading-7 text-pretty text-ink-muted">{s.body}</p>
-            <div className="mt-6 lg:hidden">
-              <BrowserFrame>
-                <div className="relative aspect-[16/10]">
-                  <Image src={s.image} alt={s.alt} fill sizes="100vw" className="object-cover object-top" />
-                </div>
-              </BrowserFrame>
+            <div className="mt-8 flex justify-center lg:hidden">
+              <div className="w-[min(72vw,280px)] overflow-hidden rounded-[36px] border-[6px] border-brand-plum bg-brand-plum shadow-[0_24px_60px_-20px_rgb(50_19_44/0.4)]">
+                <Image src={s.mobileImage} alt={s.alt} width={603} height={1311} sizes="72vw" className="h-auto w-full rounded-[30px]" />
+              </div>
             </div>
           </section>
         ))}

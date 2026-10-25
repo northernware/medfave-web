@@ -31,7 +31,7 @@ export default async function LandingPage() {
 
   return (
     <CursorLight>
-    <div className="flex min-h-dvh flex-col bg-canvas">
+    <div className="flex min-h-dvh flex-col overflow-x-clip bg-canvas">
       <Header />
       <main className="flex-1">
         <Hero />

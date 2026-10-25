@@ -106,7 +106,7 @@ function Hero() {
           <p className="mt-5 text-sm text-ink-faint">On the web today · iPhone and Android apps coming soon</p>
         </div>
         <div className="landing-rise relative mx-auto mt-10 max-w-5xl sm:mt-14 lg:mt-20">
-          <div aria-hidden className="absolute -inset-x-4 -bottom-3 top-1/2 rounded-[48px] sm:-inset-x-10 sm:-bottom-10 sm:top-1/3 bg-[radial-gradient(ellipse_at_50%_80%,rgb(233_30_131/0.35),transparent_65%)] lg:blur-2xl" />
+          <div aria-hidden className="absolute hidden rounded-[48px] sm:block sm:-inset-x-10 sm:-bottom-10 sm:top-1/3 bg-[radial-gradient(ellipse_at_50%_80%,rgb(233_30_131/0.35),transparent_65%)] lg:blur-2xl" />
           <HeroFilm />
         </div>
       </div>

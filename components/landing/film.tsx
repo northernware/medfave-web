@@ -23,7 +23,7 @@ export function HeroFilm() {
 
   return (
     <div className="relative">
-      <div className="overflow-hidden rounded-[28px] border border-border bg-brand-plum shadow-[0_40px_100px_-30px_rgb(50_19_44/0.45)]">
+      <div className="overflow-hidden rounded-[28px] border border-border bg-brand-plum shadow-[0_12px_28px_-14px_rgb(50_19_44/0.35)] sm:shadow-[0_40px_100px_-30px_rgb(50_19_44/0.45)]">
         <video
           ref={loop}
           className="aspect-video w-full object-cover motion-reduce:hidden"

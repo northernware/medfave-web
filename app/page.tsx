@@ -55,12 +55,12 @@ const inPanel = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10";
 
 function Header() {
   return (
-    <header className="sticky top-0 z-20 lg:border-b lg:border-border/50">
+    <header className="sticky top-0 z-20 border-b border-border/50">
       {/*
         The frosted glass is its own layer and reaches above the header: iOS Safari shows the
         page under the status bar, and this keeps that strip frosted too (off screen elsewhere).
       */}
-      <div aria-hidden className="landing-header-glass absolute inset-x-0 -top-28 -bottom-5 -z-10 bg-canvas/70 backdrop-blur-xl backdrop-saturate-150 lg:bottom-0" />
+      <div aria-hidden className="absolute inset-x-0 -top-28 bottom-0 -z-10 bg-canvas/70 backdrop-blur-xl backdrop-saturate-150" />
       <div className={`${wrap} flex items-center justify-between gap-4 py-3`}>
         <Link href="/" aria-label="Medfave home" className="rounded-md focus-visible:outline-2 focus-visible:outline-accent">
           <Lockup className="h-7 w-auto" />

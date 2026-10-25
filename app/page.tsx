@@ -55,7 +55,7 @@ const inPanel = "mx-auto w-full max-w-7xl px-2 sm:px-6 lg:px-10";
 
 function Header() {
   return (
-    <header className="sticky top-0 z-20 border-b border-border/60 bg-canvas/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-20 border-b border-border/60 bg-canvas/95 lg:bg-canvas/80 lg:backdrop-blur-xl">
       <div className={`${wrap} flex items-center justify-between gap-4 py-3`}>
         <Link href="/" aria-label="Medfave home" className="rounded-md focus-visible:outline-2 focus-visible:outline-accent">
           <Lockup className="h-7 w-auto" />
@@ -78,8 +78,8 @@ function Header() {
 function Hero() {
   return (
     <section className="relative overflow-hidden">
-      <div aria-hidden className="landing-glow pointer-events-none absolute -top-48 -right-40 size-[720px] rounded-full bg-[radial-gradient(circle,rgb(233_30_131/0.22),rgb(253_231_241/0.6)_45%,transparent_70%)] blur-2xl" />
-      <div aria-hidden className="landing-glow-2 pointer-events-none absolute top-72 -left-56 size-[620px] rounded-full bg-[radial-gradient(circle,rgb(253_231_241/0.9),rgb(233_30_131/0.12)_50%,transparent_72%)] blur-2xl" />
+      <div aria-hidden className="landing-glow pointer-events-none absolute -top-48 -right-40 size-[720px] rounded-full bg-[radial-gradient(circle,rgb(233_30_131/0.22),rgb(253_231_241/0.6)_45%,transparent_70%)] lg:blur-2xl" />
+      <div aria-hidden className="landing-glow-2 pointer-events-none absolute top-72 -left-56 size-[620px] rounded-full bg-[radial-gradient(circle,rgb(253_231_241/0.9),rgb(233_30_131/0.12)_50%,transparent_72%)] lg:blur-2xl" />
       <div aria-hidden className="landing-pattern-fade landing-pattern-drift pointer-events-none absolute inset-x-0 top-[38%] h-[70%] bg-[url(/landing/pattern-hearts.svg)] bg-[length:180px_120px] opacity-60 dark:opacity-15" />
       <div className={`${wrap} relative pt-10 pb-14 sm:pt-16 sm:pb-20 lg:pt-24 lg:pb-28`}>
         <div className="mx-auto max-w-4xl text-center">
@@ -106,7 +106,7 @@ function Hero() {
           <p className="mt-5 text-sm text-ink-faint">On the web today · iPhone and Android apps coming soon</p>
         </div>
         <div className="landing-rise relative mx-auto mt-10 max-w-5xl sm:mt-14 lg:mt-20">
-          <div aria-hidden className="absolute -inset-x-10 -bottom-10 top-1/3 rounded-[48px] bg-[radial-gradient(ellipse_at_50%_80%,rgb(233_30_131/0.35),transparent_65%)] blur-2xl" />
+          <div aria-hidden className="absolute -inset-x-10 -bottom-10 top-1/3 rounded-[48px] bg-[radial-gradient(ellipse_at_50%_80%,rgb(233_30_131/0.35),transparent_65%)] lg:blur-2xl" />
           <HeroFilm />
         </div>
       </div>
@@ -287,7 +287,7 @@ function Apps() {
         </div>
 
         <div className="relative mx-auto w-full max-w-2xl">
-          <div aria-hidden className="absolute inset-x-[12%] bottom-[6%] h-10 rounded-[50%] bg-brand-plum/30 blur-2xl dark:bg-black/50" />
+          <div aria-hidden className="absolute inset-x-[12%] bottom-[6%] h-10 rounded-[50%] bg-[radial-gradient(ellipse,rgb(50_19_44/0.3),transparent_70%)] lg:blur-2xl dark:bg-[radial-gradient(ellipse,rgb(0_0_0/0.5),transparent_70%)]" />
           <Phones3D
             phones={APP_PHONES}
             fallback={

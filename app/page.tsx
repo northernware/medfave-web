@@ -81,7 +81,7 @@ function Hero() {
       <div aria-hidden className="landing-glow pointer-events-none absolute -top-48 -right-40 size-[720px] rounded-full bg-[radial-gradient(circle,rgb(233_30_131/0.22),rgb(253_231_241/0.6)_45%,transparent_70%)] lg:blur-2xl" />
       <div aria-hidden className="landing-glow-2 pointer-events-none absolute top-72 -left-56 size-[620px] rounded-full bg-[radial-gradient(circle,rgb(253_231_241/0.9),rgb(233_30_131/0.12)_50%,transparent_72%)] lg:blur-2xl" />
       <div aria-hidden className="landing-pattern-fade pointer-events-none absolute inset-x-0 top-[38%] h-[70%] overflow-hidden opacity-60 dark:opacity-15"><div className="landing-pattern-move bg-[url(/landing/pattern-hearts.svg)]" /></div>
-      <div className={`${wrap} relative pt-10 pb-14 sm:pt-16 sm:pb-20 lg:pt-24 lg:pb-28`}>
+      <div className={`${wrap} relative pt-10 pb-8 sm:pt-16 sm:pb-20 lg:pt-24 lg:pb-28`}>
         <div className="mx-auto max-w-4xl text-center">
           <p className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/80 px-4 py-1.5 text-sm font-semibold text-accent-ink shadow-[var(--shadow-card)]">
             <HeartMark className="size-4" tone="accent" />
@@ -106,7 +106,7 @@ function Hero() {
           <p className="mt-5 text-sm text-ink-faint">On the web today · iPhone and Android apps coming soon</p>
         </div>
         <div className="landing-rise relative mx-auto mt-10 max-w-5xl sm:mt-14 lg:mt-20">
-          <div aria-hidden className="absolute -inset-x-10 -bottom-10 top-1/3 rounded-[48px] bg-[radial-gradient(ellipse_at_50%_80%,rgb(233_30_131/0.35),transparent_65%)] lg:blur-2xl" />
+          <div aria-hidden className="absolute -inset-x-4 -bottom-3 top-1/2 rounded-[48px] sm:-inset-x-10 sm:-bottom-10 sm:top-1/3 bg-[radial-gradient(ellipse_at_50%_80%,rgb(233_30_131/0.35),transparent_65%)] lg:blur-2xl" />
           <HeroFilm />
         </div>
       </div>

@@ -58,7 +58,7 @@ export function Phones3D({ phones, fallback }: { phones: [PhoneSpec, PhoneSpec, 
       key.position.set(-200, 300, 400);
       scene.add(key);
 
-      const camera = new THREE.PerspectiveCamera(24, 1, 10, 3000);
+      const camera = new THREE.PerspectiveCamera(24, 1, 200, 1400);
 
       // --- geometry, in mm ---
       const W = 71.5, H = 149.6, D = 8.25;
@@ -103,7 +103,8 @@ export function Phones3D({ phones, fallback }: { phones: [PhoneSpec, PhoneSpec, 
       };
 
       const titanium = new THREE.MeshPhysicalMaterial({ color: 0xc8c3cb, metalness: 1, roughness: 0.3 });
-      const glass = new THREE.MeshPhysicalMaterial({ color: 0x050505, metalness: 0, roughness: 0.06, clearcoat: 1, clearcoatRoughness: 0.04 });
+      // the bezel is unlit black: lit glass picked up the studio light and read as a grey frame
+      const glass = new THREE.MeshBasicMaterial({ color: 0x000000 });
       const back = new THREE.MeshPhysicalMaterial({ color: 0xd3cfd6, metalness: 0.1, roughness: 0.55 });
       const sapphire = new THREE.MeshPhysicalMaterial({ color: 0x2c2a30, metalness: 0.3, roughness: 0.15, clearcoat: 1 });
       const black = new THREE.MeshBasicMaterial({ color: 0x000000 });
@@ -112,16 +113,16 @@ export function Phones3D({ phones, fallback }: { phones: [PhoneSpec, PhoneSpec, 
       const make = (src: string) => {
         const g = new THREE.Group();
         g.add(new THREE.Mesh(bodyGeo, titanium));
-        const front = new THREE.Mesh(glassGeo, glass); front.position.z = D / 2 + 0.02; g.add(front);
+        const front = new THREE.Mesh(glassGeo, glass); front.position.z = D / 2 + 0.12; g.add(front);
         const tex = loader.load(src, () => draw());
         tex.colorSpace = THREE.SRGBColorSpace;
         tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
         // the screenshots are taller than the screen: show the top, like the real phone
         tex.repeat.set(1, 0.985); tex.offset.set(0, 0.015);
         const screen = new THREE.Mesh(screenGeo, new THREE.MeshBasicMaterial({ map: tex, toneMapped: false }));
-        screen.position.z = D / 2 + 0.04; g.add(screen);
-        const island = new THREE.Mesh(islandGeo, black); island.position.set(0, (H - 4.4) / 2 - 3.6 - 3.05, D / 2 + 0.06); g.add(island);
-        const backGlass = new THREE.Mesh(backGeo, back); backGlass.position.z = -D / 2 - 0.02; backGlass.rotation.y = Math.PI; g.add(backGlass);
+        screen.position.z = D / 2 + 0.24; g.add(screen);
+        const island = new THREE.Mesh(islandGeo, black); island.position.set(0, (H - 4.4) / 2 - 3.6 - 3.05, D / 2 + 0.36); g.add(island);
+        const backGlass = new THREE.Mesh(backGeo, back); backGlass.position.z = -D / 2 - 0.12; backGlass.rotation.y = Math.PI; g.add(backGlass);
         // buttons: [side, from the top (mm), length (mm), Camera Control?]
         for (const [side, top, len, cc] of [[-1, 26.2, 6.9, 0], [-1, 37.4, 12, 0], [-1, 52.4, 12, 0], [1, 38.9, 18.7, 0], [1, 88.3, 10.5, 1]] as const) {
           const m = new THREE.Mesh(button(len, cc ? 4.2 : 3.2), cc ? sapphire : titanium);

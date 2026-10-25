@@ -3,6 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getViewer, homeFor } from "@/lib/auth";
 import { HeartMark, Lockup } from "@/components/brand";
+import { CursorLight, IcdDemo } from "@/components/landing/effects";
 import { HeroFilm } from "@/components/landing/film";
 import { IPhone } from "@/components/landing/iphone";
 import { Phones3D, type PhoneSpec } from "@/components/landing/phones-3d";
@@ -29,6 +30,7 @@ export default async function LandingPage() {
   if (viewer) redirect(homeFor(viewer));
 
   return (
+    <CursorLight>
     <div className="flex min-h-dvh flex-col bg-canvas">
       <Header />
       <main className="flex-1">
@@ -41,10 +43,13 @@ export default async function LandingPage() {
       </main>
       <Footer />
     </div>
+    </CursorLight>
   );
 }
 
 const wrap = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10";
+/** Coloured sections are inset panels with large rounded corners, not hard full-width bands. */
+const panel = "relative mx-2 overflow-hidden rounded-[32px] sm:mx-4 sm:rounded-[44px]";
 
 function Header() {
   return (
@@ -71,8 +76,9 @@ function Header() {
 function Hero() {
   return (
     <section className="relative overflow-hidden">
-      <div aria-hidden className="pointer-events-none absolute -top-40 -right-40 size-[640px] rounded-full bg-brand-blush/70 blur-3xl dark:bg-accent-soft/40" />
-      <div aria-hidden className="pointer-events-none absolute top-80 -left-60 size-[520px] rounded-full bg-brand-blush/50 blur-3xl dark:bg-accent-soft/30" />
+      <div aria-hidden className="landing-glow pointer-events-none absolute -top-48 -right-40 size-[720px] rounded-full bg-[radial-gradient(circle,rgb(233_30_131/0.22),rgb(253_231_241/0.6)_45%,transparent_70%)] blur-2xl" />
+      <div aria-hidden className="landing-glow-2 pointer-events-none absolute top-72 -left-56 size-[620px] rounded-full bg-[radial-gradient(circle,rgb(253_231_241/0.9),rgb(233_30_131/0.12)_50%,transparent_72%)] blur-2xl" />
+      <div aria-hidden className="landing-pattern-fade landing-pattern-drift pointer-events-none absolute inset-x-0 top-[38%] h-[70%] bg-[url(/landing/pattern-hearts.svg)] bg-[length:180px_120px] opacity-60 dark:opacity-15" />
       <div className={`${wrap} relative pt-16 pb-20 lg:pt-24 lg:pb-28`}>
         <div className="mx-auto max-w-4xl text-center">
           <p className="inline-flex items-center gap-2 rounded-full border border-border bg-surface/80 px-4 py-1.5 text-sm font-semibold text-accent-ink shadow-[var(--shadow-card)]">
@@ -97,7 +103,8 @@ function Hero() {
           </div>
           <p className="mt-5 text-sm text-ink-faint">On the web today · iPhone and Android apps coming soon</p>
         </div>
-        <div className="landing-rise mx-auto mt-14 max-w-5xl lg:mt-20">
+        <div className="landing-rise relative mx-auto mt-14 max-w-5xl lg:mt-20">
+          <div aria-hidden className="absolute -inset-x-10 -bottom-10 top-1/3 rounded-[48px] bg-[radial-gradient(ellipse_at_50%_80%,rgb(233_30_131/0.35),transparent_65%)] blur-2xl" />
           <HeroFilm />
         </div>
       </div>
@@ -114,8 +121,9 @@ const PAPER = [
 
 function PaperTrail() {
   return (
-    <section aria-labelledby="paper-title" className="bg-brand-plum text-[#fff9fc]">
-      <div className={`${wrap} py-20 lg:py-28`}>
+    <section aria-labelledby="paper-title" className={`${panel} landing-spot text-[#fff9fc]`}>
+      <div aria-hidden className="landing-pattern-drift pointer-events-none absolute inset-0 bg-[url(/landing/pattern-plum.svg)] bg-[length:180px_120px] opacity-70 [mask-image:linear-gradient(to_bottom,transparent,#000_30%,#000_70%,transparent)]" />
+      <div className={`${wrap} relative py-20 lg:py-28`}>
         <div className="landing-rise max-w-3xl">
           <p className="text-sm font-semibold tracking-[0.14em] text-brand-blush uppercase">Why we built it</p>
           <h2 id="paper-title" className="mt-4 text-[28px] leading-[1.15] font-semibold tracking-[-0.02em] text-balance sm:text-[40px]">
@@ -124,7 +132,7 @@ function PaperTrail() {
         </div>
         <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {PAPER.map(([t, d], i) => (
-            <li key={t} className="landing-rise rounded-3xl bg-[#3e2139] p-7" style={{ animationRangeStart: `entry ${i * 6}%` }}>
+            <li key={t} className="landing-rise spot-card rounded-3xl bg-[#3e2139]/90 p-7 ring-1 ring-white/8 backdrop-blur-sm" style={{ animationRangeStart: `entry ${i * 6}%` }}>
               <p className="text-lg font-semibold">{t}</p>
               <p className="mt-2 leading-7 text-[#c6b9c2]">{d}</p>
             </li>
@@ -154,7 +162,8 @@ function Product() {
             Everything about the visit, from the first hello to the follow-up.
           </h2>
         </div>
-        <div className="mt-14">
+        <div className="relative mt-14">
+          <div aria-hidden className="landing-dots pointer-events-none absolute -inset-x-6 -inset-y-10 -z-0" />
           <Story steps={STEPS} />
         </div>
       </div>
@@ -164,8 +173,9 @@ function Product() {
 
 function Trained() {
   return (
-    <section id="trained" aria-labelledby="trained-title" className="scroll-mt-20 bg-surface-muted/60">
-      <div className={`${wrap} py-20 lg:py-28`}>
+    <section id="trained" aria-labelledby="trained-title" className={`${panel} scroll-mt-20 bg-surface-muted/70 ring-1 ring-border/60`}>
+      <div aria-hidden className="landing-dots pointer-events-none absolute inset-0 opacity-60" />
+      <div className={`${wrap} relative py-20 lg:py-28`}>
         <div className="landing-rise max-w-3xl">
           <p className="text-sm font-semibold tracking-[0.14em] text-accent-ink uppercase">For doctors</p>
           <h2 id="trained-title" className="mt-4 text-[28px] leading-[1.15] font-semibold tracking-[-0.02em] text-balance sm:text-[40px]">
@@ -174,24 +184,14 @@ function Trained() {
         </div>
 
         <div className="mt-12 grid gap-4 lg:grid-cols-6">
-          <article className="landing-rise flex flex-col overflow-hidden rounded-3xl bg-surface p-7 shadow-[var(--shadow-card)] lg:col-span-4">
+          <article className="landing-rise flex flex-col overflow-hidden spot-card rounded-3xl bg-surface p-7 shadow-[var(--shadow-card)] ring-1 ring-border/70 lg:col-span-4">
             <h3 className="text-xl font-semibold tracking-[-0.01em]">Diagnoses coded to ICD-11</h3>
             <p className="mt-2 max-w-lg leading-7 text-ink-muted">Search in plain words. Medfave finds the code, and ongoing diagnoses join the chart when the note is signed.</p>
-            <div className="mt-6 rounded-2xl border border-border bg-canvas p-4" aria-label="Example: searching hypertension finds BA00, Essential hypertension">
-              <p className="rounded-xl border border-border bg-surface px-4 py-3 text-ink">hypertension</p>
-              <ul className="mt-2 divide-y divide-border" aria-hidden>
-                {[["BA00", "Essential hypertension"], ["9C61.01", "Ocular hypertension"], ["MC80.00", "White coat hypertension"], ["JA23", "Gestational hypertension"]].map(([c, n], i) => (
-                  <li key={c} className={`flex gap-6 px-4 py-2.5 ${i === 0 ? "rounded-lg bg-accent-tint" : ""}`}>
-                    <span className="w-20 font-semibold">{c}</span>
-                    <span className="text-ink-muted">{n}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <IcdDemo />
             <p className="mt-4 text-xs text-ink-faint">ICD-11 MMS © World Health Organization, CC BY-ND 3.0 IGO</p>
           </article>
 
-          <article className="landing-rise flex flex-col rounded-3xl bg-surface p-7 shadow-[var(--shadow-card)] lg:col-span-2">
+          <article className="landing-rise flex flex-col spot-card rounded-3xl bg-surface p-7 shadow-[var(--shadow-card)] ring-1 ring-border/70 lg:col-span-2">
             <h3 className="text-xl font-semibold tracking-[-0.01em]">The full history</h3>
             <p className="mt-2 leading-7 text-ink-muted">Past, family, personal and social, OB — and birth and immunizations for children.</p>
             <dl className="mt-6 space-y-3 text-sm">
@@ -204,7 +204,7 @@ function Trained() {
             </dl>
           </article>
 
-          <article className="landing-rise rounded-3xl bg-surface p-7 shadow-[var(--shadow-card)] lg:col-span-2">
+          <article className="landing-rise spot-card rounded-3xl bg-surface p-7 shadow-[var(--shadow-card)] ring-1 ring-border/70 lg:col-span-2">
             <h3 className="text-xl font-semibold tracking-[-0.01em]">Allergies first</h3>
             <p className="mt-2 leading-7 text-ink-muted">In red at the top of every chart and every note, so they&rsquo;re never on page three.</p>
             <div className="mt-6 flex flex-wrap gap-2" aria-hidden>
@@ -213,7 +213,7 @@ function Trained() {
             </div>
           </article>
 
-          <article className="landing-rise rounded-3xl bg-surface p-7 shadow-[var(--shadow-card)] lg:col-span-2">
+          <article className="landing-rise spot-card rounded-3xl bg-surface p-7 shadow-[var(--shadow-card)] ring-1 ring-border/70 lg:col-span-2">
             <h3 className="text-xl font-semibold tracking-[-0.01em]">Certificates in a minute</h3>
             <p className="mt-2 leading-7 text-ink-muted">Sick leave, fit to work, school, clearance. Choose the days of rest, sign, share.</p>
             <div className="mt-6 flex items-center justify-between rounded-2xl bg-canvas px-5 py-4" aria-hidden>
@@ -223,12 +223,12 @@ function Trained() {
             </div>
           </article>
 
-          <article className="landing-rise rounded-3xl bg-surface p-7 shadow-[var(--shadow-card)] lg:col-span-2">
+          <article className="landing-rise spot-card rounded-3xl bg-surface p-7 shadow-[var(--shadow-card)] ring-1 ring-border/70 lg:col-span-2">
             <h3 className="text-xl font-semibold tracking-[-0.01em]">Vaccines on the national schedule</h3>
             <p className="mt-2 leading-7 text-ink-muted">Every child&rsquo;s doses, from BCG at birth to MMR at 12 months.</p>
             <div className="mt-6 flex flex-wrap gap-2" aria-hidden>
               {["BCG", "Hep B", "Penta 1", "Penta 2", "Penta 3", "OPV 1", "PCV 1", "MMR 1"].map((d, i) => (
-                <span key={d} className={`rounded-full px-3 py-1.5 text-sm font-semibold ${i < 6 ? "bg-ok-soft text-ok-ink" : "bg-surface-muted text-ink-muted"}`}>{d}</span>
+                <span key={d} className={`rounded-full px-3 py-1.5 text-sm font-semibold ${i < 6 ? "vax-chip bg-ok-soft text-ok-ink" : "bg-surface-muted text-ink-muted"}`} style={i < 6 ? { animationRange: `entry ${40 + i * 7}% cover ${48 + i * 7}%` } : undefined}>{d}</span>
               ))}
             </div>
           </article>
@@ -262,8 +262,9 @@ const APP_PHONES: [PhoneSpec, PhoneSpec, PhoneSpec] = [
 
 function Apps() {
   return (
-    <section id="apps" aria-labelledby="apps-title" className="scroll-mt-20 overflow-hidden bg-brand-blush text-brand-plum dark:bg-accent-soft dark:text-ink">
-      <div className={`${wrap} grid items-center gap-14 py-20 lg:grid-cols-2 lg:py-28`}>
+    <section id="apps" aria-labelledby="apps-title" className={`${panel} mt-4 scroll-mt-20 bg-brand-blush text-brand-plum dark:bg-accent-soft dark:text-ink`}>
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[url(/landing/pattern-hearts.svg)] bg-[length:180px_120px] opacity-70 [mask-image:radial-gradient(ellipse_70%_70%_at_75%_50%,#000_10%,transparent_75%)] dark:opacity-10" />
+      <div className={`${wrap} relative grid items-center gap-14 py-20 lg:grid-cols-2 lg:py-28`}>
         <div className="landing-rise">
           <p className="text-sm font-semibold tracking-[0.14em] text-accent uppercase dark:text-accent-ink">Coming soon · iPhone and Android</p>
           <h2 id="apps-title" className="mt-4 text-[28px] leading-[1.15] font-semibold tracking-[-0.02em] text-balance sm:text-[40px]">
@@ -284,6 +285,7 @@ function Apps() {
         </div>
 
         <div className="relative mx-auto w-full max-w-2xl">
+          <div aria-hidden className="absolute inset-x-[12%] bottom-[6%] h-10 rounded-[50%] bg-brand-plum/30 blur-2xl dark:bg-black/50" />
           <Phones3D
             phones={APP_PHONES}
             fallback={
@@ -302,8 +304,10 @@ function Apps() {
 
 function Closing() {
   return (
-    <section aria-labelledby="closing-title" className="bg-brand text-white">
-      <div className={`${wrap} flex flex-col items-center py-20 text-center lg:py-28`}>
+    <section aria-labelledby="closing-title" className={`${panel} my-4 bg-brand text-white`}>
+      <div aria-hidden className="landing-pattern-drift pointer-events-none absolute inset-0 bg-[url(/landing/pattern-tonal.svg)] bg-[length:180px_120px]" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_50%_45%,#e91e83_30%,transparent_80%)]" />
+      <div className={`${wrap} relative flex flex-col items-center py-20 text-center lg:py-28`}>
         <Lockup className="h-12 w-auto sm:h-16" tone="white" />
         <h2 id="closing-title" className="mt-8 text-[32px] leading-[1.1] font-semibold tracking-[-0.025em] sm:text-[48px]">
           Care that remembers.

@@ -48,10 +48,10 @@ export default async function LandingPage() {
 }
 
 const wrap = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10";
-/** Coloured sections are inset panels with large rounded corners, not hard full-width bands. */
-const panel = "relative mx-2 overflow-hidden rounded-[28px] sm:mx-4 sm:rounded-[44px]";
-/** Inside a panel the content steps in less on phones, so its left edge lines up with the page (16px). */
-const inPanel = "mx-auto w-full max-w-7xl px-2 sm:px-6 lg:px-10";
+/** Coloured sections: full-width bands on phones; inset panels with large rounded corners from `sm` up. */
+const panel = "relative overflow-hidden sm:mx-4 sm:rounded-[44px]";
+/** A panel's content: the same side padding as the rest of the page. */
+const inPanel = "mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10";
 
 function Header() {
   return (
@@ -264,7 +264,7 @@ const APP_PHONES: [PhoneSpec, PhoneSpec, PhoneSpec] = [
 
 function Apps() {
   return (
-    <section id="apps" aria-labelledby="apps-title" className={`${panel} mt-4 scroll-mt-20 bg-brand-blush text-brand-plum dark:bg-accent-soft dark:text-ink`}>
+    <section id="apps" aria-labelledby="apps-title" className={`${panel} scroll-mt-20 sm:mt-4 bg-brand-blush text-brand-plum dark:bg-accent-soft dark:text-ink`}>
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[url(/landing/pattern-hearts.svg)] bg-[length:180px_120px] opacity-70 [mask-image:radial-gradient(ellipse_70%_70%_at_75%_50%,#000_10%,transparent_75%)] dark:opacity-10" />
       <div className={`${inPanel} relative grid items-center gap-14 py-20 lg:grid-cols-2 lg:py-28`}>
         <div className="landing-rise">
@@ -306,7 +306,7 @@ function Apps() {
 
 function Closing() {
   return (
-    <section aria-labelledby="closing-title" className={`${panel} my-4 bg-brand text-white`}>
+    <section aria-labelledby="closing-title" className={`${panel} bg-brand sm:my-4 text-white`}>
       <div aria-hidden className="landing-pattern-drift pointer-events-none absolute inset-0 bg-[url(/landing/pattern-tonal.svg)] bg-[length:180px_120px]" />
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_60%_70%_at_50%_45%,#e91e83_30%,transparent_80%)]" />
       <div className={`${inPanel} relative flex flex-col items-center py-20 text-center lg:py-28`}>

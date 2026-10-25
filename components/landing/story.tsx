@@ -73,7 +73,7 @@ export function Story({ steps }: { steps: StoryStep[] }) {
             </h3>
             <p className="mt-3 max-w-md text-base leading-7 text-pretty text-ink-muted">{s.body}</p>
             <div className="mt-8 flex justify-center lg:hidden">
-              <IPhone src={s.mobileImage} alt={s.alt} turn={i % 2 ? -12 : 12} className="w-[min(66vw,270px)]" />
+              <IPhone src={s.mobileImage} alt={s.alt} flat className="w-[min(66vw,270px)] drop-shadow-[0_24px_30px_rgb(50_19_44/0.25)]" />
             </div>
           </section>
         ))}

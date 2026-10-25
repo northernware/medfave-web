@@ -132,7 +132,7 @@ function PaperTrail() {
         </div>
         <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {PAPER.map(([t, d], i) => (
-            <li key={t} className="landing-rise spot-card rounded-3xl bg-[#3e2139]/90 p-7 ring-1 ring-white/8 backdrop-blur-sm" style={{ animationRangeStart: `entry ${i * 6}%` }}>
+            <li key={t} className="landing-rise spot-card rounded-3xl bg-[#3e2139]/90 p-7 ring-1 ring-white/8" style={{ animationRangeStart: `entry ${i * 6}%` }}>
               <p className="text-lg font-semibold">{t}</p>
               <p className="mt-2 leading-7 text-[#c6b9c2]">{d}</p>
             </li>
